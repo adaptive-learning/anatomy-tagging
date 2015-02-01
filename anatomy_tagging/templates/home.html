@@ -1,0 +1,30 @@
+<html>
+<head>
+  <link href="/static/lib/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/main.css" rel="stylesheet">
+</head>
+<body>
+<div class="header">
+  <div class="col-sm-12">
+    <h1>Tagování obrázků pro Slepou Anatomii</h1>
+  </div>
+  <div class="clearfix"></div>
+  <br>
+</div>
+<div class="col-sm-12">
+  {% for image in images %}
+    <li>
+      <a href="image/{{image.filename_slug}}">
+        {{image.name_cs}} ({{image.filename }})
+      </a>
+        Počet částí (neozančených / celkem): 
+        <strong>
+        {{ image.get_untagged_paths_count }}
+        </strong>
+        / {{ image.get_paths_count }}
+    </li>
+  {% endfor %}
+</div>
+</body>
+</html>
+

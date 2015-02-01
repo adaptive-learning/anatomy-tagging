@@ -1,0 +1,15 @@
+*.py[co]
+*.sw[pon]
+*.bak
+*.orig
+*~
+.project
+.pydevproject
+sqlite3.db
+.sass-cache
+.settings
+*.log
+.django_cache
+.ropeproject
+node_modules
+
