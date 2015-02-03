@@ -1,30 +1,22 @@
-<html>
+<html ng-app="anatomy.tagging" ng-controller="anatomyMain">
 <head>
+  <script src="/static/lib/angular-1.2.9/angular.js"></script>
+  <script src="/static/lib/angular-1.2.9/angular-cookies.js"></script>
+  <script src="/static/lib/angular-1.2.9/angular-route.js"></script>
+  <script src="/static/lib/ui-bootstrap.min.js"></script>
+  <script src="/static/lib/ui-bootstrap-tpls.min.js"></script>
+  <script src="/static/lib/jquery-1.11.0.js"></script>
+  <script src="/static/lib/raphael.js"></script>
+  <script src="/static/lib/raphael.pan-zoom.js"></script>
+  <script src="/static/app.js"></script>
+  <script src="/static/js/controllers.js"></script>
+  <script src="/static/js/services.js"></script>
+  <script src="/static/bbox.js"></script>
   <link href="/static/lib/css/bootstrap.min.css" rel="stylesheet">
   <link href="/static/main.css" rel="stylesheet">
+  <base href="/"/>
 </head>
-<body>
-<div class="header">
-  <div class="col-sm-12">
-    <h1>Tagování obrázků pro Slepou Anatomii</h1>
-  </div>
-  <div class="clearfix"></div>
-  <br>
-</div>
-<div class="col-sm-12">
-  {% for image in images %}
-    <li>
-      <a href="image/{{image.filename_slug}}">
-        {{image.name_cs}} ({{image.filename }})
-      </a>
-        Počet částí (neozančených / celkem): 
-        <strong>
-        {{ image.get_untagged_paths_count }}
-        </strong>
-        / {{ image.get_paths_count }}
-    </li>
-  {% endfor %}
-</div>
+<body ng-view>
 </body>
 </html>
 

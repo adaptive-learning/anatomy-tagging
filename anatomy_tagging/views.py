@@ -13,6 +13,14 @@ def home(request):
     return render_to_response('home.html', c)
 
 
+def images_json(request):
+    images = Image.objects.all()
+    json = {
+        'images': [i.to_serializable() for i in images],
+    }
+    return JsonResponse(json)
+
+
 def image(request, filename_slug):
     c = {
         'filename_slug': filename_slug,

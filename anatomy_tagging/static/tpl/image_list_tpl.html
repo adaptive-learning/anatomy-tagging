@@ -1,0 +1,27 @@
+<div class="header">
+  <div class="col-sm-12">
+    <h1>Tagování obrázků pro Slepou Anatomii</h1>
+  </div>
+  <div class="clearfix"></div>
+  <br>
+</div>
+<div class="table table-striped col-sm-12">
+  <div class="row" ng-repeat="image in images">
+      <a class="col-sm-6" href="image/{{image.filename_slug}}">
+        {{image.filename }}
+      </a>
+      <span class="col-sm-6">
+        <div class="progress">
+          <div class="progress-bar progress-bar-success" role="progressbar"
+            style="width: {{image.progress}}%;">
+            <span ng-if="image.progress != 0">
+            {{image.untagged_paths_count}} /
+            {{image.paths_count}}
+            </span>
+          </div>
+        </div>
+      </span>
+      <div class="clearfix"></div>
+    </div>
+</div>
+

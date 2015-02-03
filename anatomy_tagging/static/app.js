@@ -1,146 +1,26 @@
-angular.module('anatomy.tagging', ['ui.bootstrap', 'ngCookies'])
+angular.module('anatomy.tagging', [
+  'anatomy.tagging.controllers',
+  'anatomy.tagging.services',
+  'ngCookies', 
+  'ngRoute',
+  'ui.bootstrap', 
+])
 
-.controller('anatomyMain', function($scope, imageService, termsService) {
-  $scope.pathsByColor = {};
-  $scope.loading = true;
-  $scope.alerts = [];
-
-  termsService.get().success(function(data) {
-    $scope.terms = data;
+.config(['$routeProvider', '$locationProvider',
+    function($routeProvider, $locationProvider) {
+  $routeProvider.when('/', {
+    controller : 'ImageListController',
+    templateUrl : 'static/tpl/image_list_tpl.html'
+  }).when('/image/:image', {
+    controller : 'ImageController',
+    templateUrl : 'static/tpl/image_tpl.html'
+  }).otherwise({
+    //redirectTo : '/'
   });
 
-  imageService.get().success(function(data){
-    $scope.image = data.image;
-    $scope.paths = data.paths;
-    for (var i = 0; i < data.paths.length; i++) {
-      var p = data.paths[i];
-      var c = p.color;
-      if (c[1] == c[3] && c[3] == c[5] && (!p.term || p.term.code === 'no-practice')) {
-        c = 'gray';
-        if (!p.term) {
-          $scope.setNoPractice(p);
-        }
-      }
-      if (!$scope.pathsByColor[c]) {
-        $scope.pathsByColor[c] = {
-          paths : [],
-          term : '',
-        };
-      }
-      //$scope.pathsByColor[c].containsActive ;
-      $scope.pathsByColor[c].paths.push(p);
-      if ($scope.pathsByColor[c].term && $scope.pathsByColor[c].term.code && 
-          (!p.term || $scope.pathsByColor[c].term.code != p.term.code)) {
-        $scope.pathsByColor[c].showDetails = true;
-        $scope.pathsByColor[c].term = null;
-        $scope.pathsByColor[c].disabled = false;
-      }
-      if ($scope.pathsByColor[c].term !== null) {
-        $scope.pathsByColor[c].term = p.term;
-        if ($scope.pathsByColor[c].term && 
-          $scope.pathsByColor[c].term.code === 'no-practice') {
-        $scope.pathsByColor[c].disabled = true;
-        }
-      }
-      if (p.term && p.term.code === "no-practice") {
-        p.disabled = true;
-      }
-      $scope.loading = false;
-    }
-  });
+  $locationProvider.html5Mode(true);
 
-  $scope.setNoPractice = function(path) {
-      if (path.term && path.term.code && path.term.code === 'no-practice') {
-        path.term = null;
-        path.disabled = false;
-      } else {
-        path.term = {
-          code : 'no-practice',
-          name_la : 'Vyřazeno z procvičování'
-        };
-        path.disabled = true;
-      }
-      if (path.paths) {
-        $scope.termUpdated(path);
-      }
-  };
-
-  $scope.showDetails = function(byColor) {
-    byColor.showDetails = !byColor.showDetails;
-  };
-
-  $scope.focus = function(byColor) {
-    imageService.focus(byColor);
-  };
-
-  $scope.termUpdated = function(byColor) {
-    for (var i = 0; i < byColor.paths.length; i++) {
-      byColor.paths[i].term = byColor.term;
-      byColor.paths[i].disabled = byColor.term && byColor.term.code === 'no-practice';
-    }
-  };
-
-  $scope.notTooSmall= function(path) {
-    return !path.isTooSmall;
-  };
-
-  $scope.save= function() {
-    $scope.saving = true;
-    imageService.save($scope.image, $scope.paths)
-    .success(function(data) {
-      $scope.alerts.push(data);
-      $scope.saving = false;
-    })
-    .error(function(data) {
-      $scope.alerts.push(data);
-    });
-  };
-
-  $scope.closeAlert = function(index) {
-    $scope.alerts.splice(index, 1);
-  };
-
-})
-
-.service('termsService', function($http) {
-  return {
-    get : function() {
-      var url = '/terms';
-      var promise = $http.get(url);
-      return promise;
-    }
-  };
-})
-
-.service('imageService', function($http, $location ,$cookies) {
-  var focusListeners = [];
-  var promise;
-  return {
-    get : function() {
-      var urlParts = $location.absUrl().split('/');
-      var url = '/imagejson/' + urlParts[urlParts.length - 1];
-      promise = promise || $http.get(url);
-      return promise;
-    },
-    bindFocus : function(callback) {
-      focusListeners.push(callback);
-    },
-    focus : function(path) {
-      for (var i = 0; i < focusListeners.length; i++) {
-        focusListeners[i](path);
-      }
-    },
-    save : function(image, paths) {
-      var url = "/image/update";
-      var data = {
-        image: image,
-        paths: paths,
-      };
-      $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
-      return $http.post(url, data);
-    }
-  };
-})
+}])
 
 .directive('image', function(imageService, $window) {
   var paths = [];
@@ -164,7 +44,7 @@ angular.module('anatomy.tagging', ['ui.bootstrap', 'ngCookies'])
             paperBBox.width = data.image.width;
             paperBBox.height = data.image.height;
             var paperWidth = $window.innerWidth * (7 /12);
-            var paperHeight = $window.innerHeight - 100;
+            var paperHeight = $window.innerHeight - 66;
             var r = Raphael(element[0], paperWidth, paperHeight);
             r.setViewBox(paperBBox.x, paperBBox.y, paperBBox.width, paperBBox.height, false);
 
@@ -174,8 +54,8 @@ angular.module('anatomy.tagging', ['ui.bootstrap', 'ngCookies'])
               path.attr({
                 'fill' : p.color,
                 'opacity' : p.opacity,
-                'stroke-width' : 0,
-                'stroke' : 'red',
+                'stroke-width' : p.stroke_width,
+                'stroke' : p.stroke,
                 'cursor' : 'pointer',
 
               });
@@ -251,7 +131,9 @@ angular.module('anatomy.tagging', ['ui.bootstrap', 'ngCookies'])
 
             function clearFocused() {
               for (var i = 0; i < focused.length; i++) {
-                focused[i].attr('stroke-width', 0);
+                var p = pathsObj[focused[i].data('id')];
+                focused[i].attr('stroke-width', p.stroke_width);
+                focused[i].attr('stroke', p.stroke);
               }
               focused = [];
             }
@@ -265,6 +147,7 @@ angular.module('anatomy.tagging', ['ui.bootstrap', 'ngCookies'])
               animateFocusRect(bbox);
               focused.push(rPath);
               rPath.attr('stroke-width', 3);
+              rPath.attr('stroke', 'red');
               rPath.toFront();
               //console.log(bbox);
               return bbox;

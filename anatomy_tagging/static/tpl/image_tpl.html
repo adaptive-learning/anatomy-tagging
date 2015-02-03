@@ -1,0 +1,115 @@
+<div class="">
+  <div class="header">
+    <div class="form-group col-sm-6">
+    <h1>
+      <a href="/">
+        <i class="glyphicon glyphicon-home"></i>
+      </a>
+      {{image.filename}}
+    </h1>
+    </div>
+    <div class="form-group col-sm-3">
+      <input placeholder="Název obrázku česky" ng-model="image.name_cs"
+      class="form-control" autofocus>
+    </div>
+    <div class="form-group col-sm-3">
+      <input placeholder="Název obrázku anglicky" ng-model="image.name_en" class="form-control">
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="col-sm-12" ng-show="loading">
+    <br>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active"
+        style="width: 100%">
+        Načítání
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-7" ng-hide="loading">
+    <div class="image"></div>
+<div class="btn-group zoom-btn"
+  tooltip-placement="right"
+  tooltip="{{'Přiblížit obrázek můžete i kolečkem myši nebo dotykovým gestem.' }}"
+  show-after-x-answers="11"
+  ng-show="!loading && false">
+  <a class="btn btn-default" id="zoom-out">
+    <i class="glyphicon glyphicon-minus"></i></a>
+  <a class="btn btn-default" id="zoom-in">
+    <i class="glyphicon glyphicon-plus"></i></a> 
+</div>
+
+  </div>
+  <div class="col-sm-5 image-edit" ng-hide="loading">
+    <form class="">
+      <div ng-repeat="(color, byColor) in pathsByColor">
+        <div class="input-group"
+            ng-show="(byColor.paths | filter : notTooSmall).length">
+          <div class="input-group-addon">
+            <span class="color-indicator"
+              style="background-color: {{color}}" ></span>
+          </div>
+          <input ng-model="byColor.term" class="form-control"
+            typeahead="term as term.name_la for term in terms | filter:$viewValue | limitTo:8"
+            ng-focus="focus(byColor)"
+            ng-blur="termUpdated(byColor)"
+            ng-disabled="byColor.showDetails || byColor.disabled ||
+              (byColor.term && byColor.term.code == 'no-practice')">
+          <span class="input-group-addon clickable"
+            ng-click="showDetails(byColor)" 
+            title="Popsat jednotlivé části zvlášť">
+            <i ng-show="byColor.showDetails"
+              class="glyphicon glyphicon-collapse-up"></i>
+            <i ng-show="!byColor.showDetails"
+              class="glyphicon glyphicon-collapse-down"></i>
+            {{(byColor.paths | filter : notTooSmall).length}}
+          </span>
+          <span class="input-group-addon clickable"
+            ng-click="setNoPractice(byColor)" 
+            title="Vyřadit z procvičování">
+            <i ng-show="!byColor.disabled"
+              class="glyphicon glyphicon-remove"></i>
+            <i ng-show="byColor.disabled"
+              class="glyphicon glyphicon-share-alt"></i>
+          </span>
+        </div>
+        <div ng-show="byColor.showDetails" class="sub-parts">
+          <div ng-repeat="path in byColor.paths | filter : notTooSmall">
+            <div class="input-group">
+              <div class="input-group-addon">
+                <span class="color-indicator"
+                  style="background-color: {{path.color}};
+                    opacity: {{path.opacity}}"></span>
+              </div>
+              <input ng-model="path.term"
+                typeahead="term as term.name_la for term in terms | filter:$viewValue | limitTo:8"
+                ng-focus="focus(path)"
+                ng-disabled="path.disabled"
+                class="form-control">
+              <span class="input-group-addon clickable"
+                ng-click="setNoPractice(path)" 
+                title="Vyřadit z procvičování">
+                <i ng-show="!path.disabled"
+                  class="glyphicon glyphicon-remove"></i>
+                <i ng-show="path.disabled"
+                  class="glyphicon glyphicon-share-alt"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <alert ng-repeat="alert in alerts" type="{{alert.type}}"
+      close="closeAlert($index)">{{alert.msg}}</alert>
+      <br>
+      <div class="form-group">
+        <a ng-click="save()"
+          ng-disabled="saving"
+          class="btn btn-primary btn-lg">
+            {{saving ? 'Ukládání...' : 'Uložit' }}
+        </a>
+        <a href="/" class="btn btn-link pull-right btn-lg">Zpět na seznam obrázků</a>
+      </div>
+    </form>
+  </div>
+</div>

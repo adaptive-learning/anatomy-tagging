@@ -6,10 +6,14 @@
 .project
 .pydevproject
 sqlite3.db
+db.sqlite3
 .sass-cache
 .settings
 *.log
 .django_cache
 .ropeproject
 node_modules
+screenshots
+terms
+svg
 

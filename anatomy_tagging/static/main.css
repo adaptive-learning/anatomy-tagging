@@ -17,11 +17,15 @@
   padding-top: 10px;
 }
 
-.header h1 {
+.header h1,
+.header h1 a {
   margin: 0;
   color: white;
   font-size: 30px;
   font-family: Arista,Arial,sans-serif;
+}
+.header h1 a {
+  margin-right: 10px;
 }
 
 .clickable {
@@ -32,3 +36,20 @@
   margin-left: 10px;
 }
 
+.row > a,
+.row > span {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.row .progress {
+  margin: 0;
+}
+
+.row:nth-of-type(odd) {
+  background: #eee;
+}
+
+.row:hover {
+  background: #ddd;
+}

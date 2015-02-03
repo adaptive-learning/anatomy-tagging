@@ -18,7 +18,13 @@ class Image(models.Model):
     name_en = models.TextField(null=True, max_length=200)
 
     @property
-    def get_paths_count(self):
+    def progress(self):
+        paths_count = self.paths_count
+        untagged_paths_count = self.untagged_paths_count
+        return (100.0 * (paths_count - untagged_paths_count)) / paths_count
+
+    @property
+    def paths_count(self):
         return Path.objects.filter(
             image=self.id
         ).exclude(
@@ -28,7 +34,7 @@ class Image(models.Model):
         ).count()
 
     @property
-    def get_untagged_paths_count(self):
+    def untagged_paths_count(self):
         return Path.objects.filter(image=self.id, term=None).count()
 
     def __unicode__(self):
@@ -44,6 +50,9 @@ class Image(models.Model):
             'y': self.y,
             'width': self.width,
             'height': self.height,
+            'progress': self.progress,
+            'paths_count': self.paths_count,
+            'untagged_paths_count': self.untagged_paths_count,
         }
 
 
@@ -73,6 +82,8 @@ class Term(models.Model):
 class Path(models.Model):
     d = models.TextField()
     color = models.TextField(max_length=10)
+    stroke = models.TextField(max_length=10, null=True)
+    stroke_width = models.FloatField()
     opacity = models.FloatField()
     term = models.ForeignKey(Term, null=True)
     image = models.ForeignKey(Image)
@@ -81,6 +92,8 @@ class Path(models.Model):
         return {
             'id': self.id,
             'color': self.color,
+            'stroke': self.stroke,
+            'stroke_width': self.stroke_width,
             'opacity': self.opacity,
             'term': self.term.to_serializable() if not self.term is None else None,
             'd': self.d,

@@ -40,23 +40,36 @@ class Command(BaseCommand):
             width=int(svg.attributes['width'].value.replace('px', '').split('.')[0]),
         )
         image.save()
-        paths = map_dom.getElementsByTagName('path')
+        paths = map_dom.getElementsByTagName('path') + map_dom.getElementsByTagName('line')
         path_objects = []
         print 'updating image: ' + file_name + ' with %s elements' % len(paths)
         for path in paths:
-            if 'opacity' in path.attributes.keys():
-                opacity = path.attributes['opacity'].value
-            else:
-                opacity = 1
-            if 'fill' in path.attributes.keys():
-                fill = path.attributes['fill'].value
-            else:
-                fill = 1
-            path_object = Path(
-                image=image,
-                opacity=opacity,
-                color=fill,
-                d=path.attributes['d'].value,
-            )
+            path_object = self.path_elem_to_object(path.attributes, image)
             path_objects.append(path_object)
         Path.objects.bulk_create(path_objects)
+
+    def path_elem_to_object(self, attributes, image):
+        if 'd' in attributes.keys():
+            d = attributes['d'].value
+        else:
+            d = self.create_path_from_line(attributes)
+        path_object = Path(
+            image=image,
+            opacity=self.get_attr_value(attributes, 'opacity', 1),
+            color=self.get_attr_value(attributes, 'fill', 1),
+            stroke=self.get_attr_value(attributes, 'stroke', None),
+            stroke_width=self.get_attr_value(attributes, 'stroke-width', 0),
+            d=d,
+        )
+        return path_object
+
+    def get_attr_value(self, attributes, key, default):
+        if key in attributes.keys():
+            return attributes[key].value
+        else:
+            return default
+
+    def create_path_from_line(self, attributes):
+        path = "M" + attributes['x1'].value + ',' + attributes['y1'].value
+        path += "L" + attributes['x2'].value + ',' + attributes['y2'].value
+        return path
