@@ -16,3 +16,7 @@ python $DIR/manage.py migrate
 
 # static files
 python $DIR/manage.py collectstatic --noinput
+
+# anatomy data
+python $DIR/manage.py load_images 
+python $DIR/manage.py load_terms
