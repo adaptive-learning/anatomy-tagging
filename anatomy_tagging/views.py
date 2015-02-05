@@ -10,6 +10,7 @@ def home(request):
     c = {
         'images': Image.objects.all(),
     }
+    request.META["CSRF_COOKIE_USED"] = True
     return render_to_response('home.html', c)
 
 
