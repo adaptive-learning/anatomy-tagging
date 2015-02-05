@@ -12,8 +12,8 @@ class Image(models.Model):
     width = models.IntegerField()
     height = models.IntegerField()
     textbook_page = models.IntegerField(null=True)
-    filename = models.TextField(max_length=200)
-    filename_slug = models.SlugField(max_length=200, db_index=True)
+    filename = models.TextField(max_length=200, unique=True)
+    filename_slug = models.SlugField(max_length=200, db_index=True, unique=True)
     name_cs = models.TextField(null=True, max_length=200)
     name_en = models.TextField(null=True, max_length=200)
 
@@ -86,7 +86,7 @@ class Path(models.Model):
     stroke_width = models.FloatField()
     opacity = models.FloatField()
     term = models.ForeignKey(Term, null=True)
-    image = models.ForeignKey(Image)
+    image = models.ForeignKey(Image, db_index=True)
 
     def to_serializable(self):
         return {
