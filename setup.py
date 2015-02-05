@@ -13,7 +13,7 @@ setup(
     packages=[
     ],
     install_requires=[
-        'Django>=1.6,<1.7',
+        'Django>=1.7,<1.8',
     ],
     license='Gnu GPL v3',
 )
