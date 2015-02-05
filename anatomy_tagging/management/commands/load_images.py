@@ -27,7 +27,10 @@ class Command(BaseCommand):
             Path.objects.all().delete()
         for f in sorted(listdir(settings.BASE_DIR + self.IMAGES_DIR)):
             if f.endswith('.svg'):
-                self.upload_image(f)
+                try:
+                    Image.objects.get(filename=f)
+                except Image.DoesNotExist:
+                    self.upload_image(f)
 
     def upload_image(self, file_name):
         file_path = settings.BASE_DIR + self.IMAGES_DIR + file_name
