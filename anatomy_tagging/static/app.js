@@ -49,18 +49,6 @@ angular.module('anatomy.tagging', [
             };
             var r = Raphael(element[0]);
 
-            function onWidowResize(){
-              paper.width = $window.innerWidth * (7 /12);
-              paper.height = $window.innerHeight - 66;
-              r.setSize(paper.width, paper.height);
-              r.setViewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height, true);
-            }
-            onWidowResize();
-            angular.element($window).bind('resize', function() {
-              onWidowResize();
-            });
-
-
             function clickHandler(){
               var input = $(".sub-parts:visible #input-" + this.data('id'));
               if (input.length === 0) {
@@ -98,7 +86,19 @@ angular.module('anatomy.tagging', [
             data.image.y = viewBox.y;
             data.image.width = viewBox.width;
             data.image.height = viewBox.height;
-            r.setViewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height, true);
+
+            function onWidowResize(){
+              paper.width = $window.innerWidth * (7 /12);
+              paper.height = $window.innerHeight - 66;
+              r.setSize(paper.width, paper.height);
+              r.setViewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height, true);
+            }
+            onWidowResize();
+            angular.element($window).bind('resize', function() {
+              onWidowResize();
+            });
+
+
 
             var initMapZoom = function(paper, options) {
               var panZoom = paper.panzoom(options);
