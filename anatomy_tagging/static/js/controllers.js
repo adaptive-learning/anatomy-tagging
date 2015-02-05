@@ -4,8 +4,15 @@ angular.module('anatomy.tagging.controllers', [])
 })
 
 .controller('ImageListController', function($scope, imageService) {
-  imageService.all().success(function(data) {
+  $scope.loading = true;
+
+  imageService.all(true).success(function(data) {
     $scope.images = data.images;
+    $scope.loading = false;
+
+    imageService.all().success(function(data) {
+      $scope.images = data.images;
+    });
   });
 })
 
@@ -24,7 +31,8 @@ angular.module('anatomy.tagging.controllers', [])
     for (var i = 0; i < data.paths.length; i++) {
       var p = data.paths[i];
       var c = p.color;
-      if (colorService.isGray(p.color) && (!p.term || p.term.code === 'no-practice')) {
+      if ((colorService.isGray(p.color) || p.color === 'none') && 
+          (!p.term || p.term.code === 'no-practice')) {
         c = 'gray';
         if (!p.term) {
           $scope.setNoPractice(p);
@@ -54,8 +62,9 @@ angular.module('anatomy.tagging.controllers', [])
         p.disabled = true;
       }
       //p.color = colorService.toGrayScale(p.color);
-      $scope.loading = false;
     }
+    $scope.loading = false;
+    imageService.save($scope.image, $scope.paths);
   });
 
   $scope.setNoPractice = function(path) {
@@ -76,15 +85,23 @@ angular.module('anatomy.tagging.controllers', [])
 
   $scope.showDetails = function(byColor) {
     byColor.showDetails = !byColor.showDetails;
+    $scope.updateFocused();
+  };
+
+  $scope.updateFocused = function() {
+    if ($scope.focused && $scope.focused.paths) {
+      $scope.termUpdated($scope.focused);
+    }
   };
 
   $scope.focus = function(byColor) {
+    $scope.updateFocused();
+    $scope.focused = byColor;
     imageService.focus(byColor);
   };
 
   $scope.termUpdated = function(byColor) {
     for (var i = 0; i < byColor.paths.length; i++) {
-      console.log( byColor.paths[i].term = byColor.term);
       byColor.paths[i].term = byColor.term;
       byColor.paths[i].disabled = byColor.term && byColor.term.code === 'no-practice';
     }
@@ -95,6 +112,7 @@ angular.module('anatomy.tagging.controllers', [])
   };
 
   $scope.save= function() {
+    $scope.updateFocused();
     $scope.saving = true;
     imageService.save($scope.image, $scope.paths)
     .success(function(data) {

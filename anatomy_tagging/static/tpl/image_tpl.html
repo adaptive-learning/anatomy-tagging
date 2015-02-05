@@ -45,35 +45,40 @@
       <div ng-repeat="(color, byColor) in pathsByColor">
         <div class="input-group"
             ng-show="(byColor.paths | filter : notTooSmall).length">
-          <div class="input-group-addon">
+          <span class="input-group-addon">
             <span class="color-indicator"
               style="background-color: {{color}}" ></span>
-          </div>
+          </span>
           <input ng-model="byColor.term" class="form-control"
+            id="input-{{color.substr(1)}}"
             typeahead="term as term.name_la for term in terms | filter:$viewValue | limitTo:8"
             ng-focus="focus(byColor)"
             ng-blur="termUpdated(byColor)"
             ng-disabled="byColor.showDetails || byColor.disabled ||
-              (byColor.term && byColor.term.code == 'no-practice')">
-          <span class="input-group-addon clickable"
-            ng-click="showDetails(byColor)" 
-            title="Popsat jednotlivé části zvlášť">
-            <i ng-show="byColor.showDetails"
-              class="glyphicon glyphicon-collapse-up"></i>
-            <i ng-show="!byColor.showDetails"
-              class="glyphicon glyphicon-collapse-down"></i>
-            {{(byColor.paths | filter : notTooSmall).length}}
-          </span>
-          <span class="input-group-addon clickable"
-            ng-click="setNoPractice(byColor)" 
-            title="Vyřadit z procvičování">
-            <i ng-show="!byColor.disabled"
-              class="glyphicon glyphicon-remove"></i>
-            <i ng-show="byColor.disabled"
-              class="glyphicon glyphicon-share-alt"></i>
+              (byColor.term && byColor.term.code == 'no-practice')"/>
+          <span class="input-group-btn">
+            <button class="btn btn-default"
+              ng-click="showDetails(byColor)" 
+              title="Popsat jednotlivé části zvlášť">
+              <i ng-show="byColor.showDetails"
+                class="glyphicon glyphicon-collapse-up"></i>
+              <i ng-show="!byColor.showDetails"
+                class="glyphicon glyphicon-collapse-down"></i>
+              {{(byColor.paths | filter : notTooSmall).length}}
+            </button>
+            <button class="btn btn-default"
+              ng-click="setNoPractice(byColor)" 
+              title="Vyřadit z procvičování">
+              &nbsp;
+              <i ng-show="!byColor.disabled"
+                class="glyphicon glyphicon-remove"></i>
+              <i ng-show="byColor.disabled"
+                class="glyphicon glyphicon-share-alt"></i>
+              &nbsp;
+            </button>
           </span>
         </div>
-        <div ng-show="byColor.showDetails" class="sub-parts">
+        <div ng-if="byColor.showDetails" class="sub-parts">
           <div ng-repeat="path in byColor.paths | filter : notTooSmall">
             <div class="input-group">
               <div class="input-group-addon">
@@ -82,17 +87,22 @@
                     opacity: {{path.opacity}}"></span>
               </div>
               <input ng-model="path.term"
+                id="input-{{path.id}}"
                 typeahead="term as term.name_la for term in terms | filter:$viewValue | limitTo:8"
                 ng-focus="focus(path)"
                 ng-disabled="path.disabled"
                 class="form-control">
-              <span class="input-group-addon clickable"
-                ng-click="setNoPractice(path)" 
-                title="Vyřadit z procvičování">
-                <i ng-show="!path.disabled"
-                  class="glyphicon glyphicon-remove"></i>
-                <i ng-show="path.disabled"
-                  class="glyphicon glyphicon-share-alt"></i>
+              <span class="input-group-btn">
+                <button class="btn btn-default"
+                  ng-click="setNoPractice(path)" 
+                  title="Vyřadit z procvičování">
+                  &nbsp;
+                  <i ng-show="!path.disabled"
+                    class="glyphicon glyphicon-remove"></i>
+                  <i ng-show="path.disabled"
+                    class="glyphicon glyphicon-share-alt"></i>
+                  &nbsp;
+                </button>
               </span>
             </div>
           </div>

@@ -27,11 +27,14 @@ angular.module('anatomy.tagging.services', [])
       return Math.max(Math.abs(rgb[0] - rgb[1]), Math.abs(rgb[0] - rgb[2])) < 10;
     },
     toGrayScale : function(c) {
+      if (that.isGray(c)) {
+        return c;
+      }
       var rgb = that.hexToRgb(c);
       var weights =  [0.299, 0.587, 0.114];
       var graySum = 0;
       for (var i = 0; i < rgb.length; i++) {
-        graySum += 2.7 * rgb[i] * weights[i];
+        graySum += 3.7 * rgb[i] * weights[i];
       }
       var grayAverageHex = Math.round(graySum / 3).toString(16);
       return '#' + grayAverageHex + grayAverageHex + grayAverageHex;
@@ -44,9 +47,13 @@ angular.module('anatomy.tagging.services', [])
   var focusListeners = [];
   var promises = {};
   return {
-    all : function() {
+    all : function(cached) {
       var url = '/imagejson/';
+      if (cached && promises[url]){
+        return promises[url];
+      }
       var promise = $http.get(url);
+      promises[url] = promise;
       return promise;
     },
     get : function() {

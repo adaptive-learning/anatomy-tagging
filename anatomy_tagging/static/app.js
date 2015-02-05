@@ -27,7 +27,7 @@ angular.module('anatomy.tagging', [
   var pathsObj = {};
   var rPathsObj = {};
   var focusRect;
-  var paperBBox = {
+  var viewBox = {
     x : 0,
     y : 0,
   };
@@ -39,14 +39,35 @@ angular.module('anatomy.tagging', [
       },
       link: function(scope, element, attrs) {
           imageService.get(attrs.url).success(function(data){
-            paperBBox.x = data.image.x;
-            paperBBox.y = data.image.y;
-            paperBBox.width = data.image.width;
-            paperBBox.height = data.image.height;
-            var paperWidth = $window.innerWidth * (7 /12);
-            var paperHeight = $window.innerHeight - 66;
-            var r = Raphael(element[0], paperWidth, paperHeight);
-            r.setViewBox(paperBBox.x, paperBBox.y, paperBBox.width, paperBBox.height, false);
+            viewBox.x = data.image.x;
+            viewBox.y = data.image.y;
+            viewBox.width = data.image.width;
+            viewBox.height = data.image.height;
+            var paper = {
+              x : 0,
+              y : 0,
+            };
+            var r = Raphael(element[0]);
+
+            function onWidowResize(){
+              paper.width = $window.innerWidth * (7 /12);
+              paper.height = $window.innerHeight - 66;
+              r.setSize(paper.width, paper.height);
+              r.setViewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height, true);
+            }
+            onWidowResize();
+            angular.element($window).bind('resize', function() {
+              onWidowResize();
+            });
+
+
+            function clickHandler(){
+              var input = $(".sub-parts:visible #input-" + this.data('id'));
+              if (input.length === 0) {
+                input = $("#input-" + this.attr('fill').substr(1));
+              }
+              input.focus();
+            }
 
             for (var i = 0; i < data.paths.length; i++) {
               var p = data.paths[i];
@@ -56,14 +77,10 @@ angular.module('anatomy.tagging', [
                 'opacity' : p.opacity,
                 'stroke-width' : p.stroke_width,
                 'stroke' : p.stroke,
-                'cursor' : 'pointer',
-
+                'cursor' : p.disabled ? 'default' : 'pointer',
               });
               path.data('id', p.id);
-              path.click(function(){
-                //console.log(this.data('id'));
-                var p = pathsObj[this.data('id')];
-              });
+              path.click(clickHandler);
               var bbox = path.getBBox();
               if (bbox.width < 5 || bbox.height < 5) {
                 p.isTooSmall = true;
@@ -76,12 +93,12 @@ angular.module('anatomy.tagging', [
               pathsObj[p.id] = p;
             }
 
-            paperBBox = getBBox(paths.map(function(p) {return p.getBBox();}));
-            data.image.x = paperBBox.x;
-            data.image.y = paperBBox.y;
-            data.image.width = paperBBox.width;
-            data.image.height = paperBBox.height;
-            r.setViewBox(paperBBox.x, paperBBox.y, paperBBox.width, paperBBox.height, true);
+            viewBox = getBBox(paths.map(function(p) {return p.getBBox();}));
+            data.image.x = viewBox.x;
+            data.image.y = viewBox.y;
+            data.image.width = viewBox.width;
+            data.image.height = viewBox.height;
+            r.setViewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height, true);
 
             var initMapZoom = function(paper, options) {
               var panZoom = paper.panzoom(options);
@@ -100,8 +117,8 @@ angular.module('anatomy.tagging', [
             };
             var panZoomOptions = {
              initialPosition : {
-               x : paperBBox.x,
-               y : paperBBox.y,
+               x : viewBox.x,
+               y : viewBox.y,
              }
             };
             //initMapZoom(r, panZoomOptions);
@@ -154,13 +171,14 @@ angular.module('anatomy.tagging', [
             }
 
             function animateFocusRect(bbox) {
-              focusRect.attr(paperBBox);
+              focusRect.attr(paper);
               focusRect.animate(enlargeABit(bbox), 200, '>');
               focusRect.toFront();
             }
 
-            function enlargeABit(bbox) {
-              var bit = 2;
+            function enlargeABit(oldBBox) {
+              var bbox = angular.copy(oldBBox);
+              var bit = 4;
               bbox.x -= bit;
               bbox.y -= bit;
               bbox.width += 2 * bit;
