@@ -131,8 +131,6 @@ class Term(models.Model):
     def to_serializable(self):
         return {
             'code': self.code,
-            'name_cs': self.name_cs,
-            'name_en': self.name_en,
             'name_la': self.name_la,
         }
 

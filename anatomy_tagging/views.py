@@ -84,7 +84,7 @@ def image_json(request, filename_slug):
 
 
 def terms(request):
-    terms = Term.objects.all()
+    terms = Term.objects.exclude(slug__in=['too-small', 'no-practice'])
     json = [t.to_serializable() for t in terms]
     return JsonResponse(json)
 
