@@ -25,7 +25,7 @@ class Command(BaseCommand):
         if options['delete']:
             Image.objects.all().delete()
             Path.objects.all().delete()
-        for f in sorted(listdir(settings.BASE_DIR + self.IMAGES_DIR)):
+        for f in sorted(listdir(settings.MEDIA_DIR + self.IMAGES_DIR)):
             if f.endswith('.svg'):
                 try:
                     Image.objects.get(filename=f)
@@ -33,14 +33,11 @@ class Command(BaseCommand):
                     self.upload_image(f)
 
     def upload_image(self, file_name):
-        file_path = settings.BASE_DIR + self.IMAGES_DIR + file_name
+        file_path = settings.MEDIA_DIR + self.IMAGES_DIR + file_name
         map_dom = minidom.parse(file_path)
-        svg = map_dom.getElementsByTagName('svg')[0]
         image = Image(
             filename=file_name,
             filename_slug=slugify(file_name),
-            height=int(svg.attributes['height'].value.replace('px', '').split('.')[0]),
-            width=int(svg.attributes['width'].value.replace('px', '').split('.')[0]),
         )
         image.save()
         paths = map_dom.getElementsByTagName('path') + map_dom.getElementsByTagName('line')

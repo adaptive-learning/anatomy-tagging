@@ -120,7 +120,11 @@ angular.module('anatomy.tagging.controllers', [])
       $scope.saving = false;
     })
     .error(function(data) {
-      $scope.alerts.push(data);
+      $scope.alerts.push({
+        type : 'danger',
+        msg : 'Na serveru nastala chyba',
+      });
+      $scope.saving = false;
     });
   };
 
@@ -128,5 +132,5 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.alerts.splice(index, 1);
   };
 
-})
+});
 

@@ -26,14 +26,14 @@ class Command(BaseCommand):
         if options['delete']:
             Term.objects.all().delete()
         self.slugs = []
-        for f in sorted(listdir(settings.BASE_DIR + self.TERMS_DIR)):
+        for f in sorted(listdir(settings.MEDIA_DIR + self.TERMS_DIR)):
             if f.endswith('.csv'):
                 self.upload_terms(f)
 
     def upload_terms(self, file_name):
         terms = []
         self.create_special_terms()
-        with open(settings.BASE_DIR + self.TERMS_DIR + file_name, 'rb') as csvfile:
+        with open(settings.MEDIA_DIR + self.TERMS_DIR + file_name, 'rb') as csvfile:
             terms_reader = csv.reader(csvfile, delimiter='\t')
             next(terms_reader, None)  # skip the headers
             for row in terms_reader:

@@ -19,8 +19,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$7#bbg892g5)vpf$&va3b)m%w(x063awse+q+covv2c8i=)cpc'
 
+ON_SERVER = os.getenv('ON_AL', "False") == "True"
+DEBUG = os.getenv('DJANGO_DEBUG', "False") == "True"
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if not ON_SERVER:
+    DEBUG = True
 
 TEMPLATE_DEBUG = True
 
@@ -61,6 +65,11 @@ ROOT_URLCONF = 'anatomy_tagging.urls'
 
 WSGI_APPLICATION = 'anatomy_tagging.wsgi.application'
 
+if ON_SERVER:
+    MEDIA_DIR = os.path.join(BASE_DIR, '..', 'media')
+else:
+    MEDIA_DIR = BASE_DIR
+
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -68,7 +77,7 @@ WSGI_APPLICATION = 'anatomy_tagging.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(MEDIA_DIR, 'db.sqlite3'),
     }
 }
 
@@ -96,3 +105,9 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
+
+
+try:
+    from githash import HASH
+except (SyntaxError, ImportError) as e:
+    HASH = ''

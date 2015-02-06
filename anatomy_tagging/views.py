@@ -1,14 +1,31 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
-from models import Term, Path, Image
+from models import Term, Path, Image, Bbox
 from django.http import HttpResponse
 import json as simplejson
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 
 
 def home(request):
+    js_files = [
+        "/static/lib/jquery-1.11.0.js",
+        "/static/lib/angular-1.2.9/angular.js",
+        "/static/lib/angular-1.2.9/angular-cookies.js",
+        "/static/lib/angular-1.2.9/angular-route.js",
+        "/static/lib/ui-bootstrap.min.js",
+        "/static/lib/ui-bootstrap-tpls.min.js",
+        "/static/lib/raphael.js",
+        "/static/lib/raphael.pan-zoom.js",
+        "/static/js/app.js",
+        "/static/js/controllers.js",
+        "/static/js/directives.js",
+        "/static/js/services.js",
+        "/static/js/bbox.js",
+    ]
     c = {
         'images': Image.objects.all(),
+        'js_files': [f + '?hash=' + settings.HASH for f in js_files]
     }
     request.META["CSRF_COOKIE_USED"] = True
     return render_to_response('home.html', c)
@@ -36,18 +53,12 @@ def image_update(request):
         image = get_object_or_404(Image, filename_slug=data['image']['filename_slug'])
         image.name_cs = data['image']['name_cs']
         image.name_en = data['image']['name_en']
-        image.x = int(data['image']['x'])
-        image.x = int(data['image']['x'])
-        image.width = int(data['image']['width'])
-        image.height = int(data['image']['height'])
+        Bbox.objects.add_to_image(image, data['image']['bbox'])
         image.save()
         for path_dict in data['paths']:
-            term = None
             path = Path.objects.get(id=path_dict['id'])
-            if ('term' in path_dict and
-                    path_dict['term'] is not None and
-                    'code' in path_dict['term']):
-                term = Term.objects.get(code=path_dict['term']['code'])
+            Bbox.objects.add_to_path(path, path_dict['bbox'])
+            term = Term.objects.get_term_from_dict(path_dict)
             if term is not None:
                 if path.term_id != term.id:
                     path.term = term

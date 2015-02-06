@@ -1,26 +1,4 @@
-angular.module('anatomy.tagging', [
-  'anatomy.tagging.controllers',
-  'anatomy.tagging.services',
-  'ngCookies', 
-  'ngRoute',
-  'ui.bootstrap', 
-])
-
-.config(['$routeProvider', '$locationProvider',
-    function($routeProvider, $locationProvider) {
-  $routeProvider.when('/', {
-    controller : 'ImageListController',
-    templateUrl : 'static/tpl/image_list_tpl.html'
-  }).when('/image/:image', {
-    controller : 'ImageController',
-    templateUrl : 'static/tpl/image_tpl.html'
-  }).otherwise({
-    //redirectTo : '/'
-  });
-
-  $locationProvider.html5Mode(true);
-
-}])
+angular.module('anatomy.tagging.directives', [])
 
 .directive('image', function(imageService, $window) {
   var paths = [];
@@ -39,10 +17,7 @@ angular.module('anatomy.tagging', [
       },
       link: function(scope, element, attrs) {
           imageService.get(attrs.url).success(function(data){
-            viewBox.x = data.image.x;
-            viewBox.y = data.image.y;
-            viewBox.width = data.image.width;
-            viewBox.height = data.image.height;
+            viewBox = data.image.bbox;
             var paper = {
               x : 0,
               y : 0,
@@ -69,8 +44,8 @@ angular.module('anatomy.tagging', [
               });
               path.data('id', p.id);
               path.click(clickHandler);
-              var bbox = path.getBBox();
-              if (bbox.width < 5 || bbox.height < 5) {
+              p.bbox = p.bbox || path.getBBox();
+              if (p.bbox.width < 5 || p.bbox.height < 5) {
                 p.isTooSmall = true;
                 p.term = {
                   code : 'too-small',
@@ -81,11 +56,8 @@ angular.module('anatomy.tagging', [
               pathsObj[p.id] = p;
             }
 
-            viewBox = getBBox(paths.map(function(p) {return p.getBBox();}));
-            data.image.x = viewBox.x;
-            data.image.y = viewBox.y;
-            data.image.width = viewBox.width;
-            data.image.height = viewBox.height;
+            viewBox = getBBox(data.paths.map(function(p) {return p.bbox;}));
+            data.image.bbox = viewBox;
 
             function onWidowResize(){
               paper.width = $window.innerWidth * (7 /12);
@@ -160,14 +132,13 @@ angular.module('anatomy.tagging', [
                 return;
               }
               var rPath = rPathsObj[path.id];
-              var bbox = (rPath.getBBox());
-              animateFocusRect(bbox);
+              animateFocusRect(path.bbox);
               focused.push(rPath);
               rPath.attr('stroke-width', 3);
               rPath.attr('stroke', 'red');
               rPath.toFront();
               //console.log(bbox);
-              return bbox;
+              return path.bbox;
             }
 
             function animateFocusRect(bbox) {

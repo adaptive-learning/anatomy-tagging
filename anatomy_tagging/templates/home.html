@@ -1,19 +1,15 @@
 <html ng-app="anatomy.tagging" ng-controller="anatomyMain">
 <head>
-  <script src="/static/lib/jquery-1.11.0.js"></script>
-  <script src="/static/lib/angular-1.2.9/angular.js"></script>
-  <script src="/static/lib/angular-1.2.9/angular-cookies.js"></script>
-  <script src="/static/lib/angular-1.2.9/angular-route.js"></script>
-  <script src="/static/lib/ui-bootstrap.min.js"></script>
-  <script src="/static/lib/ui-bootstrap-tpls.min.js"></script>
-  <script src="/static/lib/raphael.js"></script>
-  <script src="/static/lib/raphael.pan-zoom.js"></script>
-  <script src="/static/app.js"></script>
-  <script src="/static/js/controllers.js"></script>
-  <script src="/static/js/services.js"></script>
-  <script src="/static/bbox.js"></script>
+  <title> Anatom - tagování obrázků</title>
+
+  {% for file in js_files %}
+    <script src="{{ file }}"></script>
+  {% endfor %}
+
+
   <link href="/static/lib/css/bootstrap.min.css" rel="stylesheet">
   <link href="/static/main.css" rel="stylesheet">
+
   <base href="/"/>
   {% csrf_token %}
 </head>
