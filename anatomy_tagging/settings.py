@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for anatomy_tagging project.
 
@@ -12,19 +13,43 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+ADMINS = (
+    ('Vít Stanislav', 'slaweet@gmail.com'),
+)
+MANAGERS = ADMINS
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
+SEND_BROKEN_LINK_EMAILS = True
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$7#bbg892g5)vpf$&va3b)m%w(x063awse+q+covv2c8i=)cpc'
 
-ON_SERVER = os.getenv('ON_AL', "False") == "True"
-DEBUG = os.getenv('DJANGO_DEBUG', "False") == "True"
+ON_PRODUCTION = False
+ON_STAGING = False
 
-# SECURITY WARNING: don't run with debug turned on in production!
-if not ON_SERVER:
+if 'PROSO_ON_PRODUCTION' in os.environ:
+    ON_PRODUCTION = True
+if 'PROSO_ON_STAGING' in os.environ:
+    ON_STAGING = True
+    DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
+if ON_PRODUCTION:
+    DEBUG = False
+else:
     DEBUG = True
+
+ON_SERVER = ON_PRODUCTION or ON_STAGING
+
+# Make a dictionary of default keys
+default_keys = {
+    'SECRET_KEY': '$7#bbg892g5)vpf$&va3b)m%w(x063awse+q+covv2c8i=)cpc'
+}
+
+# Replace default keys with dynamic values if we are on server
+use_keys = default_keys
+if ON_SERVER:
+    default_keys['SECRET_KEY'] = os.environ['PROSO_SECRET_KEY']
+
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = use_keys['SECRET_KEY']
+
 
 TEMPLATE_DEBUG = True
 
@@ -37,6 +62,7 @@ TEMPLATE_DIRS = (
 
 ALLOWED_HOSTS = [
     'altest.thran.cz',
+    'znackuj.anatom.cz',
 ]
 
 
