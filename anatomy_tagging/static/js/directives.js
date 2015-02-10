@@ -10,6 +10,7 @@ angular.module('anatomy.tagging.directives', [])
     y : 0,
   };
   var focused = [];
+  var glows = [];
   return {
       restrict: 'C',
       scope: {
@@ -97,7 +98,7 @@ angular.module('anatomy.tagging.directives', [])
 
             focusRect = r.rect(-100,10, 10, 10);
             focusRect.attr({
-                'stroke-width' : 5,
+                'stroke-width' : 3,
                 'stroke' : 'red',
             });
 
@@ -119,7 +120,11 @@ angular.module('anatomy.tagging.directives', [])
             });
 
             function clearFocused() {
-              for (var i = 0; i < focused.length; i++) {
+              for (var i = 0; i < glows.length; i++) {
+                glows[i].remove();
+              }
+              glows = [];
+              for (i = 0; i < focused.length; i++) {
                 var p = pathsObj[focused[i].data('id')];
                 focused[i].attr('stroke-width', p.stroke_width);
                 focused[i].attr('stroke', p.stroke);
@@ -134,17 +139,27 @@ angular.module('anatomy.tagging.directives', [])
               var rPath = rPathsObj[path.id];
               animateFocusRect(path.bbox);
               focused.push(rPath);
-              rPath.attr('stroke-width', 3);
-              rPath.attr('stroke', 'red');
-              rPath.toFront();
+              var focusAttr = {
+                'stroke-width' : '3',
+                'stroke' : 'red',
+              };
+              //rPath.animate(focusAttr, 500, '>');
+              var glow = rPath.glow({
+                'color': 'red',
+                'opacity': 1,
+                'width': 5,
+              });
+              glow.toFront();
+              glows.push(glow);
+              //rPath.toFront();
               //console.log(bbox);
               return path.bbox;
             }
 
             function animateFocusRect(bbox) {
               focusRect.attr(paper);
-              focusRect.animate(enlargeABit(bbox), 200, '>');
-              focusRect.toFront();
+              focusRect.animate(enlargeABit(bbox), 500, '>');
+              //focusRect.toFront();
             }
 
             function enlargeABit(oldBBox) {
