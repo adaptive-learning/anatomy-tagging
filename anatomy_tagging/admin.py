@@ -3,6 +3,7 @@ from django.contrib import admin
 
 
 class ImageAdmin(admin.ModelAdmin):
+    search_fields = ('name_cs', 'name_en')
     list_display = ('filename', 'name_cs', 'textbook_page')
 
 
@@ -11,7 +12,8 @@ class PathAdmin(admin.ModelAdmin):
 
 
 class TermAdmin(admin.ModelAdmin):
-    list_display = ('slug', 'name_cs', 'name_en')
+    search_fields = ('name_la', 'name_cs', 'name_en')
+    list_display = ('name_la', 'name_cs', 'name_en')
 
 
 class BboxAdmin(admin.ModelAdmin):

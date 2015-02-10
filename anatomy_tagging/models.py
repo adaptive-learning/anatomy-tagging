@@ -100,7 +100,7 @@ class TermManager(models.Manager):
                 path_dict['term'] is not None):
             if 'name_la' in path_dict['term']:
                 term = self.get(name_la=path_dict['term']['name_la'])
-            elif isinstance(path_dict['term'], basestring):
+            elif isinstance(path_dict['term'], basestring) and path_dict['term']:
                 try:
                     term = self.get(name_la=path_dict['term'])
                 except Term.DoesNotExist:
