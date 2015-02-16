@@ -48,14 +48,18 @@ angular.module('anatomy.tagging.controllers', [])
       if ($scope.pathsByColor[c].term && $scope.pathsByColor[c].term.code && 
           (!p.term || $scope.pathsByColor[c].term.code != p.term.code)) {
         $scope.pathsByColor[c].showDetails = true;
-        $scope.pathsByColor[c].term = null;
+        $scope.pathsByColor[c].term = {
+          code : 'split',
+          name_la : 'Rozděleno na podčásti',
+        };
         $scope.pathsByColor[c].disabled = false;
       }
-      if ($scope.pathsByColor[c].term !== null) {
+      if (!$scope.pathsByColor[c].term || 
+          $scope.pathsByColor[c].term.code !== 'split') {
         $scope.pathsByColor[c].term = p.term;
         if ($scope.pathsByColor[c].term && 
-          $scope.pathsByColor[c].term.code === 'no-practice') {
-        $scope.pathsByColor[c].disabled = true;
+            $scope.pathsByColor[c].term.code === 'no-practice') {
+          $scope.pathsByColor[c].disabled = true;
         }
       }
       if (p.term && p.term.code === "no-practice") {
@@ -85,6 +89,12 @@ angular.module('anatomy.tagging.controllers', [])
 
   $scope.showDetails = function(byColor) {
     byColor.showDetails = !byColor.showDetails;
+    if (byColor.showDetails) {
+      byColor.term = {
+        code : 'split',
+        name_la : 'Rozděleno na podčásti',
+      };
+    }
     $scope.updateFocused();
   };
 
@@ -101,6 +111,9 @@ angular.module('anatomy.tagging.controllers', [])
   };
 
   $scope.termUpdated = function(byColor) {
+    if (byColor.term && byColor.term.code === 'split') {
+      return;
+    }
     for (var i = 0; i < byColor.paths.length; i++) {
       byColor.paths[i].term = byColor.term;
       byColor.paths[i].disabled = byColor.term && byColor.term.code === 'no-practice';
