@@ -1,6 +1,6 @@
 angular.module('anatomy.tagging.directives', [])
 
-.directive('image', function(imageService, $window) {
+.directive('image', function(imageService, $window, Slug) {
   var paths = [];
   var pathsObj = {};
   var rPathsObj = {};
@@ -26,9 +26,14 @@ angular.module('anatomy.tagging.directives', [])
             var r = Raphael(element[0]);
 
             function clickHandler(){
-              var input = $(".sub-parts:visible #input-" + this.data('id'));
+              var input = $(".tab-pane.active .sub-parts:visible #input-" + this.data('id'));
               if (input.length === 0) {
-                input = $("#input-" + this.attr('fill').substr(1));
+                input = $(".tab-pane.active #input-" + this.attr('fill').substr(1));
+              }
+              var pathObj = pathsObj[this.data('id')];
+              var termSlug = Slug.slugify(pathObj.term && pathObj.term.name_la);
+              if (input.length === 0) {
+                input = $(".tab-pane.active #input-" + termSlug);
               }
               input.focus();
             }

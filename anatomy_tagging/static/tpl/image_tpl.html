@@ -42,44 +42,45 @@
   </div>
   <div class="col-sm-5 image-edit" ng-hide="loading">
     <form class="">
-      <div ng-repeat="(color, byColor) in pathsByColor">
-        <div class="input-group"
-            ng-show="(byColor.paths | filter : notTooSmall).length">
-          <span class="input-group-addon">
+   <tabset justified="true">
+    <tab heading="{{pathsBy.heading}}" ng-repeat="pathsBy in pathsBys">
+      <div ng-repeat="(key, pathsByObj) in pathsBy.obj" class="term-edit">
+        <div class="input-group top-term"
+            ng-show="(pathsByObj.paths | filter : notTooSmall).length">
+          <span class="input-group-addon {{ pathsByObj.showDetails && 'open'}}">
             <span class="color-indicator"
-              style="background-color: {{color}}" ></span>
+              style="background-color: {{pathsByObj.color}}" ></span>
           </span>
-          <input ng-model="byColor.term" class="form-control"
-            id="input-{{color.substr(1)}}"
+          <input ng-model="pathsByObj.term" class="form-control"
+            id="input-{{key | slugify}}"
             typeahead="term as term.name_la for term in terms | filter:$viewValue | limitTo:8"
-            ng-focus="focus(byColor)"
-            ng-blur="termUpdated(byColor)"
-            ng-disabled="byColor.showDetails || byColor.disabled ||
-              (byColor.term && byColor.term.code == 'no-practice')"/>
+            ng-focus="focus(pathsByObj)"
+            ng-disabled="pathsByObj.showDetails || pathsByObj.disabled ||
+              (pathsByObj.term && pathsByObj.term.code == 'no-practice')"/>
           <span class="input-group-btn">
             <button class="btn btn-default"
-              ng-click="showDetails(byColor)" 
+              ng-click="showDetails(pathsByObj)" 
               title="Popsat jednotlivé části zvlášť">
-              <i ng-show="byColor.showDetails"
+              <i ng-show="pathsByObj.showDetails"
                 class="glyphicon glyphicon-collapse-up"></i>
-              <i ng-show="!byColor.showDetails"
+              <i ng-show="!pathsByObj.showDetails"
                 class="glyphicon glyphicon-collapse-down"></i>
-              {{(byColor.paths | filter : notTooSmall).length}}
+              {{(pathsByObj.paths | filter : notTooSmall).length}}
             </button>
             <button class="btn btn-default"
-              ng-click="setNoPractice(byColor)" 
+              ng-click="setNoPractice(pathsByObj)" 
               title="Vyřadit z procvičování">
               &nbsp;
-              <i ng-show="!byColor.disabled"
+              <i ng-show="!pathsByObj.disabled"
                 class="glyphicon glyphicon-remove"></i>
-              <i ng-show="byColor.disabled"
+              <i ng-show="pathsByObj.disabled"
                 class="glyphicon glyphicon-share-alt"></i>
               &nbsp;
             </button>
           </span>
         </div>
-        <div ng-if="byColor.showDetails" class="sub-parts">
-          <div ng-repeat="path in byColor.paths | filter : notTooSmall">
+        <div ng-if="pathsByObj.showDetails" class="sub-parts">
+          <div ng-repeat="path in pathsByObj.paths | filter : notTooSmall">
             <div class="input-group">
               <div class="input-group-addon">
                 <span class="color-indicator"
@@ -108,6 +109,8 @@
           </div>
         </div>
       </div>
+    </tab>
+  </tabset>
       <br>
       <alert ng-repeat="alert in alerts" type="{{alert.type}}"
       close="closeAlert($index)">{{alert.msg}}</alert>

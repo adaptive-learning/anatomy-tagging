@@ -53,3 +53,30 @@
 .row:hover {
   background: #ddd;
 }
+
+.nav a, .pagination a, .carousel a {
+      cursor: pointer;
+}
+
+.term-edit .btn,
+.term-edit .input-group-addon {
+  border-radius: 0;
+}
+
+.term-edit:last-child .btn {
+  border-bottom-right-radius: 4px;
+}
+
+.term-edit .input-group-addon.open,
+.term-edit:last-child .input-group-addon {
+  border-bottom-left-radius: 4px;
+}
+
+.input-group {
+  margin-bottom: -1px;
+}
+
+.form-control:focus,
+.form-control:active {
+  z-index: 10;
+}

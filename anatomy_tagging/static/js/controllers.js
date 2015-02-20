@@ -16,10 +16,21 @@ angular.module('anatomy.tagging.controllers', [])
   });
 })
 
-.controller('ImageController', function($scope, imageService, termsService, colorService) {
+.controller('ImageController', function($scope, imageService, termsService, colorService, Slug) {
   $scope.pathsByColor = {};
   $scope.loading = true;
   $scope.alerts = [];
+  $scope.pathsByTerm = {};
+  $scope.byTermByTermId = {};
+  $scope.pathsBys = [
+    {
+      heading  : 'Podle barev',
+      obj : $scope.pathsByColor,
+    }, {
+      heading  : 'Podle pojmů',
+      obj : $scope.pathsByTerm,
+    }
+  ]
 
   termsService.get().success(function(data) {
     $scope.terms = data;
@@ -31,6 +42,7 @@ angular.module('anatomy.tagging.controllers', [])
     for (var i = 0; i < data.paths.length; i++) {
       var p = data.paths[i];
       var c = p.color;
+      $scope.pathTermUpdated(p);
       if ((colorService.isGray(p.color) || p.color === 'none') && 
           (!p.term || p.term.code === 'no-practice')) {
         c = 'gray';
@@ -42,6 +54,7 @@ angular.module('anatomy.tagging.controllers', [])
         $scope.pathsByColor[c] = {
           paths : [],
           term : '',
+          color : p.color,
         };
       }
       $scope.pathsByColor[c].paths.push(p);
@@ -57,10 +70,10 @@ angular.module('anatomy.tagging.controllers', [])
       if (!$scope.pathsByColor[c].term || 
           $scope.pathsByColor[c].term.code !== 'split') {
         $scope.pathsByColor[c].term = p.term;
-        if ($scope.pathsByColor[c].term && 
-            $scope.pathsByColor[c].term.code === 'no-practice') {
-          $scope.pathsByColor[c].disabled = true;
-        }
+      }
+      if ($scope.pathsByColor[c].term && 
+          $scope.pathsByColor[c].term.code === 'no-practice') {
+        $scope.pathsByColor[c].disabled = true;
       }
       if (p.term && p.term.code === "no-practice") {
         p.disabled = true;
@@ -99,8 +112,12 @@ angular.module('anatomy.tagging.controllers', [])
   };
 
   $scope.updateFocused = function() {
-    if ($scope.focused && $scope.focused.paths) {
-      $scope.termUpdated($scope.focused);
+    if ($scope.focused) {
+      if ($scope.focused.paths) {
+        $scope.termUpdated($scope.focused);
+      } else {
+        $scope.pathTermUpdated($scope.focused);
+      }
     }
   };
 
@@ -114,10 +131,34 @@ angular.module('anatomy.tagging.controllers', [])
     if (byColor.term && byColor.term.code === 'split') {
       return;
     }
-    for (var i = 0; i < byColor.paths.length; i++) {
-      byColor.paths[i].term = byColor.term;
-      byColor.paths[i].disabled = byColor.term && byColor.term.code === 'no-practice';
+    if (byColor.paths) {
+      for (var i = 0; i < byColor.paths.length; i++) {
+        byColor.paths[i].term = byColor.term;
+        $scope.pathTermUpdated(byColor.paths[i]);
+        byColor.paths[i].disabled = byColor.term && byColor.term.code === 'no-practice';
+      }
     }
+  };
+
+  $scope.pathTermUpdated = function(p) {
+    var slug = p.term ? Slug.slugify(p.term.name_la) : 'zzz-empty';
+    var oldByTerm = $scope.byTermByTermId[p.id];
+    if (oldByTerm && oldByTerm != $scope.pathsByTerm[slug]) {
+      oldByTerm.paths  = oldByTerm.paths.filter(function(path) {
+        return p.id != path.id;
+      });
+    }
+    if (!$scope.pathsByTerm[slug]) {
+      $scope.pathsByTerm[slug] = {
+        term : p.term,
+        paths : [],
+        color : p.color,
+      };
+    }
+    if (oldByTerm != $scope.pathsByTerm[slug]) {
+      $scope.pathsByTerm[slug].paths.push(p);
+    }
+    $scope.byTermByTermId[p.id] = $scope.pathsByTerm[slug];
   };
 
   $scope.notTooSmall= function(path) {

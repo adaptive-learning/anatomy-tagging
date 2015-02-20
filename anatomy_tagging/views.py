@@ -17,6 +17,7 @@ def home(request):
         "/static/lib/ui-bootstrap-tpls.min.js",
         "/static/lib/raphael.js",
         "/static/lib/raphael.pan-zoom.js",
+        "/static/lib/angular-slugify.js",
         "/static/js/app.js",
         "/static/js/controllers.js",
         "/static/js/directives.js",

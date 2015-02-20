@@ -4,6 +4,7 @@ angular.module('anatomy.tagging', [
   'anatomy.tagging.services',
   'ngCookies', 
   'ngRoute',
+  'slugifier',
   'ui.bootstrap', 
 ])
 
