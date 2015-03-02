@@ -17,6 +17,10 @@
   padding-top: 10px;
 }
 
+.header a {
+  color: white;
+}
+
 .header h1,
 .header h1 a {
   margin: 0;
@@ -79,4 +83,40 @@
 .form-control:focus,
 .form-control:active {
   z-index: 10;
+}
+
+.row.header-row {
+  font-size: 1.1em;
+  font-weight: bold;
+  background-color: #DCDCDC;
+}
+
+.paging {
+  background: #ddd;
+  padding: 5px;
+}
+
+.paging button.btn {
+  font-size: 30px;
+  line-height: 0.4em;
+}
+
+.page-input {
+  width: 40px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+select.per-page-select {
+  width: 55px;
+  margin: 0;
+}
+
+.table .row .alert {
+  margin-bottom: 0;
+  padding: 5px;
+}
+
+.table .row .alert .close {
+  right: 0;
 }

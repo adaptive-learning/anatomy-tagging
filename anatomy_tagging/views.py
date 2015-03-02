@@ -18,6 +18,7 @@ def home(request):
         "/static/lib/raphael.js",
         "/static/lib/raphael.pan-zoom.js",
         "/static/lib/angular-slugify.js",
+        "/static/lib/simplify.js",
         "/static/js/app.js",
         "/static/js/controllers.js",
         "/static/js/directives.js",
@@ -48,6 +49,21 @@ def image(request, filename_slug):
     return render_to_response('image.html', c)
 
 
+def update_term(request):
+    if request.body:
+        data = simplejson.loads(request.body)
+        term = Term.objects.get(id=data['id'])
+        term.name_la = data['name_la']
+        term.name_en = data['name_en']
+        term.parent = Term.objects.get_term_from_dict(data, 'parent')
+        term.save()
+        response = {
+            'type': 'success',
+            'msg': u'Změny byly uloženy',
+        }
+    return JsonResponse(response)
+
+
 def image_update(request):
     if request.body:
         data = simplejson.loads(request.body)
@@ -59,7 +75,7 @@ def image_update(request):
         for path_dict in data['paths']:
             path = Path.objects.get(id=path_dict['id'])
             Bbox.objects.add_to_path(path, path_dict['bbox'])
-            term = Term.objects.get_term_from_dict(path_dict)
+            term = Term.objects.get_term_from_dict(path_dict, 'term')
             if term is not None:
                 if path.term_id != term.id:
                     path.term = term
@@ -84,8 +100,14 @@ def image_json(request, filename_slug):
     return JsonResponse(json)
 
 
-def terms(request):
+def terms(request, filename_slug=None):
     terms = Term.objects.exclude(slug__in=['too-small', 'no-practice'])
+    if filename_slug is not None and filename_slug != '':
+        image = get_object_or_404(Image, filename_slug=filename_slug)
+        paths = Path.objects.filter(image=image)
+        print [p.term.name_la for p in paths if p.term_id is not None]
+        terms = terms.filter(id__in=[p.term_id for p in paths if p.term_id is not None])
+
     json = [t.to_serializable() for t in terms]
     return JsonResponse(json)
 

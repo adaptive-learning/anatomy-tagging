@@ -94,19 +94,18 @@ class Image(models.Model):
 
 
 class TermManager(models.Manager):
-    def get_term_from_dict(self, path_dict):
+    def get_term_from_dict(self, path_dict, term_key='term'):
         term = None
-        if ('term' in path_dict and
-                path_dict['term'] is not None):
-            if 'name_la' in path_dict['term']:
-                term = self.get(name_la=path_dict['term']['name_la'])
-            elif isinstance(path_dict['term'], basestring) and path_dict['term']:
+        if (term_key in path_dict and
+                path_dict[term_key] is not None):
+            if 'id' in path_dict[term_key]:
+                term = self.get(id=path_dict[term_key]['id'])
+            elif isinstance(path_dict[term_key], basestring) and path_dict[term_key]:
                 try:
-                    term = self.get(name_la=path_dict['term'])
+                    term = self.get(name_la=path_dict[term_key])
                 except Term.DoesNotExist:
                     term = Term(
-                        name_la=path_dict['term'],
-                        slug=slugify(path_dict['term']),
+                        name_la=path_dict[term_key],
                     )
                     term.save()
             return term
@@ -125,14 +124,29 @@ class Term(models.Model):
 
     objects = TermManager()
 
+    # Overriding
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name_la)
+            print self.slug
+            while Term.objects.filter(slug=self.slug).exists():
+                self.slug += '_duplicate'
+        super(Term, self).save(*args, **kwargs)
+
     def __unicode__(self):
         return u'{0} ({1})'.format(self.name_cs, self.slug)
 
-    def to_serializable(self):
-        return {
+    def to_serializable(self, subterm=False):
+        obj = {
+            'id': self.id,
             'code': self.code,
             'name_la': self.name_la,
+            'name_cs': self.name_cs,
+            'name_en': self.name_en,
         }
+        if not subterm and self.parent is not None:
+            obj['parent'] = self.parent.to_serializable(True)
+        return obj
 
 
 class Path(models.Model):

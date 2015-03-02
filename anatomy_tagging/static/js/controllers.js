@@ -3,6 +3,52 @@ angular.module('anatomy.tagging.controllers', [])
 .controller('anatomyMain', function($scope) {
 })
 
+.controller('TermsController', 
+    function($scope, termsService, $window, $location, imageService) {
+  $scope.loading = true;
+  $scope.Math = $window.Math;
+
+  var urlParts = $location.absUrl().split('/');
+  var image = urlParts[urlParts.length - 1];
+
+  termsService.get().success(function(data) {
+    for (var i = 0; i < data.length; i++) {
+      data[i].name_cs = undefined;
+      data[i].name_en = undefined;
+    }
+    $scope.allTerms = data;
+  });
+
+  termsService.get(image).success(function(data) {
+    $scope.terms = data;
+    $scope.loading = false;
+  });
+  $scope.save = function(term) {
+    term.saving = true;
+    termsService.save(term).success(function(data) {
+      term.alerts = term.alerts || [];
+      term.alerts.push(data);
+      term.saving = false;
+    }).error(function(data) {
+      term.alerts = term.alerts || [];
+      term.alerts.push({
+        type : 'danger',
+        msg : 'Na serveru nastala chyba',
+      });
+      term.saving = false;
+    });
+  };
+
+  imageService.get().success(function(data){
+    $scope.image = data.image;
+  });
+
+  $scope.closeAlert = function(term, index) {
+    term.alerts.splice(index, 1);
+  };
+
+})
+
 .controller('ImageListController', function($scope, imageService) {
   $scope.loading = true;
 
@@ -30,9 +76,13 @@ angular.module('anatomy.tagging.controllers', [])
       heading  : 'Podle pojmů',
       obj : $scope.pathsByTerm,
     }
-  ]
+  ];
 
   termsService.get().success(function(data) {
+    for (var i = 0; i < data.length; i++) {
+      data[i].name_cs = undefined;
+      data[i].name_en = undefined;
+    }
     $scope.terms = data;
   });
 

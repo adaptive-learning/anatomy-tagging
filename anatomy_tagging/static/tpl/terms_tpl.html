@@ -1,0 +1,96 @@
+<div class="header">
+  <div class="col-sm-12">
+    <div class="pull-right input-group col-sm-3">
+      <input class="form-control input-sm" ng-model="search"/>
+      <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+    </div>
+    <h1>
+      <a href="/">
+        <i class="glyphicon glyphicon-home"></i>
+      </a>
+      Anatom.cz -
+      {{image.filename || 'všechny pojmy'}}
+    </h1>
+  </div>
+  <div class="clearfix"></div>
+  <br>
+</div>
+<div class="table table-striped col-sm-12">
+  <div class="row header-row">
+    <span class="col-sm-3" >&nbsp;&nbsp;  Název latinsky </span>
+    <span class="col-sm-3" >&nbsp;&nbsp;  Název anglicky </span>
+    <span class="col-sm-3" >&nbsp;&nbsp;  Nadpojem latinsky</span>
+    <span class="col-sm-3" ></span>
+    <div class="clearfix"></div>
+  </div>
+  <div class="col-sm-12" ng-show="loading">
+    <br>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active"
+        style="width: 100%">
+        Načítání
+      </div>
+    </div>
+  </div>
+  <div ng-repeat="term in filteredTerms = (terms | filter: search) |
+      startFrom: (page -1) * pageSize | limitTo: pageSize"
+    class="row">
+    <span class="col-sm-3" >
+      <input class="form-control input-sm" ng-model="term.name_la" />
+    </span>
+    <span class="col-sm-3" >
+      <input class="form-control input-sm" ng-model="term.name_en" />
+    </span>
+    <span class="col-sm-3" >
+      <input class="form-control input-sm"
+        ng-model="term.parent" 
+        typeahead="term as term.name_la for term in allTerms |
+          filter:$viewValue | limitTo:8" />
+    </span>
+    <span class="col-sm-3" >
+      <a href="" class="btn btn-primary btn-sm"
+        ng-click="save(term)"
+        ng-hide="term.alerts.length"
+        ng-disabled="term.saving">Uložit</a>
+      <span>
+        <alert ng-repeat="alert in term.alerts" type="{{alert.type}}"
+          close="closeAlert(term, $index)">{{alert.msg}}</alert>
+      </span>
+    </span>
+    <div class="clearfix"></div>
+  </div>
+  <div class="row header-row paging">
+    <span class="pull-left col-sm-3">
+      <select ng-init="pageSize = 20"
+        class="per-page-select" 
+        ng-model="pageSize"
+        ng-options="v for v in [5, 10, 20, 50, 100]">
+      </select>
+      na stránku 
+    </span>
+    <span class="pull-right">
+      {{Math.min((page - 1) * pageSize + 1, filteredTerms.length)}} 
+       - 
+      {{Math.min(page * pageSize, filteredTerms.length)}}
+       z
+      {{filteredTerms.length}}
+      <button ng-click="page = 1" class="btn btn-default" title="First page">&laquo;</button>
+      <button ng-click="page = page - 1"
+        ng-disabled="page == 1" 
+        title="Previous page"
+        class="btn btn-default">&lsaquo;</button>
+      <input ng-init="page = 1" ng-model="page"
+      class="page-input">
+      z
+      {{Math.ceil(filteredTerms.length / pageSize)}}
+      <button ng-disabled="page == Math.ceil(filteredTerms.length / pageSize)"
+        ng-click="page = page + 1" 
+        class="btn btn-default" 
+        title="Next page">&rsaquo;</button>
+      <button ng-click="page = Math.ceil(filteredTerms.length / pageSize)"
+        class="btn btn-default" 
+        title="Last page">&raquo;</button>
+    </span>
+    <div class="clearfix"></div>
+  </div>
+</div>

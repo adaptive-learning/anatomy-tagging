@@ -1,10 +1,16 @@
 angular.module('anatomy.tagging.services', [])
 
-.service('termsService', function($http) {
+.service('termsService', function($http, $cookies) {
   return {
-    get : function() {
-      var url = '/terms';
+    get : function(image) {
+      var url = '/termsjson/' + (image || '');
       var promise = $http.get(url);
+      return promise;
+    },
+    save : function(term) {
+      var url = '/termsjson/update';
+      $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+      var promise = $http.post(url, term);
       return promise;
     }
   };

@@ -1,7 +1,12 @@
 <div class="header">
-  <div class="col-sm-12">
+  <div class="col-sm-10">
     <h1>Anatom.cz - značkování obrázků</h1>
   </div>
+      <span class="col-sm-2">
+        <a href="terms/">
+          Všechny pojmy
+        </a>
+      </span>
   <div class="clearfix"></div>
   <br>
 </div>
@@ -16,10 +21,10 @@
 </div>
 <div class="table table-striped col-sm-12">
   <div class="row" ng-repeat="image in images">
-      <a class="col-sm-6" href="image/{{image.filename_slug}}">
+      <a class="col-sm-5" href="image/{{image.filename_slug}}">
         {{image.filename }}
       </a>
-      <span class="col-sm-6">
+      <span class="col-sm-5">
         <div class="progress">
           <div class="progress-bar progress-bar-success" role="progressbar"
             style="width: {{image.progress}}%;">
@@ -29,6 +34,11 @@
             </span>
           </div>
         </div>
+      </span>
+      <span class="col-sm-2">
+        <a class="" href="terms/{{image.filename_slug}}">
+          Pojmy
+        </a>
       </span>
       <div class="clearfix"></div>
     </div>

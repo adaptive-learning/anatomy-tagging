@@ -39,22 +39,24 @@ class Command(BaseCommand):
             for row in terms_reader:
                 if len(row) >= 4 and row[0] != '':
                     slug = slugify(unicode(row[1], 'utf-8'))
-                    if slug not in self.slugs:
-                        self.slugs.append(slug)
-                        term = Term(
-                            code=row[0],
-                            name_la=unicode(row[1], 'utf-8'),
-                            name_en=unicode(row[2], 'utf-8'),
-                            name_cs=unicode(row[3], 'utf-8'),
-                            slug=slug,
-                        )
-                        try:
-                            Term.objects.get(slug=slug)
-                        except Term.DoesNotExist:
-                            terms.append(term)
+                    while slug in self.slugs or Term.objects.exclude(
+                            code=row[0]).filter(slug=slug).exists():
+                        slug += '_duplicate'
+                    self.slugs.append(slug)
+                    term = Term(
+                        code=row[0],
+                        name_la=unicode(row[1], 'utf-8'),
+                        name_en=unicode(row[2], 'utf-8'),
+                        name_cs=unicode(row[3], 'utf-8'),
+                        slug=slug,
+                    )
+                    if not Term.objects.filter(
+                            code=term.code,
+                            name_la=term.name_la).exists():
+                        terms.append(term)
         print "Uploaded file '" + file_name + "' with %d new terms" % len(terms)
         print "longest slug length: %d" % len(max(self.slugs, key=len))
-        Term.objects.bulk_create(terms)
+        # Term.objects.bulk_create(terms)
 
     def create_special_terms(self):
         try:
