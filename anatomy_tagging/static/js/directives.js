@@ -1,6 +1,6 @@
 angular.module('anatomy.tagging.directives', [])
 
-.directive('image', function(imageService, $window, Slug) {
+.directive('image', function(imageService, $window, Slug, simplify) {
   var paths = [];
   var pathsObj = {};
   var rPathsObj = {};
@@ -40,7 +40,8 @@ angular.module('anatomy.tagging.directives', [])
 
             for (var i = 0; i < data.paths.length; i++) {
               var p = data.paths[i];
-              path = r.path(p.d);
+              simplePathString = p.d; //simplify(p.d);
+              path = r.path(simplePathString);
               path.attr({
                 'fill' : p.color,
                 'opacity' : p.opacity,
@@ -193,7 +194,102 @@ angular.module('anatomy.tagging.directives', [])
                 height : maxY - minY,
               };
             }
+
           });
       }
+  };
+})
+
+.factory('simplify', function() {
+
+  function convertPoint(pointArray) {
+    var command = pointArray[0].toLowerCase();
+    var x, y;
+    var indexes = {
+      'c' : [5, 6],
+      's' : [3, 4],
+      'l' : [1, 2],
+      'm' : [1, 2],
+      'h' : [1, -1],
+      'v' : [-1, 1],
+      'z' : [-1, -1],
+    };
+    xy = indexes[command];
+    if (!xy) {
+      alert ("error " + pointObj);
+      throw pointArray;
+    }
+    var pointObj = {
+      c : pointArray[0],
+      x : parseFloat(pointArray[xy[0]]) || 0,
+      y : parseFloat(pointArray[xy[1]]) || 0,
+    };
+    return pointObj;
+  }
+
+  function parsePathData(pathData) {
+      var tokenizer = /([a-z]+)|([+-]?(?:\d+\.?\d*|\.\d+))/gi,
+          match,
+          current,
+          commands = [];
+
+      tokenizer.lastIndex = 0;
+      while (match = tokenizer.exec(pathData))
+      {
+          if (match[1])
+          {
+              if (current) commands.push(current);
+              current = [ match[1] ];
+          }
+          else
+          {
+              if (!current) current = [];
+              current.push(match[2]);
+          }
+      }
+      if (current) commands.push(current);
+      return commands;
+  }
+
+  function simplifyPath (path, minLength) {
+    var newPath = [];
+    var lastPos = [path[0][1], path[0][2]];
+    var pos;
+    for (var i = 0; i < path.length; i++) {
+      var pa = path[i];
+      var p = convertPoint(pa);
+      if (p.c.toLowerCase() == p.c) {
+        p.c = p.c.toUpperCase();
+        p.x = pos[0] + p.x;
+        p.y = pos[1] + p.y;
+        if ('SCL'.indexOf(p.c) != -1) {
+          pa[0] = p.c;
+          for (var j = 1; j < pa.length; j++) {
+            pa[j] = pos[(j + 1) % 2] + parseFloat(pa[j]);
+          }
+        }
+      }
+      pos = [p.x, p.y];
+      if ('SCL'.indexOf(p.c) == -1 || Math.max(Math.abs(pos[0] - lastPos[0]), 
+          Math.abs(pos[1] - lastPos[1])) > minLength) {
+        lastPos = pos;
+        newPath.push(pa);
+      } else {
+        //console.log(pos[0], lastPos[0], pos[1], lastPos[1]);
+      }
+    }
+    return newPath;
+  }
+
+  return function(path) {
+    var parsedPath = parsePathData(path);
+    var simplifiedPath = simplifyPath(parsedPath, 0.2);
+    var simplePathString = simplifiedPath.map(function(p) {
+      return p.join(' ');
+    }).join(' ');
+    if (parsedPath.length > 100) {
+      console.log(parsedPath.length, simplifiedPath.length);
+    }
+    return simplePathString;
   };
 });
