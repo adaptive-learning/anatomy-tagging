@@ -56,7 +56,7 @@ class Command(BaseCommand):
                         terms.append(term)
         print "Uploaded file '" + file_name + "' with %d new terms" % len(terms)
         print "longest slug length: %d" % len(max(self.slugs, key=len))
-        # Term.objects.bulk_create(terms)
+        Term.objects.bulk_create(terms)
 
     def create_special_terms(self):
         try:

@@ -108,6 +108,7 @@ def terms(request, filename_slug=None):
         print [p.term.name_la for p in paths if p.term_id is not None]
         terms = terms.filter(id__in=[p.term_id for p in paths if p.term_id is not None])
 
+    terms = terms.select_related('parent')
     json = [t.to_serializable() for t in terms]
     return JsonResponse(json)
 

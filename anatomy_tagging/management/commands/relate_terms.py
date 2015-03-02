@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = u"""Relate terms based on codes"""
 
     def handle(self, *args, **options):
-        terms = Term.objects.all()  # [:3600]
+        terms = Term.objects.all()
         exists = 0
         not_exists = 0
         for t in terms:
@@ -18,10 +18,7 @@ class Command(BaseCommand):
                     exists += 1
                 else:
                     not_exists += 1
-                    # print t.code, t.name_cs
-                    # if '0.00.000' not in t.code and '1.01.001' not in t.code:
-                        # find_parent(t, True)
-                if parent is not None and t.parent_id != parent.id:
+                if parent is not None and t.parent is None:
                     t.parent = parent
                     t.save()
         print 'Related:', exists, 'not related:', not_exists
