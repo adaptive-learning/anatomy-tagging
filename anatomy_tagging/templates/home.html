@@ -12,6 +12,15 @@
 
   <base href="/"/>
   {% csrf_token %}
+
+<script type="text/ng-template" id="termTemplate.html">
+  <a>
+  <span bind-html-unsafe="match.model.name_la | typeaheadHighlight:query"></span>
+  <span style="color:#ccc;">
+   <span bind-html-unsafe="match.model.parent.name_la"></span>
+  </span>
+  </a>
+</script>
 </head>
 <body ng-view>
 </body>

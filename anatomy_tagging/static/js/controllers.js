@@ -12,10 +12,6 @@ angular.module('anatomy.tagging.controllers', [])
   var image = urlParts[urlParts.length - 1];
 
   termsService.get().success(function(data) {
-    for (var i = 0; i < data.length; i++) {
-      data[i].name_cs = undefined;
-      data[i].name_en = undefined;
-    }
     $scope.allTerms = data;
   });
 
@@ -33,7 +29,7 @@ angular.module('anatomy.tagging.controllers', [])
       term.alerts = term.alerts || [];
       term.alerts.push({
         type : 'danger',
-        msg : 'Na serveru nastala chyba',
+        msg : 'Na serveru nastala chyba.',
       });
       term.saving = false;
     });
@@ -79,10 +75,6 @@ angular.module('anatomy.tagging.controllers', [])
   ];
 
   termsService.get().success(function(data) {
-    for (var i = 0; i < data.length; i++) {
-      data[i].name_cs = undefined;
-      data[i].name_en = undefined;
-    }
     $scope.terms = data;
   });
 

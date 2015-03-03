@@ -44,8 +44,10 @@
     <span class="col-sm-3" >
       <input class="form-control input-sm"
         ng-model="term.parent" 
+        typeahead-template-url="termTemplate.html"
         typeahead="term as term.name_la for term in allTerms |
-          filter:$viewValue | limitTo:8" />
+          filter:{name_la: $viewValue} | 
+          limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
     </span>
     <span class="col-sm-3" >
       <a href="" class="btn btn-primary btn-sm"
