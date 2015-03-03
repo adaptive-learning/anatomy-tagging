@@ -2,6 +2,7 @@
 from django.shortcuts import render_to_response
 from models import Term, Path, Image, Bbox
 from django.http import HttpResponse
+from django.db import connection
 import json as simplejson
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -34,11 +35,11 @@ def home(request):
 
 
 def images_json(request):
-    images = Image.objects.all()
+    images = Image.objects.all().select_related('bbox')
     json = {
         'images': [i.to_serializable() for i in images],
     }
-    return JsonResponse(json)
+    return render_json(request, json)
 
 
 def image(request, filename_slug):
@@ -61,7 +62,7 @@ def update_term(request):
             'type': 'success',
             'msg': u'Změny byly uloženy',
         }
-    return JsonResponse(response)
+    return render_json(request, response)
 
 
 def image_update(request):
@@ -87,17 +88,17 @@ def image_update(request):
             'type': 'success',
             'msg': u'Změny byly uloženy',
         }
-    return JsonResponse(response)
+    return render_json(request, response)
 
 
 def image_json(request, filename_slug):
     image = get_object_or_404(Image, filename_slug=filename_slug)
-    paths = Path.objects.filter(image=image)
+    paths = Path.objects.filter(image=image).select_related('term', 'bbox')
     json = {
         'image': image.to_serializable(),
         'paths': [p.to_serializable() for p in paths if p.term is None or p.term.code != 'too-small'],
     }
-    return JsonResponse(json)
+    return render_json(request, json)
 
 
 def terms(request, filename_slug=None):
@@ -110,6 +111,22 @@ def terms(request, filename_slug=None):
 
     terms = terms.select_related('parent')
     json = [t.to_serializable() for t in terms]
+    return render_json(request, json)
+
+
+def render_json(request, json, status=None,):
+    if 'html' in request.GET:
+        return HttpResponse(
+            content=simplejson.dumps(json),
+            status=status,
+        )
+
+    if settings.DEBUG and 'sqldump' in request.GET:
+        return HttpResponse(
+            content=str(connection.queries),
+            content_type='text/plain',
+            status=status,
+        )
     return JsonResponse(json)
 
 
