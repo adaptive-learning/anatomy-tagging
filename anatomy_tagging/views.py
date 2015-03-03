@@ -105,7 +105,7 @@ def terms(request, filename_slug=None):
     terms = Term.objects.exclude(slug__in=['too-small', 'no-practice'])
     if filename_slug is not None and filename_slug != '':
         image = get_object_or_404(Image, filename_slug=filename_slug)
-        paths = Path.objects.filter(image=image)
+        paths = Path.objects.filter(image=image).select_related('term')
         print [p.term.name_la for p in paths if p.term_id is not None]
         terms = terms.filter(id__in=[p.term_id for p in paths if p.term_id is not None])
 

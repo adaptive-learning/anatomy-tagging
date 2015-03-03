@@ -68,9 +68,9 @@ class Image(models.Model):
         return Path.objects.filter(
             image=self.id
         ).exclude(
-            term=Term.objects.get(slug='no-practice')
+            term__slug='no-practice'
         ).exclude(
-            term=Term.objects.get(slug='too-small')
+            term__slug='too-small'
         ).count()
 
     @property
@@ -130,7 +130,7 @@ class Term(models.Model):
             self.slug = slugify(self.name_la)
             print self.slug
             while Term.objects.filter(slug=self.slug).exists():
-                self.slug += '_duplicate'
+                self.slug += '_dup'
         super(Term, self).save(*args, **kwargs)
 
     def __unicode__(self):

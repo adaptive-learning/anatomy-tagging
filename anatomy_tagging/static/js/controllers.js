@@ -11,10 +11,6 @@ angular.module('anatomy.tagging.controllers', [])
   var urlParts = $location.absUrl().split('/');
   var image = urlParts[urlParts.length - 1];
 
-  termsService.get().success(function(data) {
-    $scope.allTerms = data;
-  });
-
   termsService.get(image).success(function(data) {
     $scope.terms = data;
     $scope.loading = false;
@@ -42,6 +38,10 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.closeAlert = function(term, index) {
     term.alerts.splice(index, 1);
   };
+
+  termsService.get().success(function(data) {
+    $scope.allTerms = data;
+  });
 
 })
 
