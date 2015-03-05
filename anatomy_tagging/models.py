@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 from django.template.defaultfilters import slugify
 
@@ -112,6 +113,23 @@ class TermManager(models.Manager):
 
 
 class Term(models.Model):
+    HEAD = "H"
+    NECK = "N"
+    CHEST = "C"
+    ABDOMEN = "A"
+    PELVIS = "P"
+    UPPER_EXT = "UE"
+    LOWER_EXT = "LE"
+
+    BODY_PARTS = (
+        (HEAD, 'Head - Hlava'),
+        (NECK, 'Neck - Krk'),
+        (CHEST, 'Chest - Hrudní koš'),
+        (ABDOMEN, 'Abdomen - Břicho'),
+        (PELVIS, 'Pelvis - Pánev'),
+        (UPPER_EXT, 'Upper Ext. - Horní končetina'),
+        (LOWER_EXT, 'Lower Ext. - Dolní končetina'),
+    )
     parent = models.ForeignKey('self', null=True)
     slug = models.SlugField(
         max_length=200,
@@ -121,6 +139,12 @@ class Term(models.Model):
     name_cs = models.TextField(max_length=200)
     name_en = models.TextField(max_length=200)
     name_la = models.TextField(max_length=200)
+    body_part = models.CharField(
+        max_length=2,
+        choices=BODY_PARTS,
+        default=None,
+        null=True
+    )
 
     objects = TermManager()
 
@@ -143,6 +167,7 @@ class Term(models.Model):
             'name_la': self.name_la,
             'name_cs': self.name_cs,
             'name_en': self.name_en,
+            'body_part': self.body_part,
         }
         if not subterm and self.parent is not None:
             obj['parent'] = self.parent.to_serializable(True)

@@ -7,6 +7,30 @@ angular.module('anatomy.tagging.controllers', [])
     function($scope, termsService, $window, $location, imageService) {
   $scope.loading = true;
   $scope.Math = $window.Math;
+  $scope.parts = [{
+    key : 'H',
+    label : 'Hlava',
+  }, {
+    key : 'N',
+    label : 'Krk',
+  }, {
+    key : 'C',
+    label : 'Hrudní koš',
+  }, {
+    key : 'A',
+    label : 'Břicho',
+  }, {
+    key : 'P',
+    label : 'Pánev',
+  }, {
+    key : 'UE',
+    label : 'Horní končetina',
+  }, {
+    key : 'LE',
+    label : 'Dolní končetina',
+  }
+
+  ];
 
   var urlParts = $location.absUrl().split('/');
   var image = urlParts[urlParts.length - 1];
@@ -15,6 +39,7 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.terms = data;
     $scope.loading = false;
   });
+
   $scope.save = function(term) {
     term.saving = true;
     termsService.save(term).success(function(data) {

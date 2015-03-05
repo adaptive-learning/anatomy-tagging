@@ -19,8 +19,9 @@
   <div class="row header-row">
     <span class="col-sm-3" >&nbsp;&nbsp;  Název latinsky </span>
     <span class="col-sm-3" >&nbsp;&nbsp;  Název anglicky </span>
-    <span class="col-sm-3" >&nbsp;&nbsp;  Nadpojem latinsky</span>
-    <span class="col-sm-3" ></span>
+    <span class="col-sm-2" >&nbsp;&nbsp;  Nadpojem latinsky</span>
+    <span class="col-sm-2" >&nbsp;&nbsp;  Umístění na těle</span>
+    <span class="col-sm-2" ></span>
     <div class="clearfix"></div>
   </div>
   <div class="col-sm-12" ng-show="loading">
@@ -41,7 +42,7 @@
     <span class="col-sm-3" >
       <input class="form-control input-sm" ng-model="term.name_en" />
     </span>
-    <span class="col-sm-3" >
+    <span class="col-sm-2" >
       <input class="form-control input-sm"
         ng-model="term.parent" 
         typeahead-template-url="termTemplate.html"
@@ -49,7 +50,14 @@
           filter:{name_la: $viewValue} | 
           limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
     </span>
-    <span class="col-sm-3" >
+    <span class="col-sm-2" >
+      <select ng-model="term.body_part"
+          class="form-control"
+          ng-options="p.key as p.label for p in parts">
+        <option value="">-- Neurčeno --</option>
+      </select>
+    </span>
+    <span class="col-sm-2" >
       <a href="" class="btn btn-primary btn-sm"
         ng-click="save(term)"
         ng-hide="term.alerts.length"
