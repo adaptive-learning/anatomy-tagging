@@ -7,17 +7,17 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
 
-#requirements
+echo " * setup.py install requirements"
 python $DIR/setup.py install
 
-# database
+echo " * syncdb and migrate"
 python $DIR/manage.py syncdb
 python $DIR/manage.py migrate
 
-# static files
-python $DIR/manage.py collectstatic --noinput
+echo " * collect static | tail"
+python $DIR/manage.py collectstatic --noinput | tail
 
-# anatomy data
+echo " * anatomy data"
 python $DIR/manage.py load_images 
 python $DIR/manage.py load_terms
 python $DIR/manage.py relate_terms
