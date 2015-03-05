@@ -32,12 +32,14 @@
   tooltip-placement="right"
   tooltip="{{'Přiblížit obrázek můžete i kolečkem myši nebo dotykovým gestem.' }}"
   show-after-x-answers="11"
-  ng-show="!loading && false">
+  ng-show="!loading && zoomInited">
   <a class="btn btn-default" id="zoom-out">
     <i class="glyphicon glyphicon-minus"></i></a>
   <a class="btn btn-default" id="zoom-in">
     <i class="glyphicon glyphicon-plus"></i></a> 
 </div>
+<a class="btn btn-default" id="init-zoom" ng-show="!zoomInited">
+  Aktivovat zoom (není vyladěný)</a>
 
   </div>
   <div class="col-sm-5 image-edit" ng-hide="loading">

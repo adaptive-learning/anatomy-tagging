@@ -100,7 +100,12 @@ angular.module('anatomy.tagging.directives', [])
                y : viewBox.y,
              }
             };
-            //initMapZoom(r, panZoomOptions);
+
+            $('#init-zoom').click(function(e) {
+              initMapZoom(r, panZoomOptions);
+              scope.zoomInited = true;
+              $(this).hide();
+            });
 
             focusRect = r.rect(-100,10, 10, 10);
             focusRect.attr({
