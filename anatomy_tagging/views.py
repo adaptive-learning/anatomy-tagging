@@ -35,7 +35,7 @@ def home(request):
 
 
 def images_json(request):
-    images = Image.objects.all().select_related('bbox')
+    images = Image.objects.all().select_related('bbox', 'category')
     json = {
         'images': [i.to_serializable() for i in images],
     }

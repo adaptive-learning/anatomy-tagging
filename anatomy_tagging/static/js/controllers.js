@@ -74,13 +74,25 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.loading = true;
 
   imageService.all(true).success(function(data) {
-    $scope.images = data.images;
+    processImages(data.images);
     $scope.loading = false;
 
     imageService.all().success(function(data) {
-      $scope.images = data.images;
+      processImages(data.images);
     });
   });
+
+  function processImages(images) {
+    $scope.imagesByCategory = {};
+    for (var i = 0; i < images.length; i++) {
+      var categoryName = images[i].category && images[i].category.name_cs;
+      if (!$scope.imagesByCategory[categoryName]) {
+        $scope.imagesByCategory[categoryName] = [];
+      }
+      $scope.imagesByCategory[categoryName].push(images[i]);
+    }
+    $scope.images = images;
+  }
 })
 
 .controller('ImageController', function($scope, imageService, termsService, colorService, Slug) {

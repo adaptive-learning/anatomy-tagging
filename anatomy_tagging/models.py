@@ -1,10 +1,36 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.db.models import Count
+
+
+class CategoryManager(models.Manager):
+    def get_by_name(self, name):
+        try:
+            cat = self.get(name_cs=name)
+        except Category.DoesNotExist:
+            cat = Category(
+                name_cs=name,
+            )
+            cat.save()
+        return cat
 
 
 class Category(models.Model):
     parent = models.ForeignKey('self', null=True)
+    name_cs = models.TextField(max_length=200, default="")
+    name_en = models.TextField(max_length=200, default="")
+
+    objects = CategoryManager()
+
+    def __unicode__(self):
+        return u'Category: {0}'.format(self.name_cs)
+
+    def to_serializable(self):
+        return {
+            'name_cs': self.name_cs,
+            'name_en': self.name_en,
+        }
 
 
 class BboxManager(models.Manager):

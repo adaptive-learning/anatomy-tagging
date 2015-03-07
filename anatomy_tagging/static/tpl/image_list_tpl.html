@@ -20,7 +20,11 @@
   </div>
 </div>
 <div class="table table-striped col-sm-12">
-  <div class="row" ng-repeat="image in images">
+  <div ng-repeat="(category, images) in imagesByCategory">
+    <div class="row">
+      <h2 class="col-sm-12" ng-bind="category"></h2>
+    </div>
+    <div class="row" ng-repeat="image in images">
       <a class="col-sm-5" href="image/{{image.filename_slug}}">
         {{image.filename }}
       </a>
@@ -42,5 +46,6 @@
       </span>
       <div class="clearfix"></div>
     </div>
+  </div>
 </div>
 
