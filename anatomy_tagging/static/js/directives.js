@@ -1,6 +1,8 @@
 angular.module('anatomy.tagging.directives', [])
 
-.directive('image', function(imageService, $window, Slug, simplify) {
+.value('$', jQuery)
+
+.directive('image', function(imageService, $window, Slug, simplify, $) {
   var paths = [];
   var pathsObj = {};
   var rPathsObj = {};
