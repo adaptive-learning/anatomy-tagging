@@ -27,7 +27,6 @@ def home(request):
         "/static/js/bbox.js",
     ]
     c = {
-        'images': Image.objects.all(),
         'js_files': [f + '?hash=' + settings.HASH for f in js_files]
     }
     request.META["CSRF_COOKIE_USED"] = True
@@ -36,9 +35,16 @@ def home(request):
 
 def images_json(request):
     images = Image.objects.all().select_related('bbox', 'category')
+    counts = Image.objects.get_counts()
     json = {
         'images': [i.to_serializable() for i in images],
     }
+    for i in json['images']:
+        i.update({
+            'progress': counts[i['id']]['progress'],
+            'paths_count': counts[i['id']]['paths_count'],
+            'untagged_paths_count': counts[i['id']]['untagged_paths_count'],
+        })
     return render_json(request, json)
 
 

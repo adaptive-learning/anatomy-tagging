@@ -75,6 +75,35 @@ class Bbox(models.Model):
         }
 
 
+class ImageManager(models.Manager):
+
+    def get_counts(self):
+        untagged_paths_count = Path.objects.filter(
+            term=None
+        ).values('image').annotate(Count('image'))
+        untagged_paths_count = self.to_dict(untagged_paths_count)
+
+        paths_count = Path.objects.exclude(
+            term__slug='no-practice'
+        ).exclude(
+            term__slug='too-small'
+        ).values('image').annotate(Count('image'))
+
+        ret = dict([(c['image'], {
+            'paths_count': c['image__count'],
+            'untagged_paths_count': untagged_paths_count.get(c['image'], 0),
+            'progress': self.progress(c['image__count'],
+                                      untagged_paths_count.get(c['image'], 0)),
+        }) for c in paths_count])
+        return ret
+
+    def to_dict(self, count):
+        return dict([(c['image'], c['image__count']) for c in count])
+
+    def progress(self, paths_count, untagged_paths_count):
+        return (100.0 * (paths_count - untagged_paths_count)) / paths_count
+
+
 class Image(models.Model):
     category = models.ForeignKey(Category, null=True)
     bbox = models.ForeignKey(Bbox, null=True)
@@ -84,39 +113,20 @@ class Image(models.Model):
     name_cs = models.TextField(null=True, max_length=200)
     name_en = models.TextField(null=True, max_length=200)
 
-    @property
-    def progress(self):
-        paths_count = self.paths_count
-        untagged_paths_count = self.untagged_paths_count
-        return (100.0 * (paths_count - untagged_paths_count)) / paths_count
-
-    @property
-    def paths_count(self):
-        return Path.objects.filter(
-            image=self.id
-        ).exclude(
-            term__slug='no-practice'
-        ).exclude(
-            term__slug='too-small'
-        ).count()
-
-    @property
-    def untagged_paths_count(self):
-        return Path.objects.filter(image=self.id, term=None).count()
+    objects = ImageManager()
 
     def __unicode__(self):
         return u'{0} ({1})'.format(self.name_cs, self.filename)
 
     def to_serializable(self):
         return {
+            'id': self.id,
             'filename': self.filename,
             'filename_slug': self.filename_slug,
             'name_cs': self.name_cs,
             'name_en': self.name_en,
             'bbox': self.bbox.to_serializable() if self.bbox is not None else None,
-            'progress': self.progress,
-            'paths_count': self.paths_count,
-            'untagged_paths_count': self.untagged_paths_count,
+            'category': self.category.to_serializable() if self.category is not None else None,
         }
 
 
