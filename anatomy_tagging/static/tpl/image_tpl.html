@@ -1,6 +1,6 @@
 <div class="">
   <div class="header">
-    <div class="form-group col-sm-6">
+    <div class="form-group col-sm-7">
     <h1>
       <a href="/">
         <i class="glyphicon glyphicon-home"></i>
@@ -8,12 +8,15 @@
       {{image.filename}}
     </h1>
     </div>
-    <div class="form-group col-sm-3">
+    <div class="form-group col-sm-2">
       <input placeholder="Název obrázku česky" ng-model="image.name_cs"
       class="form-control" autofocus>
     </div>
-    <div class="form-group col-sm-3">
+    <div class="form-group col-sm-2">
       <input placeholder="Název obrázku anglicky" ng-model="image.name_en" class="form-control">
+    </div>
+    <div class="form-group col-sm-1">
+      <input placeholder="Strana v učebnici" ng-model="image.textbook_page" class="form-control">
     </div>
     <div class="clearfix"></div>
   </div>

@@ -125,6 +125,7 @@ class Image(models.Model):
             'filename_slug': self.filename_slug,
             'name_cs': self.name_cs,
             'name_en': self.name_en,
+            'textbook_page': self.textbook_page,
             'bbox': self.bbox.to_serializable() if self.bbox is not None else None,
             'category': self.category.to_serializable() if self.category is not None else None,
         }

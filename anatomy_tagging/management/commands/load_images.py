@@ -89,17 +89,19 @@ class Command(BaseCommand):
         with open(file_path, 'rb') as csvfile:
             terms_reader = csv.reader(csvfile, delimiter=',')
             next(terms_reader, None)  # skip the headers
-            not_found = 0
             for row in terms_reader:
-                if row[6] == '1':
-                    file_name = row[2] + '.svg'
-                    try:
-                        image = Image.objects.get(filename=file_name)
-                        if image.textbook_page != int(row[1]):
-                            image.textbook_page = int(row[1])
+                if row[6] == '1' and row[2] != '':
+                    images = Image.objects.filter(filename__startswith=row[2])
+                    for image in images:
+                        if row[7] != '':
+                            name = unicode(row[7], 'utf-8')
+                        else:
+                            name = image.filename.replace('.svg', '')
+                        textbook_page = int(row[1])
+                        if image.name_cs != name or (
+                                image.textbook_page != textbook_page and
+                                textbook_page is not None):
+                            image.name_cs = name
+                            image.textbook_page = textbook_page
                             image.save()
-                            print 'Updated:', row[2]
-                    except Image.DoesNotExist:
-                        #  print 'Not found', file_name
-                        not_found += 1
-            print 'Not found', not_found
+                            print 'Updated:', image
