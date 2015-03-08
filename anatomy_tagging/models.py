@@ -239,4 +239,4 @@ class Path(models.Model):
 
 
 def to_serializable_or_none(obj):
-    return obj.to_serializable() if obj is not None else None,
+    return obj.to_serializable() if obj is not None else None
