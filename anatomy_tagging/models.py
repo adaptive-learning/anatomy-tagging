@@ -109,7 +109,10 @@ class Image(models.Model):
     bbox = models.ForeignKey(Bbox, null=True)
     textbook_page = models.IntegerField(null=True)
     filename = models.TextField(max_length=200, unique=True)
-    filename_slug = models.SlugField(max_length=200, db_index=True, unique=True)
+    filename_slug = models.SlugField(
+        max_length=200,
+        db_index=True,
+        unique=True)
     name_cs = models.TextField(null=True, max_length=200)
     name_en = models.TextField(null=True, max_length=200)
 
@@ -126,8 +129,8 @@ class Image(models.Model):
             'name_cs': self.name_cs,
             'name_en': self.name_en,
             'textbook_page': self.textbook_page,
-            'bbox': self.bbox.to_serializable() if self.bbox is not None else None,
-            'category': self.category.to_serializable() if self.category is not None else None,
+            'bbox': to_serializable_or_none(self.bbox),
+            'category': to_serializable_or_none(self.category),
         }
 
 
@@ -138,7 +141,8 @@ class TermManager(models.Manager):
                 path_dict[term_key] is not None):
             if 'id' in path_dict[term_key]:
                 term = self.get(id=path_dict[term_key]['id'])
-            elif isinstance(path_dict[term_key], basestring) and path_dict[term_key]:
+            elif (isinstance(path_dict[term_key], basestring) and
+                    path_dict[term_key]):
                 try:
                     term = self.get(name_la=path_dict[term_key])
                 except Term.DoesNotExist:
@@ -228,7 +232,11 @@ class Path(models.Model):
             'stroke': self.stroke,
             'stroke_width': self.stroke_width,
             'opacity': self.opacity,
-            'term': self.term.to_serializable() if not self.term is None else None,
+            'term': to_serializable_or_none(self.term),
             'd': self.d,
-            'bbox': self.bbox.to_serializable() if self.bbox is not None else None,
+            'bbox': to_serializable_or_none(self.bbox),
         }
+
+
+def to_serializable_or_none(obj):
+    return obj.to_serializable() if obj is not None else None,
