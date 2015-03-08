@@ -4,16 +4,17 @@ from django.contrib import admin
 
 class ImageAdmin(admin.ModelAdmin):
     search_fields = ('name_cs', 'name_en')
-    list_display = ('filename', 'name_cs', 'textbook_page')
+    list_display = ('filename', 'name_cs', 'bbox', 'category', 'textbook_page')
+    list_filter = ('category',)
 
 
 class PathAdmin(admin.ModelAdmin):
-    list_display = ('image', 'color', 'opacity')
+    list_display = ('image', 'term', 'bbox', 'color', 'opacity')
 
 
 class TermAdmin(admin.ModelAdmin):
     search_fields = ('name_la', 'name_cs', 'name_en')
-    list_display = ('name_la', 'name_cs', 'name_en')
+    list_display = ('name_la', 'name_cs', 'name_en', 'parent', 'body_part')
 
 
 class BboxAdmin(admin.ModelAdmin):

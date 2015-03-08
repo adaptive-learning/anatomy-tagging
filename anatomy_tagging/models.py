@@ -24,7 +24,7 @@ class Category(models.Model):
     objects = CategoryManager()
 
     def __unicode__(self):
-        return u'Category: {0}'.format(self.name_cs)
+        return u'{0}'.format(self.name_cs)
 
     def to_serializable(self):
         return {
