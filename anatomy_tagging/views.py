@@ -27,7 +27,8 @@ def home(request):
         "/static/js/bbox.js",
     ]
     c = {
-        'js_files': [f + '?hash=' + settings.HASH for f in js_files]
+        'js_files': [f + '?hash=' + settings.HASH for f in js_files],
+        'ON_PRODUCTION': settings.ON_PRODUCTION,
     }
     request.META["CSRF_COOKIE_USED"] = True
     return render_to_response('home.html', c)

@@ -1,6 +1,6 @@
 <html ng-app="anatomy.tagging" ng-controller="anatomyMain">
 <head>
-  <title>Anatom.cz - značkování obrázků</title>
+  <title>{% if not ON_PRODUCTION %}Loc - {% endif %}Anatom.cz - značkování obrázků</title>
 
   {% for file in js_files %}
     <script src="{{ file }}"></script>
