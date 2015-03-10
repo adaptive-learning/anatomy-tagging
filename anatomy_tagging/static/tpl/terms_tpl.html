@@ -44,6 +44,16 @@
       </div>
     </div>
   </div>
+  <div class="col-sm-12" ng-show="terms.length == 0">
+    <div class="alert alert-info">
+        Na tomto obrázku zatím nebyl označen žádný pojem.
+    </div>
+  </div>
+  <div class="col-sm-12" ng-show="terms.length != 0 && filteredTerms == 0">
+    <div class="alert alert-info">
+       Vyhledáváné hodnotě "{{search}}" nevyhovuje žádný pojem.
+    </div>
+  </div>
   <div ng-repeat="term in filteredTerms = (terms | filter: search) |
       startFrom: (page -1) * pageSize | limitTo: pageSize"
     class="row">
@@ -111,3 +121,7 @@
     <div class="clearfix"></div>
   </div>
 </div>
+        <a href="/image/{{image.filename_slug}}"
+          ng-if="image"
+          class="btn btn-link pull-right btn-lg">
+          Přejít na popisování obrázku {{image.filename}}</a>
