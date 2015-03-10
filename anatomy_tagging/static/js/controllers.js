@@ -119,6 +119,9 @@ angular.module('anatomy.tagging.controllers', [])
     for (var i = 0; i < data.paths.length; i++) {
       var p = data.paths[i];
       var c = p.color;
+      if (p.term && p.term.code == 'too-small') {
+        continue;
+      }
       $scope.pathTermUpdated(p);
       if ((colorService.isGray(p.color) || p.color === 'none') && 
           (!p.term || p.term.code === 'no-practice')) {
