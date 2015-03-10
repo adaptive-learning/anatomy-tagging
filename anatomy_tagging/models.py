@@ -115,6 +115,11 @@ class Image(models.Model):
         unique=True)
     name_cs = models.TextField(null=True, max_length=200)
     name_en = models.TextField(null=True, max_length=200)
+    body_part = models.CharField(
+        max_length=10,
+        default='',
+        null=True
+    )
 
     objects = ImageManager()
 
@@ -181,9 +186,8 @@ class Term(models.Model):
     name_en = models.TextField(max_length=200)
     name_la = models.TextField(max_length=200)
     body_part = models.CharField(
-        max_length=2,
-        choices=BODY_PARTS,
-        default=None,
+        max_length=10,
+        default='',
         null=True
     )
 

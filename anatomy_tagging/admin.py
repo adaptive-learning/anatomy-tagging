@@ -4,7 +4,7 @@ from django.contrib import admin
 
 class ImageAdmin(admin.ModelAdmin):
     search_fields = ('name_cs', 'name_en')
-    list_display = ('filename', 'name_cs', 'bbox', 'category', 'textbook_page')
+    list_display = ('filename', 'name_cs', 'bbox', 'category', 'textbook_page', 'body_part')
     list_filter = ('category',)
 
 

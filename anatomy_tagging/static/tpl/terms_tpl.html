@@ -20,7 +20,18 @@
     <span class="col-sm-3" >&nbsp;&nbsp;  Název latinsky </span>
     <span class="col-sm-3" >&nbsp;&nbsp;  Název anglicky </span>
     <span class="col-sm-2" >&nbsp;&nbsp;  Nadpojem latinsky</span>
-    <span class="col-sm-2" >&nbsp;&nbsp;  Umístění na těle</span>
+    <span class="col-sm-2" >&nbsp;&nbsp;  Umístění na těle
+      <i class="glyphicon glyphicon-question-sign"
+      data-toggle="tooltip" data-placement="bottom"
+      title='"H" - Head: Hlava krk
+      "N"- Neck: krk
+      "C" - Chest: hrudní koš
+      "A"- Abdomen: břicho
+      "P" - Pelvis: Pánev
+      "UE" - Upper Ext.: horní končetina
+      "LE" - Lower Ext.: dolní končetina'
+      ></i>
+    </span>
     <span class="col-sm-2" ></span>
     <div class="clearfix"></div>
   </div>
@@ -51,11 +62,7 @@
           limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
     </span>
     <span class="col-sm-2" >
-      <select ng-model="term.body_part"
-          class="form-control"
-          ng-options="p.key as p.label for p in parts">
-        <option value="">-- Neurčeno --</option>
-      </select>
+      <input ng-model="term.body_part" class="form-control imput-sm"/>
     </span>
     <span class="col-sm-2" >
       <a href="" class="btn btn-primary btn-sm"

@@ -98,10 +98,13 @@ class Command(BaseCommand):
                         else:
                             name = image.filename.replace('.svg', '')
                         textbook_page = int(row[1])
-                        if image.name_cs != name or (
+                        body_part = row[8]
+                        if (image.name_cs != name or
+                                image.body_part != body_part or (
                                 image.textbook_page != textbook_page and
-                                textbook_page is not None):
+                                textbook_page is not None)):
                             image.name_cs = name
+                            image.body_part = body_part
                             image.textbook_page = textbook_page
                             image.save()
                             print 'Updated:', image
