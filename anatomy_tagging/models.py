@@ -35,13 +35,13 @@ class Category(models.Model):
 
 class BboxManager(models.Manager):
     def add_to_image(self, image, bbox_dict):
-        self._add_to_image_or_path(image, bbox_dict)
+        return self._add_to_image_or_path(image, bbox_dict)
 
     def add_to_path(self, path, bbox_dict):
-        self._add_to_image_or_path(path, bbox_dict)
+        return self._add_to_image_or_path(path, bbox_dict)
 
     def _add_to_image_or_path(self, image_or_path, bbox_dict):
-        if image_or_path.bbox is None and bbox_dict is not None:
+        if image_or_path.bbox_id is None and bbox_dict is not None:
             bbox = Bbox(
                 x=int(bbox_dict['x']),
                 y=int(bbox_dict['y']),
@@ -50,6 +50,7 @@ class BboxManager(models.Manager):
             )
             bbox.save()
             image_or_path.bbox = bbox
+            return True
 
 
 class Bbox(models.Model):
@@ -149,7 +150,7 @@ class TermManager(models.Manager):
             elif (isinstance(path_dict[term_key], basestring) and
                     path_dict[term_key]):
                 try:
-                    term = self.get(name_la=path_dict[term_key])
+                    term = self.select_related('bbox').get(name_la=path_dict[term_key])
                 except Term.DoesNotExist:
                     term = Term(
                         name_la=path_dict[term_key],

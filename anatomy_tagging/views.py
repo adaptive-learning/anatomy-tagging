@@ -81,16 +81,26 @@ def image_update(request):
         image.name_en = data['image']['name_en']
         Bbox.objects.add_to_image(image, data['image']['bbox'])
         image.save()
+        paths_by_id = dict([
+            (p.id, p) for p in
+            Path.objects.filter(image=image.id).select_related('bbox')
+        ])
         for path_dict in data['paths']:
-            path = Path.objects.get(id=path_dict['id'])
-            Bbox.objects.add_to_path(path, path_dict['bbox'])
+            path = paths_by_id[path_dict['id']]
+            # path = Path.objects.select_related('bbox').get(id=path_dict['id'])
+            path_updated = Bbox.objects.add_to_path(path, path_dict['bbox'])
             term = Term.objects.get_term_from_dict(path_dict, 'term')
             if term is not None:
                 if path.term_id != term.id:
                     path.term = term
-                    path.save()
+                    path_updated = True
+                if term.body_part == '' and image.body_part != '':
+                    term.body_part = image.body_part
+                    term.save()
             elif term is None and path.term is not None:
                 path.term = None
+                path_updated = True
+            if path_updated:
                 path.save()
         response = {
             'type': 'success',
