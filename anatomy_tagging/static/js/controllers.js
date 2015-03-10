@@ -28,9 +28,7 @@ angular.module('anatomy.tagging.controllers', [])
   }, {
     key : 'LE',
     label : 'Dolní končetina',
-  }
-
-  ];
+  }];
 
   var urlParts = $location.absUrl().split('/');
   var image = urlParts[urlParts.length - 1];
