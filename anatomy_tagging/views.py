@@ -94,7 +94,8 @@ def image_update(request):
                 if path.term_id != term.id:
                     path.term = term
                     path_updated = True
-                if term.body_part == '' and image.body_part != '':
+                if ((term.body_part is None or term.body_part == '') and
+                        image.body_part != ''):
                     term.body_part = image.body_part
                     term.save()
             elif term is None and path.term is not None:
