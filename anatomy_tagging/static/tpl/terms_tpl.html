@@ -57,7 +57,7 @@
   </div>
   <div ng-repeat="term in filteredTerms = (terms | filter: search) |
       startFrom: (page -1) * pageSize | limitTo: pageSize"
-    class="row">
+    class="row table-row">
     <span class="col-sm-3" >
       <input class="form-control input-sm" ng-model="term.name_la" />
     </span>
