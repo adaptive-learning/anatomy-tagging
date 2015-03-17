@@ -6,6 +6,7 @@ angular.module('anatomy.tagging', [
   'ngRoute',
   'slugifier',
   'ui.bootstrap', 
+  'angular-svg-round-progress',
 ])
 
 .config(['$routeProvider', '$locationProvider',
@@ -13,6 +14,12 @@ angular.module('anatomy.tagging', [
   $routeProvider.when('/', {
     controller : 'ImageListController',
     templateUrl : 'static/tpl/image_list_tpl.html'
+  }).when('/home', {
+    controller : 'ImageListController',
+    templateUrl : 'static/tpl/homepage_tpl.html'
+  }).when('/home/:section?', {
+    controller : 'ImageListController',
+    templateUrl : 'static/tpl/section_tpl.html'
   }).when('/image/:image', {
     controller : 'ImageController',
     templateUrl : 'static/tpl/image_tpl.html'

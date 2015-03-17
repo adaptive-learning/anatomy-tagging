@@ -20,6 +20,7 @@ def home(request):
         "/static/lib/raphael.pan-zoom.js",
         "/static/lib/angular-slugify.js",
         "/static/lib/simplify.js",
+        "/static/lib/roundProgress.js",
         "/static/js/app.js",
         "/static/js/controllers.js",
         "/static/js/directives.js",

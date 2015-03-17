@@ -40,21 +40,21 @@
   margin-left: 10px;
 }
 
-.row > a,
-.row > span {
+.table-row > a,
+.table-row > span {
   padding-top: 5px;
   padding-bottom: 5px;
 }
 
-.row .progress {
+.table-row .progress {
   margin: 0;
 }
 
-.row:nth-of-type(odd) {
+.table-row:nth-of-type(odd) {
   background: #eee;
 }
 
-.row:hover {
+.table-row:hover {
   background: #ddd;
 }
 
@@ -119,4 +119,61 @@ select.per-page-select {
 
 .table .row .alert .close {
   right: 0;
+}
+
+.tile {
+  padding: 5px;
+}
+
+.in-tile {
+  display: block;
+  overflow: hidden;
+  position: relative;
+}
+
+.tile a {
+  display: inline-block;
+  color: #5CA03C;
+  width: 100%;
+  background-color: #efefef;
+  background-image: url("/static/img/1-obecna-anatomie.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  text-decoration: none;
+}
+.tile:nth-child(3n + 2) a {
+  background-image: url("/static/img/2-kostra.png");
+}
+.tile:nth-child(3n + 3) a {
+  background-image: url("/static/img/3-kosterni-spoje.png");
+}
+
+.tile a:hover {
+  background-color: #e5e5e5;
+}
+
+.tile a:hover h2 {
+  bottom: 0px;
+}
+
+.tile a h2 {
+  position: absolute;
+  bottom: -75px;
+  bottom: -5px;
+  font-size: 1.4em;
+  text-align: center;
+  display: block;
+  width: 100%;
+  color: white;
+  background-color: rgba(0,0,0,0.5);
+  transition: all ease-in-out 0.2s;
+  margin: 0;
+  padding: 15px;
+}
+.dummy {
+  margin-top: 100%;
+}
+.absolute {
+  position: absolute;
+  top: 0px;
 }

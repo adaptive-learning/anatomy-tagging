@@ -68,8 +68,9 @@ angular.module('anatomy.tagging.controllers', [])
 
 })
 
-.controller('ImageListController', function($scope, imageService) {
+.controller('ImageListController', function($scope, imageService, $window, $routeParams) {
   $scope.loading = true;
+  $scope.section = $routeParams.section;
 
   imageService.all(true).success(function(data) {
     processImages(data.images);
@@ -84,10 +85,16 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.imagesByCategory = {};
     for (var i = 0; i < images.length; i++) {
       var categoryName = images[i].category && images[i].category.name_cs;
-      if (!$scope.imagesByCategory[categoryName]) {
-        $scope.imagesByCategory[categoryName] = [];
+      var slug = (categoryName || 'null').replace(/ /g, '-');
+      if (!$scope.imagesByCategory[slug]) {
+        $scope.imagesByCategory[slug] = {
+          name : categoryName,
+          slug : slug,
+          progress : Math.floor((Math.random() * 100) + 1),
+          images : [],
+        };
       }
-      $scope.imagesByCategory[categoryName].push(images[i]);
+      $scope.imagesByCategory[slug].images.push(images[i]);
     }
     $scope.images = images;
   }

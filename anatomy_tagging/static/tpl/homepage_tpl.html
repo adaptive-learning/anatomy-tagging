@@ -1,0 +1,43 @@
+<div class="header">
+  <div class="col-sm-10">
+    <h1>Anatom.cz</h1>
+  </div>
+  <div class="clearfix"></div>
+  <br>
+</div>
+<div class="col-sm-12" ng-show="loading">
+  <br>
+  <div class="progress">
+    <div class="progress-bar progress-bar-striped active"
+      style="width: 100%">
+      Načítání
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12 col-md-10 col-lg-8 col-md-offset-1 col-lg-offset-2">
+    <span ng-repeat="(key, category) in imagesByCategory"
+      class="col-xs-6 col-sm-3 tile">
+      <span class="in-tile">
+        <a href="#/home/{{category.slug}}">
+          <div class="dummy"></div>
+          <div class="absolute">
+            <div round-progress
+                max="100"
+                current="category.progress"
+                color="#5CA03C"
+                bgcolor="rgba(150,150,150,0.5)"
+                radius="90"
+                stroke="15"
+                iterations="50"
+                animation="easeInOutQuart"></div>
+          </div>
+          <h2 ng-bind="category.name"></h2>
+        </a>
+      </span>
+    </span>
+    <div class="clearfix"></div>
+  </div>
+</div>
+
+
