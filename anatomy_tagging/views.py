@@ -42,7 +42,8 @@ def images_json(request):
         'images': [i.to_serializable() for i in images],
     }
     for i in json['images']:
-        i.update(counts[i['id']])
+        if i['id'] in counts:
+            i.update(counts[i['id']])
     return render_json(request, json)
 
 
