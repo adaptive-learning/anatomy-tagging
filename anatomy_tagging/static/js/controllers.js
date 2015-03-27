@@ -71,6 +71,7 @@ angular.module('anatomy.tagging.controllers', [])
 .controller('ImageListController', function($scope, imageService, $window, $routeParams) {
   $scope.loading = true;
   $scope.section = $routeParams.section;
+  $scope.alerts = [];
 
   imageService.all(true).success(function(data) {
     processImages(data.images);
@@ -79,7 +80,17 @@ angular.module('anatomy.tagging.controllers', [])
     imageService.all().success(function(data) {
       processImages(data.images);
     });
+  }).error(function() {
+    $scope.alerts.push({
+      type : 'danger',
+      msg : 'Na serveru nastala chyba',
+    });
+    $scope.loading = false;
   });
+
+  $scope.closeAlert = function(index) {
+    $scope.alerts.splice(index, 1);
+  };
 
   function processImages(images) {
     $scope.imagesByCategory = {};

@@ -19,6 +19,8 @@
     </div>
   </div>
 </div>
+<alert ng-repeat="alert in alerts" type="{{alert.type}}"
+close="closeAlert($index)">{{alert.msg}}</alert>
 <div class="table table-striped col-sm-12">
   <div ng-repeat="(key, category) in imagesByCategory">
     <div class="row table-row">
