@@ -10,6 +10,7 @@ urlpatterns = patterns(
     url(r'^image/update$', 'image_update', name='image'),
     url(r'^image/[\w\.-]*$', 'home', name='image'),
     url(r'^terms/[\w\.-]*$', 'home', name='image'),
+    url(r'^practice/[\w\.-]*$', 'home', name='image'),
     url(r'^imagejson/$', 'images_json', name='images'),
     url(r'^imagejson/e$', 'images_json', name='images'),
     url(r'^imagejson/(?P<filename_slug>[\w\.-]*)$', 'image_json', name='image'),

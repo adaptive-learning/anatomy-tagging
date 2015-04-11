@@ -25,6 +25,7 @@ def home(request):
         "/static/js/controllers.js",
         "/static/js/directives.js",
         "/static/js/services.js",
+        "/static/js/filters.js",
         "/static/js/bbox.js",
     ]
     c = {

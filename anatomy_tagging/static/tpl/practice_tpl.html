@@ -1,0 +1,138 @@
+<div class="">
+  <div class="header">
+    <div class="form-group col-sm-7">
+    <h1>
+      <a href="/">
+        <i class="glyphicon glyphicon-home"></i>
+      </a>
+      {{image.name_cs}}
+    </h1>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="col-sm-12" ng-show="loading">
+    <br>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active"
+        style="width: 100%">
+        Načítání
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-7" ng-hide="loading">
+    <div class="image"></div>
+<div class="btn-group zoom-btn"
+  tooltip-placement="right"
+  tooltip="{{'Přiblížit obrázek můžete i kolečkem myši nebo dotykovým gestem.' }}"
+  show-after-x-answers="11"
+  ng-show="!loading && zoomInited">
+  <a class="btn btn-default" id="zoom-out">
+    <i class="glyphicon glyphicon-minus"></i></a>
+  <a class="btn btn-default" id="zoom-in">
+    <i class="glyphicon glyphicon-plus"></i></a> 
+</div>
+<a class="btn btn-default" id="init-zoom" ng-show="!zoomInited">
+  Aktivovat zoom (není vyladěný)</a>
+
+  </div>
+  <div class="col-sm-5" ng-hide="loading">
+<div class="progress quesions-progress">
+  <div class="progress-bar" style="width: {{progress}}%;"></div>
+</div>
+  <div class="practice horizontal">
+    <div ng-repeat="question in questions"
+        ng-class="{'slide-out': question.slideOut}"
+        class="inner-practice">
+      <div class="question">
+        <span ng-bind="question.text"></span>
+        <span class="label label-default" ng-show="question|isFindOnMapType">
+          <i class="flag-{{question.asked_code}}"></i> {{question.item}}
+        </span>
+        <span ng-show="question.answered_code && (question|isFindOnMapType) && question.answered_code != question.asked_code">
+          <span>{{'Vybráno' | trans }}</span>
+          <span class="label label-default">
+            <i class="flag-{{question.answered_code}}"></i> {{question.answered_code | codeToName}}
+          </span>
+        </span>
+        <br class="clearfix">
+      </div>
+        <div mnemonic="{{question.asked_code}}" class="col-sm-12"
+          ng-show="canNext && question.answered_code != question.asked_code">
+        </div>
+      <span class="col-sm-7">
+        <span ng-show="question|isPickNameOfType">
+          <button ng-repeat="item in question.options"
+            class="btn btn-lg btn-default"
+            ng-click="checkAnswer(item.code)"
+            ng-class="{'btn-success': item.correct, 'btn-danger': item.selected && !item.correct }"
+            ng-disabled="item.disabled">
+             <i class="flag-{{item.code}}"></i> {{item.name_la}}
+          </button>
+        </span>
+      </span>
+      <span class="col-sm-5" >
+        <button class="btn btn-lg btn-default dont-know" 
+                ng-click="checkAnswer()" 
+                ng-disabled="canNext" >
+            <i class="glyphicon glyphicon-question-sign"></i> {{'Nevím' | trans }}
+        </button>
+        <button class="btn btn-lg btn-default next {{!canNext || 'btn-primary'}}" 
+                ng-click="next()" 
+                ng-disabled="!canNext" >
+            <i class="glyphicon glyphicon-arrow-right"></i> {{'Pokračovat' | trans }}
+        </button>
+        <button class="btn btn-lg btn-default" 
+                ng-click="highlight()" 
+                ng-disabled="canNext"  
+                ng-show="question.options != undefined" >
+            <i class="glyphicon glyphicon-repeat"></i> {{'Znovu zvýraznit' | trans }}
+        </button>
+      </span>
+    </div>
+    <div ng-if="showSummary" class="inner-practice summary col-lg-12">
+      <div class="row">
+        <div class="col-sm-{{user.username ? 6 : 12 }}">
+          <div class="summary-progress progress" ng-show="summary != undefined">
+            <div class="progress-bar progress-bar-learned" 
+                 style="width: {{summary.correctlyAnsweredRatio | percent }};">
+              {{'Úspěšnost' | trans}}: {{summary.correctlyAnsweredRatio | percent }}
+            </div>
+            <div class="progress-bar progress-bar-unlearned" 
+                 style="width: {{(1 - summary.correctlyAnsweredRatio) | percent }};">
+            </div>
+          </div>
+          <span ng-repeat="q in summary.questions" 
+                ng-click="map.highlightState(q.asked_code)"
+                class="label {{q.asked_code != q.answered_code &&
+                  'label-unlearned' || 'label-learned' }} ">
+            <i class="flag-{{q.asked_code}}"></i> {{q.item}}
+          </span>
+        </div>
+        <div class="col-sm-6" ng-if="user.username" >
+          <div class="level-progress-bar"></div>
+          <div goal-progress map="{{part}}" place-type="{{placeType}}">
+        </div>
+        <h2 class="clearfix" ng-show="errorMessage != undefined" ng-bind="errorMessage"></h2>
+        </div>
+      </div>
+      <br>
+      <span class="pull-right" >
+        <a class="btn btn-lg btn-default" 
+           ng-show="user.username"
+           href="#/goals/" >
+          <i class="glyphicon glyphicon-screenshot"></i> {{'Osobní cíle' | trans }}
+        </a>
+        <a class="btn btn-lg btn-default" 
+           href="#/refreshpractice/{{part}}/{{placeType}}" >
+          <i class="glyphicon glyphicon-repeat"></i> {{'Znovu procvičovat' | trans }}
+        </a>
+        <a class="btn-continue btn btn-lg btn-default {{!showSummary || 'btn-primary'}}" 
+           href="#/view/{{part}}/" >
+          <i class="glyphicon glyphicon-globe"></i> {{'Mapa znalostí' | trans }}
+        </a>
+      </span>
+    </div>
+  </div>
+  </div>
+</div>
+

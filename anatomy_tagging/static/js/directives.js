@@ -2,9 +2,19 @@ angular.module('anatomy.tagging.directives', [])
 
 .value('$', jQuery)
 
-.directive('image', function(imageService, $window, Slug, simplify, $) {
+  .value('colors', {
+    'GOOD': '#5CA03C',
+    'BAD': '#e23',
+    'NEUTRAL' : '#1d71b9',
+    'BRIGHT_GRAY' : '#ddd',
+    'WATER_COLOR' : '#73c5ef',
+  })
+  
+
+.directive('image', function(imageService, $window, Slug, simplify, $, colorService, $timeout) {
   var paths = [];
   var pathsObj = {};
+  var pathsByCode = {};
   var rPathsObj = {};
   var focusRect;
   var viewBox = {
@@ -26,8 +36,10 @@ angular.module('anatomy.tagging.directives', [])
               y : 0,
             };
             var r = Raphael(element[0]);
-
-            function clickHandler(){
+            var clickFn;
+            
+            
+            function taggingClickHandler(){
               var input = $(".tab-pane.active .sub-parts:visible #input-" + this.data('id'));
               if (input.length === 0) {
                 input = $(".tab-pane.active #input-" + this.attr('fill').substr(1));
@@ -40,18 +52,97 @@ angular.module('anatomy.tagging.directives', [])
               input.focus();
             }
 
+            function practiceClickHandler(){
+              var clickedCode = this.data('code');
+              if (clickedCode == 'no-practice' || scope.$parent.canNext) {
+                return;
+              }
+              if (clickFn) clickFn(clickedCode);
+              scope.$parent.$apply();
+            }
+
+            var highlights = [];
+            var highlightQueue = [];
+            var highlightInProgress = false;
+            var ANIMATION_TIME_MS = 500;
+
+            var that = { 
+              click: function(callback) {
+                clickFn = callback;
+              },
+              _next : function() {
+                if (highlightQueue.length > 0) {
+                  item = highlightQueue.shift();
+                  that._highlightTerm(item[0], item[1]);
+                  $timeout(that._next, ANIMATION_TIME_MS / 2);
+                } else {
+                  highlightInProgress = false;
+                }
+              },
+              highlightTerm : function(code, color) {
+                highlightQueue.push([code, color]);
+                if (!highlightInProgress) {
+                  highlightInProgress = true;
+                  that._next();
+                }
+              },
+              _highlightTerm : function(code, color) {
+                var paths = pathsByCode[code] || [];
+                var bbox = getBBox(paths.map(function(p) {return p.getBBox();}));
+                var centerX = Math.floor(bbox.x + bbox.width / 2);
+                var centerY = Math.floor(bbox.y + bbox.height / 2);
+                for (var i = 0; i < paths.length; i++) {
+                  var clone = paths[i].clone();
+                  clone.click(clickHandler);
+                  clone.data('id', paths[i].data('id'));
+                  clone.data('code', paths[i].data('code'));
+                  clone.attr({
+                    'fill' : color,
+                  });
+                  highlights.push(clone);
+                  var animAttrs = {
+                    transform : 's' + [1.5, 1.5, centerX, centerY].join(','),
+                  };
+                  (function(clone){
+                    clone.animate(animAttrs, ANIMATION_TIME_MS / 2, '>', function() {
+                      clone.animate({
+                        transform : '',
+                      }, ANIMATION_TIME_MS / 2, '<');
+                    });
+                  })(clone);
+                }
+              },
+
+              clearHighlights : function() {
+                for (var i = 0; i < highlights.length; i++) {
+                  highlights[i].remove();
+                }
+                highlights = [];
+              },
+            }
+            scope.$parent.imageController = that;
+
+            var clickHandler;
+            if (attrs.tagging) {
+              clickHandler = taggingClickHandler;
+            } else {
+              clickHandler = practiceClickHandler;
+            }
+
             for (var i = 0; i < data.paths.length; i++) {
               var p = data.paths[i];
               simplePathString = p.d; //simplify(p.d);
               path = r.path(simplePathString);
+              var color = attrs.tagging ? p.color : colorService.toGrayScale(p.color);
               path.attr({
-                'fill' : p.color,
+                'fill' : color,
                 'opacity' : p.opacity,
                 'stroke-width' : p.stroke_width,
                 'stroke' : p.stroke,
                 'cursor' : p.disabled ? 'default' : 'pointer',
               });
               path.data('id', p.id);
+              path.data('color', color);
               path.click(clickHandler);
               p.bbox = p.bbox || path.getBBox();
               if (p.bbox.width < 5 || p.bbox.height < 5) {
@@ -62,6 +153,12 @@ angular.module('anatomy.tagging.directives', [])
               }
               paths.push(path);
               rPathsObj[p.id] = path;
+              var code = p.term && p.term.code;
+              path.data('code', code);
+              if (!pathsByCode[code]) {
+                pathsByCode[code] = [];
+              }
+              pathsByCode[code].push(path);
               pathsObj[p.id] = p;
             }
 

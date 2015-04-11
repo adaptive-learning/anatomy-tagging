@@ -2,6 +2,7 @@ angular.module('anatomy.tagging', [
   'anatomy.tagging.controllers',
   'anatomy.tagging.directives',
   'anatomy.tagging.services',
+  'anatomy.tagging.filters',
   'ngCookies', 
   'ngRoute',
   'slugifier',
@@ -23,6 +24,9 @@ angular.module('anatomy.tagging', [
   }).when('/image/:image', {
     controller : 'ImageController',
     templateUrl : 'static/tpl/image_tpl.html'
+  }).when('/practice/:image', {
+    controller : 'PracticeController',
+    templateUrl : 'static/tpl/practice_tpl.html'
   }).when('/terms/:image?', {
     controller : 'TermsController',
     templateUrl : 'static/tpl/terms_tpl.html'

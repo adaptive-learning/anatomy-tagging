@@ -69,6 +69,7 @@ angular.module('anatomy.tagging.controllers', [])
 })
 
 .controller('ImageListController', function($scope, imageService, $window, $routeParams) {
+  $scope.Math = $window.Math;
   $scope.loading = true;
   $scope.section = $routeParams.section;
   $scope.alerts = [];
@@ -284,5 +285,107 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.alerts.splice(index, 1);
   };
 
+})
+
+.controller('PracticeController', function($scope, imageService, termsService, colorService, practiceService, $routeParams, $timeout, $filter, colors) {
+  $scope.loading = true;
+  $scope.progress = 0;
+
+  imageService.get($routeParams.image).success(function(data){
+     $scope.image = data.image;
+  });
+
+  practiceService.getQuestions($routeParams.image).success(function(data) {
+    $scope.loading = false;
+    $timeout(function() {
+      $scope.imageController.click(function(clickedCode) {
+        var isInOptions = !$scope.question.options || 
+            $scope.question.options.filter(function(o) {
+              return o.code == clickedCode;
+            }).length == 1;
+        if ($filter('isFindOnMapType')($scope.question) && isInOptions) {
+          $scope.checkAnswer(clickedCode);
+        }
+      });
+      $scope.next();
+    }, 500);
+  });
+
+  $scope.highlight = function() {
+    if ($scope.imageController) {
+      $scope.imageController.clearHighlights();
+      if ($filter('isPickNameOfType')($scope.question)) {
+        $scope.imageController.highlightTerm($scope.question.asked_code, colors.NEUTRAL);
+      }
+      if ($filter('isFindOnMapType')($scope.question) && $scope.question.options) {
+        $scope.question.options.map(function(o) {
+          $scope.imageController.highlightTerm(o.code, colors.NEUTRAL);
+        });
+      }
+    }
+  };
+
+  $scope.next = function() {
+    if ($scope.progress < 100) {
+      $scope.question = practiceService.next();
+      $scope.questions = [$scope.question];
+      $scope.question.asked_code = $scope.question.code;
+      $scope.canNext = false;
+      $scope.highlight();
+    } else {
+      setupSummary();
+    }
+  };
+
+  $scope.checkAnswer = function(answered_code) {
+    $scope.question.answered_code = answered_code;
+    var asked = $scope.question.code;
+    $scope.progress = practiceService.answer($scope.question);
+    highlightAnswer(asked, answered_code);
+
+    if (asked == answered_code) {
+      $timeout(function() {
+        $scope.next();
+      }, 700);
+    } else {
+      $scope.canNext = true;
+    }
+  };
+
+    function setupSummary() {
+      $scope.questions.pop();
+      $scope.question.slideOut = true;
+      $scope.layer = undefined;
+      // prevents additional points gain. issue #38
+      $scope.summary = practiceService.summary();
+      $scope.showSummary = true;
+      $scope.imageController.clearHighlights();
+      //$scope.imageController.showSummaryTooltips($scope.summary.questions);
+      angular.forEach($scope.summary.questions, function(q) {
+        var correct = q.asked_code == q.answered_code;
+        $scope.imageController.highlightTerm(q.asked_code, correct ? colors.GOOD : colors.BAD, 1);
+      });
+      //$("html, body").animate({ scrollTop: "0px" });
+      //events.emit('questionSetFinished', user.getUser().answered_count);
+    }
+
+    function highlightAnswer (asked, selected) {
+      if (asked != selected) {
+        $scope.imageController.highlightTerm(selected, colors.BAD);
+      }
+      $scope.imageController.highlightTerm(asked, colors.GOOD);
+      if ($filter('isPickNameOfType')($scope.question)) {
+        highlightOptions(selected);
+      }
+    }
+
+    function highlightOptions(selected) {
+      $scope.question.options.map(function(o) {
+        o.correct = o.code == $scope.question.asked_code;
+        o.selected = o.code == selected;
+        o.disabled = true;
+        return o;
+      });
+    }
 });
 
