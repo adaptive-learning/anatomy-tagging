@@ -8,6 +8,14 @@ angular.module('anatomy.tagging.directives', [])
     'NEUTRAL' : '#1d71b9',
     'BRIGHT_GRAY' : '#ddd',
     'WATER_COLOR' : '#73c5ef',
+    'HIGHLIGHTS' : [
+      '#f9b234',
+      '#1d71b9',
+      '#36a9e0',
+      '#312883',
+      '#fdea11',
+      '#951b80',
+    ],
   })
   
 

@@ -318,9 +318,10 @@ angular.module('anatomy.tagging.controllers', [])
         $scope.imageController.highlightTerm($scope.question.asked_code, colors.NEUTRAL);
       }
       if ($filter('isFindOnMapType')($scope.question) && $scope.question.options) {
-        $scope.question.options.map(function(o) {
-          $scope.imageController.highlightTerm(o.code, colors.NEUTRAL);
-        });
+        for (var i = 0; i < $scope.question.options.length; i++) {
+          $scope.imageController.highlightTerm(
+            $scope.question.options[i].code, colors.HIGHLIGHTS[i]);
+        }
       }
     }
   };
