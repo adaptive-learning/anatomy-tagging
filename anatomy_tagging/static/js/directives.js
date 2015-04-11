@@ -70,6 +70,7 @@ angular.module('anatomy.tagging.directives', [])
             }
 
             var highlights = [];
+            var highlightsByCode = {};
             var highlightQueue = [];
             var highlightInProgress = false;
             var ANIMATION_TIME_MS = 500;
@@ -99,15 +100,19 @@ angular.module('anatomy.tagging.directives', [])
                 var bbox = getBBox(paths.map(function(p) {return p.getBBox();}));
                 var centerX = Math.floor(bbox.x + bbox.width / 2);
                 var centerY = Math.floor(bbox.y + bbox.height / 2);
+                var clones = [];
                 for (var i = 0; i < paths.length; i++) {
                   var clone = paths[i].clone();
                   clone.click(clickHandler);
+                  clone.hover(hoverInHandler, hoverOutHandler);
                   clone.data('id', paths[i].data('id'));
-                  clone.data('code', paths[i].data('code'));
+                  clone.data('code', code);
+                  clone.data('opacity', paths[i].data('opacity'));
+                  clone.data('color', color);
                   clone.attr({
                     'fill' : color,
                   });
-                  highlights.push(clone);
+                  clones.push(clone);
                   var animAttrs = {
                     transform : 's' + [1.5, 1.5, centerX, centerY].join(','),
                   };
@@ -119,6 +124,8 @@ angular.module('anatomy.tagging.directives', [])
                     });
                   })(clone);
                 }
+                highlightsByCode[code] = clones;
+                highlights = highlights.concat(clones);
               },
 
               clearHighlights : function() {
@@ -126,15 +133,39 @@ angular.module('anatomy.tagging.directives', [])
                   highlights[i].remove();
                 }
                 highlights = [];
+                highlightsByCode = {};
               },
-            }
+            };
+
             scope.$parent.imageController = that;
 
             var clickHandler;
+            var hoverOpacity = 0;
             if (attrs.tagging) {
               clickHandler = taggingClickHandler;
             } else {
               clickHandler = practiceClickHandler;
+              hoverOpacity = 0.2;
+            }
+              hoverInHandler = function() {
+                setLowerOpacity(this, hoverOpacity);
+              };
+              hoverOutHandler = function() {
+                setLowerOpacity(this, 0);
+              };
+
+            function setLowerOpacity(path, decrease) {
+                var code = path.data('code');
+                if (code == 'no-practice') {
+                  return;
+                }
+                var paths = (pathsByCode[code] || []).concat(
+                    highlightsByCode[code] || []);
+                for (var i = 0; i < paths.length; i++) {
+                  paths[i].attr({
+                    'opacity' : paths[i].data('opacity') - decrease,
+                  });
+                }
             }
 
             for (var i = 0; i < data.paths.length; i++) {
@@ -151,7 +182,9 @@ angular.module('anatomy.tagging.directives', [])
               });
               path.data('id', p.id);
               path.data('color', color);
+              path.data('opacity', p.opacity);
               path.click(clickHandler);
+              path.hover(hoverInHandler, hoverOutHandler);
               p.bbox = p.bbox || path.getBBox();
               if (p.bbox.width < 5 || p.bbox.height < 5) {
                 p.isTooSmall = true;
