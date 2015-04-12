@@ -84,6 +84,15 @@ class ImageManager(models.Manager):
         ).values('image').annotate(Count('image'))
         untagged_paths_count = self.to_dict(untagged_paths_count)
 
+        incomplete_terms_count = Path.objects.exclude(
+            term=None,
+        ).exclude(
+            term__slug__in=['no-practice', 'too-small'],
+        ).filter(
+            term__body_part=None,
+        ).values('image').annotate(Count('image'))
+        incomplete_terms_count = self.to_dict(incomplete_terms_count)
+
         paths_count = Path.objects.exclude(
             term__slug='no-practice'
         ).exclude(
@@ -93,15 +102,23 @@ class ImageManager(models.Manager):
         ret = dict([(c['image'], {
             'paths_count': c['image__count'],
             'untagged_paths_count': untagged_paths_count.get(c['image'], 0),
-            'progress': self.progress(c['image__count'],
-                                      untagged_paths_count.get(c['image'], 0)),
+            'paths_progress': self.paths_progress(
+                c['image__count'],
+                untagged_paths_count.get(c['image'], 0)),
+            'incomplete_terms_count': incomplete_terms_count.get(c['image'], 0),
+            'terms_count': c['image__count'] - untagged_paths_count.get(c['image'], 0),
+            'terms_progress': self.paths_progress(
+                incomplete_terms_count.get(c['image'], 0),
+                untagged_paths_count.get(c['image'], 0)),
         }) for c in paths_count])
         return ret
 
     def to_dict(self, count):
         return dict([(c['image'], c['image__count']) for c in count])
 
-    def progress(self, paths_count, untagged_paths_count):
+    def paths_progress(self, paths_count, untagged_paths_count):
+        if paths_count == 0:
+            return 0
         return (100.0 * (paths_count - untagged_paths_count)) / paths_count
 
 
