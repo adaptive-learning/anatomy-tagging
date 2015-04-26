@@ -137,7 +137,7 @@ angular.module('anatomy.tagging.directives', [])
               },
             };
 
-            scope.$parent.imageController = that;
+            scope.$root.imageController = that;
 
             var clickHandler;
             var hoverOpacity = 0;
@@ -208,7 +208,7 @@ angular.module('anatomy.tagging.directives', [])
 
             function onWidowResize(){
               paper.width = $window.innerWidth * (7 /12);
-              paper.height = $window.innerHeight - 66;
+              paper.height = ($window.innerHeight - 66) * (attrs.relativeHeight || 1);
               r.setSize(paper.width, paper.height);
               r.setViewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height, true);
             }

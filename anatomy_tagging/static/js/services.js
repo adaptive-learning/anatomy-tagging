@@ -62,9 +62,9 @@ angular.module('anatomy.tagging.services', [])
       promises[url] = promise;
       return promise;
     },
-    get : function() {
+    get : function(imageSlug) {
       var urlParts = $location.absUrl().split('/');
-      var url = '/imagejson/' + urlParts[urlParts.length - 1];
+      var url = '/imagejson/' + (imageSlug || urlParts[urlParts.length - 1]);
       var promise = promises[url] || $http.get(url);
       promises[url] = promise;
       return promise;

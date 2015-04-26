@@ -68,7 +68,7 @@ angular.module('anatomy.tagging.controllers', [])
 
 })
 
-.controller('ImageListController', function($scope, imageService, $window, $routeParams) {
+.controller('ImageListController', function($scope, imageService, $window, $routeParams, termsService, colors) {
   $scope.Math = $window.Math;
   $scope.loading = true;
   $scope.section = $routeParams.section;
@@ -110,6 +110,24 @@ angular.module('anatomy.tagging.controllers', [])
     }
     $scope.images = images;
   }
+  // section stuff
+
+  $scope.activateImage = function(image) {
+    $scope.activeImage = $scope.activeImage != image ? image : null;
+    if ($scope.activeImage) {
+      termsService.get(image.filename_slug).success(function(data){
+          $scope.terms = data;
+      });
+    }
+  };
+  var i = 0;
+  $scope.clickTerm = function(term) {
+    $scope.activeTerm = term;
+    $scope.$root.imageController.clearHighlights();
+    $scope.$root.imageController.highlightTerm(term.code, 
+      colors.HIGHLIGHTS[i++ % colors.HIGHLIGHTS.length]);
+    
+  };
 })
 
 .controller('ImageController', function($scope, imageService, termsService, colorService, Slug) {
@@ -298,7 +316,7 @@ angular.module('anatomy.tagging.controllers', [])
   practiceService.getQuestions($routeParams.image).success(function(data) {
     $scope.loading = false;
     $timeout(function() {
-      $scope.imageController.click(function(clickedCode) {
+      $scope.$root.imageController.click(function(clickedCode) {
         var isInOptions = !$scope.question.options || 
             $scope.question.options.filter(function(o) {
               return o.code == clickedCode;
@@ -312,14 +330,14 @@ angular.module('anatomy.tagging.controllers', [])
   });
 
   $scope.highlight = function() {
-    if ($scope.imageController) {
-      $scope.imageController.clearHighlights();
+    if ($scope.$root.imageController) {
+      $scope.$root.imageController.clearHighlights();
       if ($filter('isPickNameOfType')($scope.question)) {
-        $scope.imageController.highlightTerm($scope.question.asked_code, colors.NEUTRAL);
+        $scope.$root.imageController.highlightTerm($scope.question.asked_code, colors.NEUTRAL);
       }
       if ($filter('isFindOnMapType')($scope.question) && $scope.question.options) {
         for (var i = 0; i < $scope.question.options.length; i++) {
-          $scope.imageController.highlightTerm(
+          $scope.$root.imageController.highlightTerm(
             $scope.question.options[i].code, colors.HIGHLIGHTS[i]);
         }
       }
@@ -360,11 +378,11 @@ angular.module('anatomy.tagging.controllers', [])
       // prevents additional points gain. issue #38
       $scope.summary = practiceService.summary();
       $scope.showSummary = true;
-      $scope.imageController.clearHighlights();
-      //$scope.imageController.showSummaryTooltips($scope.summary.questions);
+      $scope.$root.imageController.clearHighlights();
+      //$scope.$root.imageController.showSummaryTooltips($scope.summary.questions);
       angular.forEach($scope.summary.questions, function(q) {
         var correct = q.asked_code == q.answered_code;
-        $scope.imageController.highlightTerm(q.asked_code, correct ? colors.GOOD : colors.BAD, 1);
+        $scope.$root.imageController.highlightTerm(q.asked_code, correct ? colors.GOOD : colors.BAD, 1);
       });
       //$("html, body").animate({ scrollTop: "0px" });
       //events.emit('questionSetFinished', user.getUser().answered_count);
@@ -372,9 +390,9 @@ angular.module('anatomy.tagging.controllers', [])
 
     function highlightAnswer (asked, selected) {
       if (asked != selected) {
-        $scope.imageController.highlightTerm(selected, colors.BAD);
+        $scope.$root.imageController.highlightTerm(selected, colors.BAD);
       }
-      $scope.imageController.highlightTerm(asked, colors.GOOD);
+      $scope.$root.imageController.highlightTerm(asked, colors.GOOD);
       if ($filter('isPickNameOfType')($scope.question)) {
         highlightOptions(selected);
       }

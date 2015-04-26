@@ -24,10 +24,10 @@
       <h2 class="col-sm-12" ng-bind="imagesByCategory[section].name"></h2>
     </div>
     <div class="row table-row" ng-repeat="image in imagesByCategory[section].images">
-      <a class="col-sm-6" href="practice/{{image.filename_slug}}">
+      <a class="col-sm-5" ng-click="activateImage(image)" href="">
         {{image.filename }}
       </a>
-      <span class="col-sm-6">
+      <span class="col-sm-5">
         <div class="progress">
           <div class="progress-bar progress-bar-success" role="progressbar"
             style="width: {{image.paths_progress}}%;">
@@ -38,7 +38,25 @@
           </div>
         </div>
       </span>
+      <span class="col-sm-2">
+        <a class="btn btn-primary" href="practice/{{image.filename_slug}}">
+          Procvičovat
+        </a>
+      </span>
       <div class="clearfix"></div>
+      <div ng-if="activeImage==image">
+        <div class="col-sm-7" ng-hide="loading">
+          <div class="image" url="{{image.filename_slug}}" relative-height="0.6"></div>
+        </div>
+        <div class="col-sm-5" ng-hide="loading">
+          <div ng-repeat="term in terms" class="">
+              <span class="btn btn-default btn-block"
+                ng-class="{'btn-info' : term == activeTerm}"
+                ng-click="clickTerm(term)"
+                ng-bind="term.name_la" ></span>
+          </div>
+        
+      </div>
     </div>
 </div>
 
