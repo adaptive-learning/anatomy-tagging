@@ -137,7 +137,10 @@ class Command(BaseCommand):
                 result.append(c)
                 body_part = body_part.replace(c, '')
         for c in body_part:
-            result.append(c)
+            if c == 'H':
+                result.extend(['Hf', 'Hb'])
+            else:
+                result.append(c)
         return result
 
     def _empty(self, x):
