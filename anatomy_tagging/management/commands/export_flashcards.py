@@ -2,6 +2,7 @@
 from django.core.management.base import BaseCommand
 from optparse import make_option
 from anatomy_tagging.models import Category, Term, Image
+import hashlib
 import json
 
 
@@ -63,7 +64,7 @@ class Command(BaseCommand):
                     if p.term.code:
                         p_json['term'] = p.term.code
                     else:
-                        p_json['term'] = p.term.slug
+                        p_json['term'] = hashlib.sha1(p.term.slug).hexdigest()
                     used_terms.add(p_json['term'])
                     if i.category is not None:
                         term_json = terms[p_json['term']]
@@ -96,7 +97,7 @@ class Command(BaseCommand):
         result = {}
         for t in Term.objects.all().exclude(code__in=['no-practice', 'too-small']):
             t_json = {
-                'id': t.code if t.code else t.slug,
+                'id': t.code if t.code else hashlib.sha1(t.slug).hexdigest(),
                 'name-cs': self._empty(t.name_cs),
                 'name-en': self._empty(t.name_en),
                 'name-la': self._empty(t.name_la),
