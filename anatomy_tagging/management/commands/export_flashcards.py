@@ -58,11 +58,14 @@ class Command(BaseCommand):
                 }
                 if p.bbox is not None:
                     p_json['bbox'] = self._bbox_to_json(p.bbox)
-                if p.term is not None and p.term.code and p.term.code not in ['no-practice', 'too-small']:
-                    used_terms.add(p.term.code)
-                    p_json['term'] = p.term.code
+                if p.term is not None and p.term.code not in ['no-practice', 'too-small']:
+                    if p.term.code:
+                        p_json['term'] = p.term.code
+                    else:
+                        p_json['term'] = p.term.slug
+                    used_terms.add(p_json['term'])
                     if i.category is not None:
-                        term_json = terms[p.term.code]
+                        term_json = terms[p_json['term']]
                         term_categories = term_json.get('categories', [])
                         term_categories.append(str(i.category.id))
                         term_json['categories'] = list(set(term_categories))
@@ -91,17 +94,17 @@ class Command(BaseCommand):
     def load_terms(self):
         result = {}
         for t in Term.objects.all().exclude(code__in=['no-practice', 'too-small']):
-            if not t.code:
-                continue
             t_json = {
-                'id': t.code,
+                'id': t.code if t.code else t.slug,
                 'name-cs': self._empty(t.name_cs),
                 'name-en': self._empty(t.name_en),
                 'name-la': self._empty(t.name_la),
             }
             if t.body_part is not None:
                 t_json['categories'] = self._body_part_to_categories(t.body_part)
-            result[t.code] = t_json
+            result[t_json['id']] = t_json
+            if t_json['id'] == 'trigonum-omotrapezium':
+                print t_json
         return result
 
     def load_categories(self):
