@@ -41,6 +41,7 @@ class Command(BaseCommand):
                     'id': ('%s-%s' % (p['term'], c['id']))[:50],
                     'term': p['term'],
                     'context': c['id'],
+                    'description': p['term'],
                 }
                 result[f_json['id']] = f_json
         return result
