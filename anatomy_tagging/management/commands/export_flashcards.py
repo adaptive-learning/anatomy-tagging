@@ -88,7 +88,6 @@ class Command(BaseCommand):
                 'content': content,
                 'name-cs': self._empty(i.name_cs),
                 'name-en': self._empty(i.name_en),
-                'name-la': '',  # TODO
             }
             result[c_json['id']] = c_json
         return result, used_terms
@@ -98,15 +97,12 @@ class Command(BaseCommand):
         for t in Term.objects.all().exclude(code__in=['no-practice', 'too-small']):
             t_json = {
                 'id': t.code if t.code else hashlib.sha1(t.slug).hexdigest(),
-                'name-cs': self._empty(t.name_cs),
+                'name-cs': self._empty(t.name_la),
                 'name-en': self._empty(t.name_en),
-                'name-la': self._empty(t.name_la),
             }
             if t.body_part is not None:
                 t_json['categories'] = self._body_part_to_categories(t.body_part)
             result[t_json['id']] = t_json
-            if t_json['id'] == 'trigonum-omotrapezium':
-                print t_json
         return result
 
     def load_categories(self):
@@ -116,7 +112,7 @@ class Command(BaseCommand):
                 'id': str(c.id),
                 'name-cs': self._empty(c.name_cs),
                 'name-en': self._empty(c.name_en),
-                'name-la': '',  # TODO
+                'type': 'system',
             }
             if c.parent is not None:
                 c_json['parent-categories'] = [str(c.parent)]
@@ -154,56 +150,47 @@ class Command(BaseCommand):
     LOCATION_CATEGORIES = [
         {
             'id': 'Hf',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Hlava, obličejová část (splanchnokranium)',
+            'name-en': 'Head - Face',
         },
         {
             'id': 'Hb',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Hlava, mozková část (neurokranium)',
+            'name-en': 'Head - Brain',
         },
         {
             'id': 'N',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Krk',
+            'name-en': 'Neck',
         },
         {
             'id': 'T',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Hrudník',
+            'name-en': 'Thorax',
         },
         {
             'id': 'B',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Záda',
+            'name-en': 'Back',
         },
         {
             'id': 'A',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Břicho',
+            'name-en': 'Abdomen',
         },
         {
             'id': 'P',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Pánev',
+            'name-en': 'Pelvis',
         },
         {
             'id': 'UE',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Horní končetina',
+            'name-en': 'Upper Extremity',
         },
         {
             'id': 'LE',
-            'name-cs': '',
-            'name-en': '',
-            'name-la': '',
+            'name-cs': 'Dolní končetina',
+            'name-en': 'Lower Extremity',
         },
     ]
