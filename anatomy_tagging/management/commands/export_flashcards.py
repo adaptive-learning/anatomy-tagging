@@ -69,7 +69,7 @@ class Command(BaseCommand):
                     if i.category is not None:
                         term_json = terms[p_json['term']]
                         term_categories = term_json.get('categories', [])
-                        term_categories.append(str(i.category.id))
+                        term_categories.append(self._get_category_id(i.category))
                         term_json['categories'] = list(set(term_categories))
                 if p.stroke is not None:
                     p_json['stroke'] = p.stroke
@@ -109,13 +109,13 @@ class Command(BaseCommand):
         result = {}
         for c in Category.objects.all():
             c_json = {
-                'id': str(c.id),
+                'id': self._get_category_id(c),
                 'name-cs': self._empty(c.name_cs),
-                'name-en': self._empty(c.name_en),
+                'name-en': self._get_category_english_name(c),
                 'type': 'system',
             }
             if c.parent is not None:
-                c_json['parent-categories'] = [str(c.parent)]
+                c_json['parent-categories'] = [self._get_category_id(c.parent)]
             result[c_json['id']] = c_json
         for c in self.LOCATION_CATEGORIES:
             c['type'] = 'location'
@@ -146,6 +146,21 @@ class Command(BaseCommand):
 
     def _empty(self, x):
         return '' if x is None else x
+
+    def _get_category_id(self, c):
+        try:
+            return str(int(c.name_cs.split()[0])).zfill(2)
+        except (ValueError, IndexError):
+            return str(c.id)
+
+    def _get_category_english_name(self, c):
+        if c.name_en is not None and c.name_en != '':
+            return c.name_en
+        try:
+            id = int(c.name_cs.split()[0])
+            return str(id) + ' ' + self.ENGLISH_CATEGORY_NAMES[id]
+        except (ValueError, IndexError):
+            return self._empty(c.name_en)
 
     LOCATION_CATEGORIES = [
         {
@@ -194,3 +209,21 @@ class Command(BaseCommand):
             'name-en': 'Lower Extremity',
         },
     ]
+
+    ENGLISH_CATEGORY_NAMES = {
+        1: 'General anatomy',
+        2: 'Bones',
+        3: 'Joints',
+        4: 'Muscles',
+        5: 'Digestive system',
+        6: 'Respiratory system',
+        7: 'Urinary system',
+        8: 'Genital system',
+        9: 'Heart and blood vessels',
+        10: 'Lymphatic and immune system',
+        11: 'Peripheral nervous system',
+        12: 'Central nervous system',
+        13: 'Sense and skin',
+        14: 'Endocrine system',
+        15: 'Topography',
+    }
