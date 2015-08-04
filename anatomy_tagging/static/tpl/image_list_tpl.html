@@ -28,6 +28,14 @@ close="closeAlert($index)">{{alert.msg}}</alert>
     </div>
     <div class="row table-row" ng-repeat="image in category.images">
       <a class="col-sm-4" href="image/{{image.filename_slug}}">
+        <span class="pull-right">
+          <span class="label label-success"
+            ng-class="{'label-danger' : !image.name_cs}"
+            tooltip="{{image.name_cs}}">cs</span>
+          <span class="label label-success"
+            ng-class="{'label-danger' : !image.name_en}"
+            tooltip="{{image.name_en}}">en</span>
+        </span>
         {{image.filename }}
       </a>
       <span class="col-sm-5">
