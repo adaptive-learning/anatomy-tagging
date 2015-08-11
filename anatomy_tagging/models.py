@@ -2,6 +2,7 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.db.models import Count
+from django.db.models import Q
 
 
 class CategoryManager(models.Manager):
@@ -89,8 +90,13 @@ class ImageManager(models.Manager):
         ).exclude(
             term__slug__in=['no-practice', 'too-small'],
         ).filter(
-            term__body_part=None,
+            Q(term__parent=None) |
+            Q(term__body_part=None) |
+            Q(term__body_part='') |
+            Q(term__name_en=None) |
+            Q(term__name_en='')
         ).values('image').annotate(Count('image'))
+
         incomplete_terms_count = self.to_dict(incomplete_terms_count)
 
         paths_count = Path.objects.exclude(
@@ -108,8 +114,8 @@ class ImageManager(models.Manager):
             'incomplete_terms_count': incomplete_terms_count.get(c['image'], 0),
             'terms_count': c['image__count'] - untagged_paths_count.get(c['image'], 0),
             'terms_progress': self.paths_progress(
-                incomplete_terms_count.get(c['image'], 0),
-                untagged_paths_count.get(c['image'], 0)),
+                c['image__count'] - incomplete_terms_count.get(c['image'], 0),
+                incomplete_terms_count.get(c['image'], 0)),
         }) for c in paths_count])
         return ret
 
@@ -119,7 +125,7 @@ class ImageManager(models.Manager):
     def paths_progress(self, paths_count, untagged_paths_count):
         if paths_count == 0:
             return 0
-        return (100.0 * (paths_count - untagged_paths_count)) / paths_count
+        return 100.0 * ((paths_count - untagged_paths_count) / (paths_count * 1.0))
 
 
 class Image(models.Model):
