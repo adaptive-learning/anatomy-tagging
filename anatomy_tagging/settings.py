@@ -61,9 +61,10 @@ TEMPLATE_DIRS = (
 )
 
 ALLOWED_HOSTS = [
-    'altest.thran.cz',
     'znackuj.anatom.cz',
 ]
+
+EMAIL_SUBJECT_PREFIX = '[znackuj.anatom.cz] '
 
 
 # Application definition
@@ -131,6 +132,41 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'filters': [],
+            'formatter': 'simple'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+    },
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s] %(levelname)s "%(message)s"'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console', 'mail_admins'],
+            'propagate': True,
+            'level': 'DEBUG'
+        }
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+
+}
 
 
 try:
