@@ -165,12 +165,12 @@ class Command(BaseCommand):
     LOCATION_CATEGORIES = [
         {
             'id': 'Hf',
-            'name-cs': 'Hlava, obličejová část (splanchnokranium)',
+            'name-cs': 'Splanchnokranium',
             'name-en': 'Head - Face',
         },
         {
             'id': 'Hb',
-            'name-cs': 'Hlava, mozková část (neurokranium)',
+            'name-cs': 'Neurokranium',
             'name-en': 'Head - Brain',
         },
         {
