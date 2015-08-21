@@ -51,6 +51,7 @@ class Command(BaseCommand):
         result = {}
         used_terms = set()
         for i in Image.objects.select_related('bbox').prefetch_related('path_set').all():
+            terms_in_image = 0
             paths = []
             for p in i.path_set.all():
                 p_json = {
@@ -66,6 +67,7 @@ class Command(BaseCommand):
                     else:
                         p_json['term'] = hashlib.sha1(p.term.slug).hexdigest()
                     used_terms.add(p_json['term'])
+                    terms_in_image += 1
                     if i.category is not None:
                         term_json = terms[p_json['term']]
                         term_categories = term_json.get('categories', [])
@@ -75,21 +77,24 @@ class Command(BaseCommand):
                     p_json['stroke'] = p.stroke
                     p_json['stroke_width'] = p.stroke_width
                 paths.append(p_json)
-            content = {
-                'meta': {
-                    'textbook-page': i.textbook_page,
-                    'filename': i.filename,
-                },
-                'bbox': self._bbox_to_json(i.bbox),
-                'paths': paths
-            }
-            c_json = {
-                'id': i.filename_slug[:50],
-                'content': content,
-                'name-cs': self._empty(i.name_cs),
-                'name-en': self._empty(i.name_en),
-            }
-            result[c_json['id']] = c_json
+            if terms_in_image > 1:
+                content = {
+                    'meta': {
+                        'textbook-page': i.textbook_page,
+                        'filename': i.filename,
+                    },
+                    'bbox': self._bbox_to_json(i.bbox),
+                    'paths': paths
+                }
+                c_json = {
+                    'id': i.filename_slug[:50],
+                    'content': content,
+                    'name-cs': self._empty(i.name_cs),
+                    'name-en': self._empty(i.name_en),
+                }
+                result[c_json['id']] = c_json
+            else:
+                print "WARNING: Skipping image with %s terms:" % terms_in_image, i.filename
         return result, used_terms
 
     def load_terms(self):
