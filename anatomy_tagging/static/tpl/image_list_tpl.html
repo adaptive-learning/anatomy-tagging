@@ -39,15 +39,15 @@ close="closeAlert($index)">{{alert.msg}}</alert>
         {{image.filename }}
       </a>
       <span class="col-sm-3">
-        <div class="progress">
-          <div class="progress-bar progress-bar-success" role="progressbar"
-            style="width: {{image.paths_progress}}%;">
+        <progress>
+          <bar class="progress-bar progress-bar-success" role="progressbar"
+            value="image.paths_progress">
             <span ng-if="image.paths_progress != 0">
             {{image.paths_count - image.untagged_paths_count}} /
             {{image.paths_count}}
             </span>
-          </div>
-        </div>
+          </bar>
+        </progress>
       </span>
       <span class="col-sm-2">
         <a class="" href="terms/{{image.filename_slug}}">
@@ -55,15 +55,15 @@ close="closeAlert($index)">{{alert.msg}}</alert>
         </a>
       </span>
       <span class="col-sm-3">
-        <div class="progress">
-          <div class="progress-bar progress-bar-success" role="progressbar"
-            style="width: {{image.terms_progress}}%;">
+        <progress>
+          <bar class="progress-bar-success" role="progressbar"
+            value="image.terms_progress">
             <span ng-if="image.terms_progress != 0 || 1">
             {{image.terms_count - image.incomplete_terms_count}} /
             {{image.terms_count}}
             </span>
-          </div>
-        </div>
+          </bar>
+        </progress>
       </span>
       <div class="clearfix"></div>
     </div>
