@@ -15,7 +15,7 @@ class Command(BaseCommand):
             dest='output',
             type=str,
             default='anatomy-flashcards.json'),
-        )
+    )
 
     def handle(self, *args, **options):
         categories = self.load_categories()
@@ -44,6 +44,7 @@ class Command(BaseCommand):
                     'term': p['term'],
                     'context': c['id'],
                     'description': p['term'],
+                    'active': c['active'],
                 }
                 result[f_json['id']] = f_json
         return result
@@ -93,7 +94,7 @@ class Command(BaseCommand):
                 'content': content,
                 'name-cs': self._empty(i.name_cs),
                 'name-en': self._empty(i.name_en),
-                'active': len(terms_in_image) > 1,
+                'active': i.active and len(terms_in_image) > 1,
             }
             if len(terms_in_image) <= 1:
                 print "WARNING: Deactivating image with %s terms:" % len(terms_in_image), i.filename

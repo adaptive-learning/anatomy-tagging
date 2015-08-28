@@ -1,6 +1,6 @@
 <div class="">
   <div class="header">
-    <div class="form-group col-sm-7">
+    <div class="form-group col-sm-6">
     <h1>
       <a href="/">
         <i class="glyphicon glyphicon-home"></i>
@@ -17,6 +17,11 @@
     </div>
     <div class="form-group col-sm-1">
       <input placeholder="Strana v učebnici" ng-model="image.textbook_page" class="form-control">
+    </div>
+    <div class="form-group col-sm-1">
+      <input tooltip="Obrázek bude nahrán do aplikace"
+        tooltip-placement="bottom"
+        ng-model="image.active" class="form-control" type="checkbox">
     </div>
     <div class="clearfix"></div>
   </div>

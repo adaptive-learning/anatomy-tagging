@@ -78,6 +78,7 @@ def image_update(request):
         image = get_object_or_404(Image, filename_slug=data['image']['filename_slug'])
         image.name_cs = data['image']['name_cs']
         image.name_en = data['image']['name_en']
+        image.active = data['image']['active']
         Bbox.objects.add_to_image(image, data['image']['bbox'])
         image.save()
         paths_by_id = dict([

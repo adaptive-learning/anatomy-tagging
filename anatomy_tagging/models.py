@@ -144,6 +144,7 @@ class Image(models.Model):
         default='',
         null=True
     )
+    active = models.BooleanField(default=False)
 
     objects = ImageManager()
 
@@ -160,6 +161,7 @@ class Image(models.Model):
             'textbook_page': self.textbook_page,
             'bbox': to_serializable_or_none(self.bbox),
             'category': to_serializable_or_none(self.category),
+            'active': self.active,
         }
 
 
