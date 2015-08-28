@@ -4,6 +4,7 @@ from optparse import make_option
 from anatomy_tagging.models import Category, Term, Image
 import hashlib
 import json
+from clint.textui import progress
 
 
 class Command(BaseCommand):
@@ -50,8 +51,10 @@ class Command(BaseCommand):
     def load_contexts(self, terms):
         result = {}
         used_terms = set()
-        for i in Image.objects.select_related('bbox').prefetch_related('path_set').all():
             terms_in_image = 0
+        print "\nLoading contexts"
+        images = Image.objects.select_related('bbox').prefetch_related('path_set').all()
+        for i in progress.bar(images, every=max(1, len(images) / 100)):
             paths = []
             for p in i.path_set.all():
                 p_json = {
