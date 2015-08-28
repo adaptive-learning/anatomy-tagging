@@ -115,7 +115,7 @@ class Command(BaseCommand):
 
     def load_categories(self):
         result = {}
-        for c in Category.objects.all():
+        for c in Category.objects.exclude(name_cs=''):
             c_json = {
                 'id': self._get_category_id(c),
                 'name-cs': self._empty(c.name_cs),
