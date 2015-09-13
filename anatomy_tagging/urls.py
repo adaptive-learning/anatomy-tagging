@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, include, url
+from django.views.generic import RedirectView
 
 from django.contrib import admin
 admin.autodiscover()
@@ -17,6 +18,8 @@ urlpatterns = patterns(
     url(r'^termsjson/update$', 'update_term', name='terms'),
     url(r'^termsjson/(?P<filename_slug>[\w\.-]*)$', 'terms', name='terms'),
     # url(r'^blog/', include('blog.urls')),
+
+    url(r'^favicon\.ico$', RedirectView.as_view(url='static/img/favicon.png')),
 
     url(r'^admin/', include(admin.site.urls)),
 
