@@ -32,6 +32,7 @@ class Command(BaseCommand):
                 'contexts': contexts.values(),
                 'flashcards': flashcards.values()
             }, f, indent=2)
+            print 'Flashcards exported to file: \'%s\'' % options['output']
 
     def load_flashcards(self, contexts):
         result = {}
@@ -97,7 +98,7 @@ class Command(BaseCommand):
                 'active': i.active and len(terms_in_image) > 1,
             }
             if len(terms_in_image) <= 1:
-                print "WARNING: Deactivating image with %s terms:" % len(terms_in_image), i.filename
+                print "WARNING: Deactivating image with %s terms:" % len(terms_in_image), i.filename.encode('utf8')
             result[c_json['id']] = c_json
         return result, used_terms
 
