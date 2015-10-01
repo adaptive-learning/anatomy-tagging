@@ -47,6 +47,7 @@ class Command(BaseCommand):
         map_dom = minidom.parse(file_path)
         image = Image(
             filename=file_name,
+            name_cs=file_name.replace('.svg', ''),
             filename_slug=slugify(file_name),
             category=category,
         )
