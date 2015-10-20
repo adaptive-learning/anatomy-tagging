@@ -134,6 +134,8 @@ class Command(BaseCommand):
         return result
 
     def _bbox_to_json(self, bbox):
+        if bbox is None:
+            return None
         return {
             'x': bbox.x,
             'y': bbox.y,
