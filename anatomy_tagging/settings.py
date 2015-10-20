@@ -173,3 +173,5 @@ try:
     from githash import HASH
 except (SyntaxError, ImportError) as e:
     HASH = ''
+
+LOGIN_URL = '/admin/'

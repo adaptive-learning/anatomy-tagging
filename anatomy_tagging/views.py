@@ -6,8 +6,10 @@ from django.db import connection
 import json as simplejson
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def home(request):
     js_files = [
         "/static/lib/jquery-1.11.0.js",
@@ -36,6 +38,7 @@ def home(request):
     return render_to_response('home.html', c)
 
 
+@login_required
 def images_json(request):
     images = Image.objects.all().select_related('bbox', 'category')
     counts = Image.objects.get_counts()
@@ -48,6 +51,7 @@ def images_json(request):
     return render_json(request, json)
 
 
+@login_required
 def image(request, filename_slug):
     c = {
         'filename_slug': filename_slug,
@@ -56,6 +60,7 @@ def image(request, filename_slug):
     return render_to_response('image.html', c)
 
 
+@login_required
 def update_term(request):
     if request.body:
         data = simplejson.loads(request.body)
@@ -72,6 +77,7 @@ def update_term(request):
     return render_json(request, response)
 
 
+@login_required
 def image_update(request):
     if request.body:
         data = simplejson.loads(request.body)
@@ -110,6 +116,7 @@ def image_update(request):
     return render_json(request, response)
 
 
+@login_required
 def image_json(request, filename_slug):
     image = get_object_or_404(Image, filename_slug=filename_slug)
     paths = Path.objects.filter(image=image).select_related('term', 'bbox')
@@ -120,6 +127,7 @@ def image_json(request, filename_slug):
     return render_json(request, json)
 
 
+@login_required
 def terms(request, filename_slug=None):
     terms = Term.objects.exclude(slug__in=['too-small', 'no-practice'])
     if filename_slug is not None and filename_slug != '':
@@ -134,6 +142,7 @@ def terms(request, filename_slug=None):
     return render_json(request, json)
 
 
+@login_required
 def render_json(request, json, status=None,):
     if 'html' in request.GET:
         return HttpResponse(
