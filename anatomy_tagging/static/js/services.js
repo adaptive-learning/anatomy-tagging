@@ -43,6 +43,9 @@ angular.module('anatomy.tagging.services', [])
         graySum += 3.7 * rgb[i] * weights[i];
       }
       var grayAverageHex = Math.round(graySum / 3).toString(16);
+      if (grayAverageHex == 'NaN') {
+        return '#000000';
+      }
       return '#' + grayAverageHex + grayAverageHex + grayAverageHex;
     },
   };
