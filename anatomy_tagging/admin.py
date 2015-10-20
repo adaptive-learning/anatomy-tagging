@@ -10,10 +10,11 @@ class ImageAdmin(admin.ModelAdmin):
 
 class PathAdmin(admin.ModelAdmin):
     list_display = ('image', 'term', 'bbox', 'color', 'opacity')
+    search_fields = ('image__name_cs', 'image__name_en', 'term__name_la', 'term__name_en')
 
 
 class TermAdmin(admin.ModelAdmin):
-    search_fields = ('name_la', 'name_cs', 'name_en')
+    search_fields = ('name_la', 'name_cs', 'name_en', 'code', 'slug')
     list_display = ('name_la', 'name_cs', 'name_en', 'parent', 'body_part')
 
 
