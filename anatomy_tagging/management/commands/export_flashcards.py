@@ -15,12 +15,21 @@ class Command(BaseCommand):
             dest='output',
             type=str,
             default='anatomy-flashcards.json'),
+        make_option(
+            '--context',
+            help='export only a single context specified by filename_slug',
+            dest='context',
+            type=str,
+            default=None),
     )
 
     def handle(self, *args, **options):
+        if options['context'] is not None:
+            options['output'] = options['output'].replace(
+                '.json', '-' + options['context'] + '.json')
         categories = self.load_categories()
         terms = self.load_terms()
-        contexts, used_terms = self.load_contexts(terms)
+        contexts, used_terms = self.load_contexts(terms, options['context'])
         terms = dict(filter(lambda (i, t): i in used_terms, terms.items()))
         flashcards = self.load_flashcards(contexts)
         for c in contexts.itervalues():
@@ -50,11 +59,13 @@ class Command(BaseCommand):
                 result[f_json['id']] = f_json
         return result
 
-    def load_contexts(self, terms):
+    def load_contexts(self, terms, context):
         result = {}
         used_terms = set()
         print "\nLoading contexts"
         images = Image.objects.select_related('bbox').prefetch_related('path_set').all()
+        if context is not None:
+            images = images.filter(filename_slug=context)
         for i in progress.bar(images, every=max(1, len(images) / 100)):
             terms_in_image = set()
             paths = []
