@@ -130,7 +130,7 @@ angular.module('anatomy.tagging.controllers', [])
   };
 })
 
-.controller('ImageController', function($scope, imageService, termsService, colorService, Slug) {
+.controller('ImageController', function($scope, imageService, termsService, colorService, Slug, $http) {
   $scope.pathsByColor = {};
   $scope.loading = true;
   $scope.alerts = [];
@@ -282,13 +282,27 @@ angular.module('anatomy.tagging.controllers', [])
     return !path.isTooSmall;
   };
 
-  $scope.save= function() {
+  $scope.save= function(production) {
     $scope.updateFocused();
     $scope.saving = true;
     imageService.save($scope.image, $scope.paths)
     .success(function(data) {
-      $scope.alerts.push(data);
-      $scope.saving = false;
+      if (!production) {
+        $scope.alerts.push(data);
+        $scope.saving = false;
+      } else {
+        var url = 'http://anatom.cz/load_flashcards/?context=' + $scope.image.filename_slug + '&callback=JSON_CALLBACK';
+        $http.jsonp(url).success(function(data) {
+          $scope.alerts.push(data);
+          $scope.saving = false;
+        }).error(function(data) {
+          $scope.alerts.push({
+            type : 'danger',
+            msg : 'Na serveru nastala chyba',
+          });
+          $scope.saving = false;
+        });
+      }
     })
     .error(function(data) {
       $scope.alerts.push({
