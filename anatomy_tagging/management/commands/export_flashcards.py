@@ -131,7 +131,7 @@ class Command(BaseCommand):
         for c in Category.objects.exclude(name_cs=''):
             c_json = {
                 'id': self._get_category_id(c),
-                'name-cs': self._empty(c.name_cs),
+                'name-cs': self._stip_number(self._empty(c.name_cs)),
                 'name-en': self._get_category_english_name(c),
                 'type': 'system',
             }
@@ -170,6 +170,9 @@ class Command(BaseCommand):
     def _empty(self, x):
         return '' if x is None else x
 
+    def _stip_number(self, x):
+        return filter(lambda c: not c.isdigit(), x).strip()
+
     def _get_category_id(self, c):
         try:
             return str(int(c.name_cs.split()[0])).zfill(2)
@@ -181,7 +184,7 @@ class Command(BaseCommand):
             return c.name_en
         try:
             id = int(c.name_cs.split()[0])
-            return str(id) + ' ' + self.ENGLISH_CATEGORY_NAMES[id]
+            return self.ENGLISH_CATEGORY_NAMES[id]
         except (ValueError, IndexError):
             return self._empty(c.name_en)
 
