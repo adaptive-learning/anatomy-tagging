@@ -7,6 +7,8 @@ import json as simplejson
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core import management
+import os
 
 
 @login_required
@@ -109,6 +111,16 @@ def image_update(request):
                 path_updated = True
             if path_updated:
                 path.save()
+        if image.active:
+            export_dir = os.path.join(settings.MEDIA_DIR, 'export')
+            if not os.path.exists(export_dir):
+                    os.makedirs(export_dir)
+            management.call_command(
+                'export_flashcards',
+                context=image.filename_slug,
+                output=os.path.join(export_dir, 'image.json'),
+                verbosity=0,
+                interactive=False)
         response = {
             'type': 'success',
             'msg': u'Změny byly uloženy',
