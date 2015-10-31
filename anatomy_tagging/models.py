@@ -170,7 +170,7 @@ class TermManager(models.Manager):
         term = None
         if (term_key in path_dict and
                 path_dict[term_key] is not None):
-            if 'id' in path_dict[term_key]:
+            if isinstance(path_dict[term_key], dict) and 'id' in path_dict[term_key]:
                 term = self.get(id=path_dict[term_key]['id'])
             elif 'code' in path_dict[term_key]:
                 term = self.get(code=path_dict[term_key]['code'])
