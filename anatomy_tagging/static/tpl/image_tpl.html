@@ -128,6 +128,23 @@
       <alert ng-repeat="alert in alerts" type="{{alert.type}}"
       close="closeAlert($index)">{{alert.msg}}</alert>
       <br>
+      <div ng-if="showBbox">
+        <div>
+          Bbox:
+        </div>
+        <span class="col-sm-3">
+          x<input ng-change="imageController.refreshBbox()" class="form-control" ng-model="image.bbox.x">
+        </span>
+        <span class="col-sm-3">
+          y<input ng-change="imageController.refreshBbox()" class="form-control" ng-model="image.bbox.y">
+        </span>
+        <span class="col-sm-3">
+          width<input ng-change="imageController.refreshBbox()" class="form-control" ng-model="image.bbox.height">
+        </span>
+        <span class="col-sm-3">
+          height<input ng-change="imageController.refreshBbox()" class="form-control" ng-model="image.bbox.width">
+        </span>
+      </div>
       <div class="form-group">
         <a ng-click="save()"
           ng-disabled="saving"

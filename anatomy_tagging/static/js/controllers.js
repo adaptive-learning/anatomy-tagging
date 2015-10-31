@@ -130,7 +130,7 @@ angular.module('anatomy.tagging.controllers', [])
   };
 })
 
-.controller('ImageController', function($scope, imageService, termsService, colorService, Slug, $http) {
+.controller('ImageController', function($scope, imageService, termsService, colorService, Slug, $http, $routeParams) {
   $scope.pathsByColor = {};
   $scope.loading = true;
   $scope.alerts = [];
@@ -145,6 +145,7 @@ angular.module('anatomy.tagging.controllers', [])
       obj : $scope.pathsByTerm,
     }
   ];
+  $scope.showBbox = $routeParams.showbbox;
 
   termsService.get().success(function(data) {
     $scope.terms = data;

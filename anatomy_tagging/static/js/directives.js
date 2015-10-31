@@ -135,6 +135,10 @@ angular.module('anatomy.tagging.directives', [])
                 highlights = [];
                 highlightsByCode = {};
               },
+              refreshBbox : function() {
+                viewBox.updated = true;
+                r.setViewBox(viewBox.x, viewBox.y, viewBox.width, viewBox.height, true);
+              },
             };
 
             scope.$root.imageController = that;

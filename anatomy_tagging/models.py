@@ -42,7 +42,9 @@ class BboxManager(models.Manager):
         return self._add_to_image_or_path(path, bbox_dict)
 
     def _add_to_image_or_path(self, image_or_path, bbox_dict):
-        if image_or_path.bbox_id is None and bbox_dict is not None:
+        if (bbox_dict is not None and
+                (image_or_path.bbox_id is None or
+                    'updated' in bbox_dict)):
             bbox = Bbox(
                 x=int(bbox_dict['x']),
                 y=int(bbox_dict['y']),
