@@ -21,5 +21,6 @@ echo " * anatomy data"
 python $DIR/manage.py load_images 
 python $DIR/manage.py load_terms
 python $DIR/manage.py relate_terms
+python $DIR/manage.py sanitize_terms
 
 echo "HASH = '$(date +%s)'" > $DIR/githash.py
