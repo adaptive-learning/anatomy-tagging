@@ -136,18 +136,10 @@ select.per-page-select {
   color: #5CA03C;
   width: 100%;
   background-color: #efefef;
-  background-image: url("/static/img/1-obecna-anatomie.png");
   background-repeat: no-repeat;
   background-size: contain;
   text-decoration: none;
 }
-.tile:nth-child(3n + 2) a {
-  background-image: url("/static/img/2-kostra.png");
-}
-.tile:nth-child(3n + 3) a {
-  background-image: url("/static/img/3-kosterni-spoje.png");
-}
-
 .tile a:hover {
   background-color: #e5e5e5;
 }

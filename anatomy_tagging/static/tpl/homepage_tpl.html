@@ -1,6 +1,6 @@
 <div class="header">
   <div class="col-sm-10">
-    <h1>Anatom.cz</h1>
+    <h1>znackuj.anatom.cz - kontrolní procvičování</h1>
   </div>
   <div class="clearfix"></div>
   <br>
@@ -19,18 +19,11 @@
     <span ng-repeat="(key, category) in imagesByCategory"
       class="col-xs-6 col-sm-3 tile">
       <span class="in-tile">
-        <a href="#/home/{{category.slug}}">
+        <a href="#/home/{{category.slug}}"
+          style="background-image:
+          url('/static/img/{{('0' + category.name.split(' ')[0]).slice(-2)}}.png')">
           <div class="dummy"></div>
           <div class="absolute">
-            <div round-progress
-                max="100"
-                current="category.progress"
-                color="#5CA03C"
-                bgcolor="rgba(150,150,150,0.5)"
-                radius="90"
-                stroke="15"
-                iterations="50"
-                animation="easeInOutQuart"></div>
           </div>
           <h2 ng-bind="category.name"></h2>
         </a>
