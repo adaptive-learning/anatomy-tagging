@@ -139,7 +139,10 @@ angular.module('anatomy.tagging.services', [])
     getQuestions : function(imageSlug) {
       termsService.get(imageSlug).success(function(data){
           items = data;
-          questions = data.slice(0, $location.search().limit || 10);
+          questions = angular.copy(data);
+          if ($location.search().limit) {
+            questions = questions.slice(0, $location.search().limit);
+          }
           index = 0;
           callback(questions);
           summary = [];
@@ -171,7 +174,8 @@ angular.module('anatomy.tagging.services', [])
     },
     next : function() {
       var q = angular.copy(questions[index++]);
-      q.type = getType($location.search().type);
+      // Hack for controll
+      q.type = 10; //getType($location.search().type);
       q.options = getOptions(q.type);
       q.text = getText(q.type);
       q.item = q.name_la;
