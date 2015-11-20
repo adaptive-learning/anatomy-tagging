@@ -99,6 +99,7 @@
                 <span class="color-indicator"
                   style="background-color: {{path.color}};
                     opacity: {{path.opacity}}"></span>
+                <span ng-if="showBbox" ng-bind="path.id"></span>
               </div>
               <input ng-model="path.term"
                 id="input-{{path.id}}"
