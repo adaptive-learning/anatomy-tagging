@@ -61,7 +61,13 @@ angular.module('anatomy.tagging.services', [])
       if (cached && promises[url]){
         return promises[url];
       }
-      var promise = $http.get(url);
+      var params = {};
+      if (cached) {
+        params.params = {
+          omit_counts: true,
+        };
+      }
+      var promise = $http.get(url, params);
       promises[url] = promise;
       return promise;
     },

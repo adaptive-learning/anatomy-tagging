@@ -43,13 +43,14 @@ def home(request):
 @login_required
 def images_json(request):
     images = Image.objects.all().select_related('bbox', 'category')
-    counts = Image.objects.get_counts()
     json = {
         'images': [i.to_serializable() for i in images],
     }
-    for i in json['images']:
-        if i['id'] in counts:
-            i.update(counts[i['id']])
+    if 'omit_counts' not in request.GET:
+        counts = Image.objects.get_counts()
+        for i in json['images']:
+            if i['id'] in counts:
+                i.update(counts[i['id']])
     return render_json(request, json)
 
 
