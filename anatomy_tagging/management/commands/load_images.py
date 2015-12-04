@@ -36,11 +36,28 @@ class Command(BaseCommand):
             category = Category.objects.get_by_name(folder_name)
             if f.endswith('.svg'):
                 try:
-                    Image.objects.get(filename=f)
+                    image = Image.objects.get(filename=f)
+                    self.fix_gradients(image, child_path)
                 except Image.DoesNotExist:
                     self.upload_image(child_path, category)
             elif os.path.isdir(child_path):
                 self.add_folder(child_path)
+
+    def fix_gradients(self, image, file_path):
+        map_dom = minidom.parse(file_path)
+        gradients = map_dom.getElementsByTagName('radialGradient')
+        for gradient in gradients:
+            gradient_id = gradient.attributes['id'].value
+            first_stop = gradient.getElementsByTagName('stop')[-1]
+            first_stop_style = first_stop.attributes['style'].value
+            first_stop_color = first_stop_style.replace('stop-color:', '')
+            paths = Path.objects.filter(
+                color='url(#%s)' % gradient_id,
+                image=image)
+            for path in paths:
+                print 'updating gradients in image: ' + image.filename
+                path.color = first_stop_color
+                path.save()
 
     def upload_image(self, file_path, category):
         file_name = os.path.basename(file_path)
@@ -59,6 +76,7 @@ class Command(BaseCommand):
             path_object = self.path_elem_to_object(path.attributes, image)
             path_objects.append(path_object)
         Path.objects.bulk_create(path_objects)
+        self.fix_gradients(image, file_path)
 
     def path_elem_to_object(self, attributes, image):
         if 'd' in attributes.keys():
