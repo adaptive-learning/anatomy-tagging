@@ -190,11 +190,13 @@ angular.module('anatomy.tagging.directives', [])
               path.click(clickHandler);
               path.hover(hoverInHandler, hoverOutHandler);
               p.bbox = p.bbox || path.getBBox();
-              if (p.bbox.width < 5 || p.bbox.height < 5) {
+              if (p.bbox.width < 5 && p.bbox.height < 5) {
                 p.isTooSmall = true;
                 p.term = {
                   code : 'too-small',
                 };
+              } else if (p.term && p.term.code == 'too-small') {
+                p.term = undefined;
               }
               paths.push(path);
               rPathsObj[p.id] = path;
