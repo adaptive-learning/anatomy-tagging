@@ -151,7 +151,7 @@ def terms(request, filename_slug=None):
         image = get_object_or_404(Image, filename_slug=filename_slug)
         paths = Path.objects.filter(image=image).select_related('term')
         terms = terms.filter(
-            id__in=[p.term_id for p in paths if p.term_id is not None]
+            id__in=list(set([p.term_id for p in paths if p.term_id is not None]))
         ).order_by('-id')
 
     terms = terms.select_related('parent')
