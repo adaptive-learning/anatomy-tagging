@@ -92,6 +92,8 @@ def image_update(request):
             image.textbook_page = int(data['image']['textbook_page'])
         except ValueError:
             image.textbook_page = None
+        except TypeError:
+            image.textbook_page = None
         Bbox.objects.add_to_image(image, data['image']['bbox'])
         image.save()
         paths_by_id = dict([
