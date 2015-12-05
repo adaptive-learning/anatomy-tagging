@@ -88,6 +88,10 @@ def image_update(request):
         image.name_cs = data['image']['name_cs']
         image.name_en = data['image']['name_en']
         image.active = data['image']['active']
+        try:
+            image.textbook_page = int(data['image']['textbook_page'])
+        except ValueError:
+            image.textbook_page = None
         Bbox.objects.add_to_image(image, data['image']['bbox'])
         image.save()
         paths_by_id = dict([
@@ -135,7 +139,7 @@ def image_json(request, filename_slug):
     paths = Path.objects.filter(image=image).select_related('term', 'bbox')
     json = {
         'image': image.to_serializable(),
-        'paths': [p.to_serializable() for p in paths],
+        'paths': [p.to_serializable() for p in paths if p.term is None or p.term.code != 'too-small'],
     }
     return render_json(request, json)
 
