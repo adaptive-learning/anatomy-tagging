@@ -103,6 +103,7 @@
               </div>
               <input ng-model="path.term"
                 id="input-{{path.id}}"
+                typeahead-template-url="termTemplate.html"
                 typeahead="term as term.name_la for term in terms | filter:$viewValue | limitTo:8"
                 ng-focus="focus(path)"
                 ng-disabled="path.disabled"
