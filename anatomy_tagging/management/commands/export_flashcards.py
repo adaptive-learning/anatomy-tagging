@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 from anatomy_tagging.models import Category, Term, Image
 import hashlib
@@ -21,6 +21,12 @@ class Command(BaseCommand):
             dest='context',
             type=str,
             default=None),
+        make_option(
+            '--skip_check',
+            help='do not check that there is no issues in the data',
+            dest='skip_check',
+            action="store_true",
+            default=False),
     )
 
     def handle(self, *args, **options):
@@ -36,14 +42,33 @@ class Command(BaseCommand):
             categories = dict(filter(lambda (i, c): i in used_categories, categories.items()))
         for c in contexts.itervalues():
             c['content'] = json.dumps(c['content'])
+        output_dict = {
+            'categories': categories.values(),
+            'terms': terms.values(),
+            'contexts': contexts.values(),
+            'flashcards': flashcards.values()
+        }
+        if not options['skip_check']:
+            self.check_validity(terms, flashcards)
         with open(options['output'], 'w') as f:
-            json.dump({
-                'categories': categories.values(),
-                'terms': terms.values(),
-                'contexts': contexts.values(),
-                'flashcards': flashcards.values()
-            }, f, indent=2)
+            json.dump(output_dict, f, indent=2)
             print 'Flashcards exported to file: \'%s\'' % options['output']
+
+    def check_validity(self, terms, flashcards):
+        for term in terms.values():
+            if term['name-en'] == '':
+                raise CommandError(
+                    u'Pojmu "%s" chybí anglický překlad' % term['name-cs'])
+        self.check_duplicity(terms, 'name-cs')
+        self.check_duplicity(terms, 'name-en')
+
+    def check_duplicity(self, terms, key):
+        terms_by_name_cs = {}
+        for term in terms.values():
+            if term[key] in terms_by_name_cs:
+                raise CommandError(
+                    u'Duplicitní pojem s názvem "%s"' % term[key])
+            terms_by_name_cs[term[key]] = term
 
     def load_flashcards(self, contexts):
         result = {}

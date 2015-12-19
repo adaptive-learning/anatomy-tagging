@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.core.management.base import CommandError
 from django.shortcuts import render_to_response
 from models import Term, Path, Image, Bbox
 from django.http import HttpResponse
@@ -118,16 +119,23 @@ def image_update(request):
                 path_updated = True
             if path_updated:
                 path.save()
-        if image.active:
+        if data.get('export', False):
             export_dir = os.path.join(settings.MEDIA_DIR, 'export')
             if not os.path.exists(export_dir):
                     os.makedirs(export_dir)
-            management.call_command(
-                'export_flashcards',
-                context=image.filename_slug,
-                output=os.path.join(export_dir, 'image.json'),
-                verbosity=0,
-                interactive=False)
+            try:
+                management.call_command(
+                    'export_flashcards',
+                    context=image.filename_slug,
+                    output=os.path.join(export_dir, 'image.json'),
+                    verbosity=0,
+                    interactive=False)
+            except CommandError as e:
+                response = {
+                    'type': 'danger',
+                    'msg': u'%s' % e,
+                }
+                return render_json(request, response)
         response = {
             'type': 'success',
             'msg': u'Změny byly uloženy',

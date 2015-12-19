@@ -86,11 +86,12 @@ angular.module('anatomy.tagging.services', [])
         focusListeners[i](path);
       }
     },
-    save : function(image, paths) {
+    save : function(image, paths, _export) {
       var url = "/image/update";
       var data = {
         image: image,
         paths: paths,
+        export: _export,
       };
       $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
       return $http.post(url, data);

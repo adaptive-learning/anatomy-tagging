@@ -146,6 +146,7 @@ angular.module('anatomy.tagging.controllers', [])
     }
   ];
   $scope.showBbox = $routeParams.showbbox;
+  $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
 
   termsService.get().success(function(data) {
     $scope.terms = data;
@@ -286,13 +287,14 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.save= function(production) {
     $scope.updateFocused();
     $scope.saving = true;
-    imageService.save($scope.image, $scope.paths)
+    imageService.save($scope.image, $scope.paths, production)
     .success(function(data) {
-      if (!production) {
+      if (!production || data.type != 'success') {
         $scope.alerts.push(data);
         $scope.saving = false;
-      } else {
-        var url = 'http://anatom.cz/load_flashcards/?context=' + $scope.image.filename_slug + '&callback=JSON_CALLBACK';
+      } else if (production) {
+        var url = 'http://' + $scope.exportDomain + '/load_flashcards/?context=' +
+          $scope.image.filename_slug + '&callback=JSON_CALLBACK';
         $http.jsonp(url).success(function(data) {
           $scope.alerts.push(data);
           $scope.saving = false;
