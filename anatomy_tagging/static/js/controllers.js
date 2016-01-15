@@ -147,6 +147,9 @@ angular.module('anatomy.tagging.controllers', [])
   ];
   $scope.showBbox = $routeParams.showbbox;
   $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
+  if ($routeParams.exportdomain) {
+    $scope.forceexport = true;
+  }
 
   termsService.get().success(function(data) {
     $scope.terms = data;

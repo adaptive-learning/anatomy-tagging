@@ -155,7 +155,7 @@
         </a>
         <a ng-click="save(true)"
           ng-disabled="saving"
-          ng-if="image.active"
+          ng-if="image.active || forceexport"
           tooltip="Uložit a nahrát na {{exportDomain}}"
           tooltip-placement="bottom"
           class="btn btn-default btn-lg">
