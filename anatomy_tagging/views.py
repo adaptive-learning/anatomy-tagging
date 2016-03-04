@@ -149,7 +149,7 @@ def image_json(request, filename_slug):
     paths = Path.objects.filter(image=image).select_related('term', 'bbox')
     json = {
         'image': image.to_serializable(),
-        'paths': [p.to_serializable() for p in paths if p.term is None or p.term.code != 'too-small'],
+        'paths': [p.to_serializable() for p in paths],
     }
     return render_json(request, json)
 
