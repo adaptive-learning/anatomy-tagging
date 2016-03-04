@@ -10,7 +10,8 @@ import csv
 
 
 class Command(BaseCommand):
-    help = u"""Load images from svg files"""
+    help = u"""Load images from svg files.
+    If one argument is provided it is used as path to the image to be loaded"""
     option_list = BaseCommand.option_list + (
         make_option(
             '--delete',
@@ -26,7 +27,13 @@ class Command(BaseCommand):
         if options['delete']:
             Image.objects.all().delete()
             Path.objects.all().delete()
-        self.add_folder(settings.MEDIA_DIR + self.IMAGES_DIR)
+        if len(args) > 0:
+            file_path = args[0]
+            folder_name = file_path.split('/')[-2]
+            category = Category.objects.get_by_name(folder_name)
+            self.upload_image(file_path, category)
+        else:
+            self.add_folder(settings.MEDIA_DIR + self.IMAGES_DIR)
         self.load_csv(settings.MEDIA_DIR + self.IMAGES_DIR + 'images.csv')
 
     def add_folder(self, folder_path):
