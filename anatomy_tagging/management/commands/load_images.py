@@ -18,21 +18,23 @@ class Command(BaseCommand):
             action='store_true',
             dest='delete',
             default=False,
-            help='Delete all images and paths at first',
+            help='Delete images and paths at first',
         ),
     )
     IMAGES_DIR = '/svg/'
 
     def handle(self, *args, **options):
-        if options['delete']:
-            Image.objects.all().delete()
-            Path.objects.all().delete()
         if len(args) > 0:
             file_path = args[0]
             folder_name = file_path.split('/')[-2]
             category = Category.objects.get_by_name(folder_name)
+            if options['delete']:
+                self.delete_image(file_path)
             self.upload_image(file_path, category)
         else:
+            if options['delete']:
+                Image.objects.all().delete()
+                Path.objects.all().delete()
             self.add_folder(settings.MEDIA_DIR + self.IMAGES_DIR)
         self.load_csv(settings.MEDIA_DIR + self.IMAGES_DIR + 'images.csv')
 
@@ -43,10 +45,14 @@ class Command(BaseCommand):
             category = Category.objects.get_by_name(folder_name)
             if f.endswith('.svg'):
                 try:
-                    image = Image.objects.get(filename=f)
+                    image = Image.objects.get(filename_slug=slugify(f))
                     self.fix_gradients(image, child_path)
                 except Image.DoesNotExist:
-                    self.upload_image(child_path, category)
+                    try:
+                        image = Image.objects.get(filename=f)
+                        self.fix_gradients(image, child_path)
+                    except Image.DoesNotExist:
+                        self.upload_image(child_path, category)
             elif os.path.isdir(child_path):
                 self.add_folder(child_path)
 
@@ -65,6 +71,15 @@ class Command(BaseCommand):
                 print 'updating gradients in image: ' + image.filename
                 path.color = first_stop_color
                 path.save()
+
+    def delete_image(self, file_path):
+        file_name = os.path.basename(file_path)
+        try:
+            image = Image.objects.get(filename=file_name)
+            Path.objects.filter(image=image).delete()
+            image.delete()
+        except Image.DoesNotExist:
+            pass
 
     def upload_image(self, file_path, category):
         file_name = os.path.basename(file_path)
