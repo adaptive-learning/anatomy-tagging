@@ -220,6 +220,11 @@ class Term(models.Model):
         default='',
         null=True
     )
+    system = models.CharField(
+        max_length=30,
+        default='',
+        null=True
+    )
 
     objects = TermManager()
 
@@ -243,6 +248,7 @@ class Term(models.Model):
             'name_cs': self.name_cs,
             'name_en': self.name_en,
             'body_part': self.body_part,
+            'system': self.system,
         }
         if not subterm and self.parent is not None:
             obj['parent'] = self.parent.to_serializable(True)
