@@ -61,13 +61,18 @@ class Command(BaseCommand):
             elif os.path.isdir(child_path):
                 self.add_folder(child_path)
 
-    def update_image(self, image, file_path):
-        self.fix_gradients(image, file_path)
+    def get_paths_from_svg_file(self, file_path):
         map_dom = minidom.parse(file_path)
         paths = map_dom.getElementsByTagName(
             'path') + map_dom.getElementsByTagName(
             'ellipse') + map_dom.getElementsByTagName(
+            'polyline') + map_dom.getElementsByTagName(
             'line')
+        return paths
+
+    def update_image(self, image, file_path):
+        self.fix_gradients(image, file_path)
+        paths = self.get_paths_from_svg_file(file_path)
         path_objects = []
         current_paths = Path.objects.filter(image=image)
         paths_dict = dict([(path.d, path) for path in current_paths])
@@ -117,7 +122,6 @@ class Command(BaseCommand):
 
     def upload_image(self, file_path, category):
         file_name = os.path.basename(file_path)
-        map_dom = minidom.parse(file_path)
         image = Image(
             filename=file_name,
             name_cs=file_name.replace('.svg', ''),
@@ -125,7 +129,7 @@ class Command(BaseCommand):
             category=category,
         )
         image.save()
-        paths = map_dom.getElementsByTagName('path') + map_dom.getElementsByTagName('line')
+        paths = self.get_paths_from_svg_file(file_path)
         path_objects = []
         print 'updating image: ' + file_name + ' with %s elements' % len(paths)
         for path in paths:
@@ -135,18 +139,24 @@ class Command(BaseCommand):
         self.fix_gradients(image, file_path)
 
     def path_elem_to_object(self, attributes, image):
+        stroke_width = 0
         if 'd' in attributes.keys():
             d = attributes['d'].value
+        elif 'points' in attributes.keys():
+            d = self.create_path_from_polyline(attributes)
+            stroke_width = 2
         elif 'cx' in attributes.keys():
             d = self.create_path_from_ellipse(attributes)
+            stroke_width = 2
         else:
             d = self.create_path_from_line(attributes)
+            stroke_width = 2
         path_object = Path(
             image=image,
             opacity=self.get_attr_value(attributes, 'opacity', 1),
             color=self.get_attr_value(attributes, 'fill', 1),
             stroke=self.get_attr_value(attributes, 'stroke', None),
-            stroke_width=self.get_attr_value(attributes, 'stroke-width', 0),
+            stroke_width=self.get_attr_value(attributes, 'stroke-width', stroke_width),
             d=d,
         )
         return path_object
@@ -160,6 +170,11 @@ class Command(BaseCommand):
     def create_path_from_line(self, attributes):
         path = "M" + attributes['x1'].value + ',' + attributes['y1'].value
         path += "L" + attributes['x2'].value + ',' + attributes['y2'].value
+        return path
+
+    def create_path_from_polyline(self, attributes):
+        path = 'M' + attributes['points'].value.strip().replace(" ", " L")
+        print path
         return path
 
     def create_path_from_ellipse(self, attributes):
