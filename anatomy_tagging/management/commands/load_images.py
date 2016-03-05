@@ -67,7 +67,6 @@ class Command(BaseCommand):
         paths = map_dom.getElementsByTagName(
             'path') + map_dom.getElementsByTagName('line')
         path_objects = []
-        print 'updating image: ' + image.filename + ' with %s elements' % len(paths)
         current_paths = Path.objects.filter(image=image)
         paths_dict = dict([(path.d, path) for path in current_paths])
         for path in paths:
@@ -76,13 +75,18 @@ class Command(BaseCommand):
                 del paths_dict[path_object.d]
             else:
                 path_objects.append(path_object)
-        print "Objects to add:", len(path_objects)
-        print "Objects to remove", len(paths_dict.keys())
-        print "Objects unchanged", len(current_paths) - len(paths_dict.keys())
-        # raw_input("Press enter to continue")
-        Path.objects.bulk_create(path_objects)
-        current_paths.filter(
-            id__in=[path.id for path in paths_dict.values()]).delete()
+        to_add = len(path_objects)
+        to_remove = len(paths_dict.keys())
+        if to_add + to_remove > 0:
+            print ('updating image: ' + image.filename +
+                   ' with %s elements') % len(paths)
+            print "Objects to add:", to_add
+            print "Objects to remove", to_remove
+            print "Objects unchanged", len(current_paths) - to_remove
+            # raw_input("Press enter to continue")
+            Path.objects.bulk_create(path_objects)
+            current_paths.filter(
+                id__in=[path.id for path in paths_dict.values()]).delete()
 
     def fix_gradients(self, image, file_path):
         map_dom = minidom.parse(file_path)
