@@ -30,13 +30,18 @@ class Command(BaseCommand):
             category = Category.objects.get_by_name(folder_name)
             if options['delete']:
                 self.delete_image(file_path)
-            self.upload_image(file_path, category)
+            try:
+                file_name = os.path.basename(file_path)
+                image = Image.objects.get(filename_slug=slugify(file_name)[:50])
+                self.update_image(image, file_path)
+            except Image.DoesNotExist:
+                self.upload_image(file_path, category)
         else:
             if options['delete']:
                 Image.objects.all().delete()
                 Path.objects.all().delete()
             self.add_folder(settings.MEDIA_DIR + self.IMAGES_DIR)
-        self.load_csv(settings.MEDIA_DIR + self.IMAGES_DIR + 'images.csv')
+            self.load_csv(settings.MEDIA_DIR + self.IMAGES_DIR + 'images.csv')
 
     def add_folder(self, folder_path):
         for f in sorted(os.listdir(folder_path)):
@@ -58,6 +63,26 @@ class Command(BaseCommand):
 
     def update_image(self, image, file_path):
         self.fix_gradients(image, file_path)
+        map_dom = minidom.parse(file_path)
+        paths = map_dom.getElementsByTagName(
+            'path') + map_dom.getElementsByTagName('line')
+        path_objects = []
+        print 'updating image: ' + image.filename + ' with %s elements' % len(paths)
+        current_paths = Path.objects.filter(image=image)
+        paths_dict = dict([(path.d, path) for path in current_paths])
+        for path in paths:
+            path_object = self.path_elem_to_object(path.attributes, image)
+            if path_object.d in paths_dict:
+                del paths_dict[path_object.d]
+            else:
+                path_objects.append(path_object)
+        print "Objects to add:", len(path_objects)
+        print "Objects to remove", len(paths_dict.keys())
+        print "Objects unchanged", len(current_paths) - len(paths_dict.keys())
+        # raw_input("Press enter to continue")
+        Path.objects.bulk_create(path_objects)
+        current_paths.filter(
+            id__in=[path.id for path in paths_dict.values()]).delete()
 
     def fix_gradients(self, image, file_path):
         map_dom = minidom.parse(file_path)
