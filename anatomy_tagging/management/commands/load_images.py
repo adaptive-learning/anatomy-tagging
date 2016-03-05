@@ -65,7 +65,9 @@ class Command(BaseCommand):
         self.fix_gradients(image, file_path)
         map_dom = minidom.parse(file_path)
         paths = map_dom.getElementsByTagName(
-            'path') + map_dom.getElementsByTagName('line')
+            'path') + map_dom.getElementsByTagName(
+            'ellipse') + map_dom.getElementsByTagName(
+            'line')
         path_objects = []
         current_paths = Path.objects.filter(image=image)
         paths_dict = dict([(path.d, path) for path in current_paths])
@@ -135,6 +137,8 @@ class Command(BaseCommand):
     def path_elem_to_object(self, attributes, image):
         if 'd' in attributes.keys():
             d = attributes['d'].value
+        elif 'cx' in attributes.keys():
+            d = self.create_path_from_ellipse(attributes)
         else:
             d = self.create_path_from_line(attributes)
         path_object = Path(
@@ -156,6 +160,16 @@ class Command(BaseCommand):
     def create_path_from_line(self, attributes):
         path = "M" + attributes['x1'].value + ',' + attributes['y1'].value
         path += "L" + attributes['x2'].value + ',' + attributes['y2'].value
+        return path
+
+    def create_path_from_ellipse(self, attributes):
+        cx = attributes['cx'].value
+        cy = attributes['cy'].value
+        ry = attributes['ry'].value
+        rx = attributes['rx'].value
+        path = "M" + str(float(cx) - float(rx)) + "," + cy
+        path += "a" + rx + "," + ry + " 0 1,0 " + str(2 * float(rx)) + ",0"
+        path += "a" + rx + "," + ry + " 0 1,0 " + str(-2 * float(rx)) + ",0"
         return path
 
     def load_csv(self, file_path):
