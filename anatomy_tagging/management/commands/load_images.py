@@ -45,16 +45,19 @@ class Command(BaseCommand):
             category = Category.objects.get_by_name(folder_name)
             if f.endswith('.svg'):
                 try:
-                    image = Image.objects.get(filename_slug=slugify(f))
-                    self.fix_gradients(image, child_path)
+                    image = Image.objects.get(filename_slug=slugify(f)[:50])
+                    self.update_image(image, child_path)
                 except Image.DoesNotExist:
                     try:
                         image = Image.objects.get(filename=f)
-                        self.fix_gradients(image, child_path)
+                        self.update_image(image, child_path)
                     except Image.DoesNotExist:
                         self.upload_image(child_path, category)
             elif os.path.isdir(child_path):
                 self.add_folder(child_path)
+
+    def update_image(self, image, file_path):
+        self.fix_gradients(image, file_path)
 
     def fix_gradients(self, image, file_path):
         map_dom = minidom.parse(file_path)
@@ -87,7 +90,7 @@ class Command(BaseCommand):
         image = Image(
             filename=file_name,
             name_cs=file_name.replace('.svg', ''),
-            filename_slug=slugify(file_name),
+            filename_slug=slugify(file_name)[:50],
             category=category,
         )
         image.save()
