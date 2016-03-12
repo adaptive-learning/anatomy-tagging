@@ -15,6 +15,8 @@ setup(
     install_requires=[
         'Django>=1.7,<1.8',
         'clint',
+        'wikipedia',
+        'beautifulsoup4',
     ],
     license='Gnu GPL v3',
 )
