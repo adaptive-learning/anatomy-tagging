@@ -30,6 +30,9 @@ angular.module('anatomy.tagging', [
   }).when('/terms/:image?', {
     controller : 'TermsController',
     templateUrl : 'static/tpl/terms_tpl.html'
+  }).when('/relations/:image?', {
+    controller : 'RelationsController',
+    templateUrl : 'static/tpl/relations_tpl.html'
   }).otherwise({
     //redirectTo : '/'
   });

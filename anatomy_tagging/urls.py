@@ -12,12 +12,16 @@ urlpatterns = patterns(
     url(r'^image/update$', 'image_update', name='image'),
     url(r'^image/[\w\.-]*$', 'home', name='image'),
     url(r'^terms/[\w\.-]*$', 'home', name='image'),
+    url(r'^relations/[\w\.-]*$', 'home', name='image'),
     url(r'^practice/[\w\.-]*$', 'home', name='image'),
+
     url(r'^imagejson/$', 'images_json', name='images'),
     url(r'^imagejson/e$', 'images_json', name='images'),
     url(r'^imagejson/(?P<filename_slug>[\w\.-]*)$', 'image_json', name='image'),
     url(r'^termsjson/update$', 'update_term', name='terms'),
     url(r'^termsjson/(?P<filename_slug>[\w\.-]*)$', 'terms', name='terms'),
+
+    url(r'^relationsjson/$', 'relations_json', name='images'),
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='static/img/favicon.png')),

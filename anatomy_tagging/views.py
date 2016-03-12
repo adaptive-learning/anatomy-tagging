@@ -171,6 +171,21 @@ def terms(request, filename_slug=None):
 
 
 @login_required
+def relations_json(request, filename_slug=None):
+    from anatomy_tagging.management.commands.scrape_wiki import Command
+    relations = Command().get_relations()
+    for r in relations:
+        if r['term1'] is not None:
+            r['term1'] = r['term1'].to_serializable()
+        if r['term2'] is not None:
+            r['term2'] = r['term2'].to_serializable()
+    json = {
+        'relations': relations,
+    }
+    return render_json(request, json)
+
+
+@login_required
 def render_json(request, json, status=None,):
     if 'html' in request.GET:
         return HttpResponse(

@@ -426,5 +426,39 @@ angular.module('anatomy.tagging.controllers', [])
         return o;
       });
     }
-});
+})
 
+.controller('RelationsController',
+    function($scope, $http, termsService) {
+  $scope.loading = true;
+  $http.get("relationsjson").success(function(data) {
+    $scope.relationsDict = {};
+    $scope.relationTypes = [];
+    $scope.relations = [];
+    for (var i = 0; i < data.relations.length; i++) {
+      var r = data.relations[i];
+      var key = r.text1;
+      var rObject = $scope.relationsDict[key];
+      if (!rObject) {
+        rObject = {};
+        $scope.relations.push(rObject);
+        $scope.relationsDict[key] = rObject;
+      }
+      rObject.Muscle = {
+        term : r.term1,
+        text : r.text1,
+      };
+      rObject[r.type] = {
+        term : r.term2,
+        text : r.text2,
+      };
+      if ($scope.relationTypes.indexOf(r.type) == -1) {
+        $scope.relationTypes.push(r.type);
+      }
+    }
+    $scope.loading = false;
+  });
+  termsService.get().success(function(data) {
+    $scope.allTerms = data;
+  });
+});
