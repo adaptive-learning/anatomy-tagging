@@ -71,6 +71,7 @@ def update_term(request):
         term = Term.objects.get(id=data['id'])
         term.name_la = data['name_la']
         term.name_en = data['name_en']
+        term.name_cs = data['name_cs']
         term.body_part = data['body_part']
         term.system = data['system']
         term.parent = Term.objects.get_term_from_dict(data, 'parent')

@@ -17,8 +17,9 @@
 </div>
 <div class="table table-striped col-sm-12">
   <div class="row header-row">
-    <span class="col-sm-3" >&nbsp;&nbsp;  Název latinsky </span>
-    <span class="col-sm-3" >&nbsp;&nbsp;  Název anglicky </span>
+    <span class="col-sm-2" >&nbsp;&nbsp;  Název latinsky </span>
+    <span class="col-sm-2" >&nbsp;&nbsp;  Název anglicky </span>
+    <span class="col-sm-2" >&nbsp;&nbsp;  Název česky </span>
     <span class="col-sm-2" >&nbsp;&nbsp;  Nadpojem latinsky</span>
     <span class="col-sm-1" > Umístění na těle
       <i class="glyphicon glyphicon-question-sign"
@@ -101,11 +102,14 @@
   <div ng-repeat="term in filteredTerms = (terms | filter: search) |
       startFrom: (page -1) * pageSize | limitTo: pageSize"
     class="row table-row">
-    <span class="col-sm-3" >
+    <span class="col-sm-2" >
       <input class="form-control input-sm" ng-model="term.name_la" />
     </span>
-    <span class="col-sm-3" >
+    <span class="col-sm-2" >
       <input class="form-control input-sm" ng-model="term.name_en" />
+    </span>
+    <span class="col-sm-2" >
+      <input class="form-control input-sm" ng-model="term.name_cs" />
     </span>
     <span class="col-sm-2" >
       <input class="form-control input-sm"
