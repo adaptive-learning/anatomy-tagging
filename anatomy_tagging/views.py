@@ -159,14 +159,23 @@ def image_json(request, filename_slug):
 @login_required
 def terms(request, filename_slug=None):
     terms = Term.objects.exclude(slug__in=['too-small', 'no-practice'])
-    if filename_slug is not None and filename_slug != '':
+    terms = terms.select_related('parent')
+    if filename_slug == 'duplicate':
+        terms = terms.order_by('name_la', '-id')
+        paths = Path.objects.all().select_related('term')
+        used_terms_ids = list(set([p.term_id for p in paths if p.term_id is not None]))
+        terms = [t for t in terms if t.id in used_terms_ids]
+        term_dict = {}
+        for t in terms:
+            term_dict[t.name_la] = term_dict.get(t.name_la, 0) + 1
+        terms = [t for t in terms if term_dict[t.name_la] > 1]
+    elif filename_slug is not None and filename_slug != '':
         image = get_object_or_404(Image, filename_slug=filename_slug)
         paths = Path.objects.filter(image=image).select_related('term')
         terms = terms.filter(
             id__in=list(set([p.term_id for p in paths if p.term_id is not None]))
         ).order_by('-id')
 
-    terms = terms.select_related('parent')
     json = [t.to_serializable() for t in terms]
     return render_json(request, json)
 

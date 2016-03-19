@@ -4,7 +4,7 @@ angular.module('anatomy.tagging.controllers', [])
 })
 
 .controller('TermsController', 
-    function($scope, termsService, $window, $location, imageService) {
+    function($scope, termsService, $window, $location, imageService, $routeParams) {
   $scope.loading = true;
   $scope.Math = $window.Math;
   $scope.parts = [{
@@ -31,6 +31,7 @@ angular.module('anatomy.tagging.controllers', [])
   }];
 
   var urlParts = $location.absUrl().split('/');
+  $scope.showCode = $routeParams.showcode;
   var image = urlParts[urlParts.length - 1];
 
   termsService.get(image).success(function(data) {

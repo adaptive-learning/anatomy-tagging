@@ -126,6 +126,7 @@
       <input ng-model="term.system" class="form-control imput-sm"/>
     </span>
     <span class="col-sm-2" >
+        <span ng-if="showCode">{{term.code}}</span>
       <a href="" class="btn btn-primary btn-sm"
         ng-click="save(term)"
         ng-hide="term.alerts.length"
