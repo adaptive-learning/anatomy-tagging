@@ -31,37 +31,47 @@ class Command(BaseCommand):
         # soup = BeautifulSoup(page)
         tables = soup.findAll("table", {"class": "wikitable"})
         relations_db = []
+        self.load_terms()
         for table in tables:
             relations = self.process_table(table)
             relations_db = relations_db + relations
         return relations_db
 
+    def load_terms(self):
+        terms = Term.objects.all()
+        self.terms = {}
+        for t in terms:
+            for name in t.name_la.split(';'):
+                self.terms[name.lower()] = t
+            for name in t.name_en.split(';'):
+                self.terms[name.lower()] = t
+
     def get_term_name(self, cell):
-        title = None
         text = " ".join(cell.findAll(text=True))
-        link = cell.find('a')
-        if link is not None and 'title' in link:
-            title = link['title']
-        if title is not None:
-            term = title
-        else:
-            term = text
+        return text
+
+    def get_term_from_cell(self, cell):
+        term = None
+        links = cell.findAll('a')
+        if len(links) == 1:
+            title = links[0].get('title', None)
+            term = self.get_term_from_name(title)
+        if term is not None:
+            return term
+
+        name = self.get_term_name(cell)
+        term = self.get_term_from_name(name)
         return term
 
-    def get_term(self, name):
+    def get_term_from_name(self, name):
         term = None
-        try:
-            term = Term.objects.get(name_en__iexact=name.strip())
-            # print term
-            # print "OK",
-        except Term.DoesNotExist:
-            # print 'not found', c
-            # print "  ",
-            pass
-        except Term.MultipleObjectsReturned:
-            # print 'multiple found', c
-            # print "  ",
-            pass
+        if name is None:
+            return None
+        name = name.lower().strip()
+        if name != "":
+            term = self.terms.get(name, None)
+            if term is None:
+                term = self.terms.get(name.replace(" muscle", ""), None)
         return term
 
     def process_table(self, table):
@@ -70,19 +80,18 @@ class Command(BaseCommand):
         header = [h.find(text=True).strip() for h in header]
         for row in table.findAll("tr")[1:]:
             cells = row.findAll("td")
-            cells = [self.get_term_name(c) for c in cells]
             if len(cells) == len(header):
                 relations_dict = {}
-                main_term = self.get_term(cells[0])
+                main_term = self.get_term_from_cell(cells[0])
                 for h, c in zip(header[1:], cells[1:]):
-                    term = self.get_term(c)
+                    term = self.get_term_from_cell(c)
                     relations_dict[h] = c
                     relation = {
                         'type': h,
                         'term1': main_term,
                         'term2': term,
-                        'text1': cells[0],
-                        'text2': c,
+                        'text1': self.get_term_name(cells[0]),
+                        'text2': self.get_term_name(c),
                     }
                     relations.append(relation)
         return relations
