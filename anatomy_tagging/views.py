@@ -177,6 +177,21 @@ def terms(request, filename_slug=None):
         ).order_by('-id')
 
     json = [t.to_serializable() for t in terms]
+
+    if filename_slug == 'duplicate':
+        paths = Path.objects.exclude(
+            term=None).exclude(
+            term__slug__in=['too-small', 'no-practice']).select_related(
+            'image', 'term')
+        image_by_term = {}
+        for p in paths:
+            image_by_term[p.term.code] = image_by_term.get(p.term.code, [])
+            image_by_term[p.term.code].append(p.image.filename_slug)
+        for t in json:
+            images = image_by_term.get(t['code'], None)
+            if images is not None:
+                t['images'] = list(set(images))
+
     return render_json(request, json)
 
 
