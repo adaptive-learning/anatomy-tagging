@@ -185,10 +185,10 @@ def terms(request, filename_slug=None):
             'image', 'term')
         image_by_term = {}
         for p in paths:
-            image_by_term[p.term.code] = image_by_term.get(p.term.code, [])
-            image_by_term[p.term.code].append(p.image.filename_slug)
+            image_by_term[p.term.slug] = image_by_term.get(p.term.slug, [])
+            image_by_term[p.term.slug].append(p.image.filename_slug)
         for t in json:
-            images = image_by_term.get(t['code'], None)
+            images = image_by_term.get(t['slug'], None)
             if images is not None:
                 t['images'] = list(set(images))
 

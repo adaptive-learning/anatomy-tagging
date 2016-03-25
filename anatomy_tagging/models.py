@@ -244,6 +244,7 @@ class Term(models.Model):
         obj = {
             'id': self.id,
             'code': self.code if self.code != "" else self.slug,
+            'slug': self.slug,
             'name_la': self.name_la,
             'name_cs': self.name_cs,
             'name_en': self.name_en,
