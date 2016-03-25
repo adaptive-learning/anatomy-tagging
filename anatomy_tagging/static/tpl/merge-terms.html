@@ -1,0 +1,45 @@
+<div class="modal-header text-center">
+    <button type="button" class="close" ng-click="cancel()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h3 class="modal-title"> Sloučit pojmy </h3>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-sm-4">
+      <h4>Bude nahrazen</h4>
+      <div>Název latinsky: <strong>{{term1.name_la}}</strong></div>
+      <div>Název anglicky: <strong>{{term1.name_en}}</strong></div>
+      <div>Název česky: <strong>{{term1.name_cs}}</strong></div>
+      <div>Nadpojem latinsky: <strong>{{term1.parent.name_la}}</strong></div>
+      <div>kód: <strong>{{term1.code}}</strong></div>
+    </div>
+    <div class="col-sm-4">
+      <h4>V obrázcích</h4>
+      <div ng-repeat="image in term1.images">
+        <a href="/image/{{image}}"
+          title="{{image}}">
+          {{image}}
+        </a>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <h4>Bude zachován</h4>
+      <div>Název latinsky: <strong>{{term2.name_la}}</strong></div>
+      <div>Název anglicky: <strong>{{term2.name_en}}</strong></div>
+      <div>Název česky: <strong>{{term2.name_cs}}</strong></div>
+      <div>Nadpojem latinsky: <strong>{{term2.parent.name_la}}</strong></div>
+      <div>kód: <strong>{{term2.code}}</strong></div>
+    </div>
+  </div>
+  <alert ng-repeat="alert in alerts" type="{{alert.type}}"
+    close="closeAlert($index)">{{alert.msg}}</alert>
+</div>
+<div class="modal-footer" >
+        <a class="btn btn-primary"
+          ng-disabled="saving"
+          ng-click="mergeTerms()">
+            {{saving ? 'Ukládání...' : 'Sloučit a zveřejnit'}}
+        </a>
+</div> 

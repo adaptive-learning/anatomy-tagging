@@ -84,6 +84,33 @@ def update_term(request):
 
 
 @login_required
+def merge_terms(request):
+    if request.body:
+        data = simplejson.loads(request.body)
+        term1 = Term.objects.get(id=data['term1']['id'])
+        term2 = Term.objects.get(id=data['term2']['id'])
+        paths = Path.objects.filter(term=term1).select_related('image')
+        for p in paths:
+            p.term = term2
+            p.save()
+        term1.delete()
+        for image in list(set([p.image for p in paths])):
+            try:
+                export_image(image)
+            except CommandError as e:
+                response = {
+                    'type': 'danger',
+                    'msg': u'%s' % e,
+                }
+                return render_json(request, response)
+        response = {
+            'type': 'success',
+            'msg': u'Změny byly uloženy',
+        }
+    return render_json(request, response)
+
+
+@login_required
 def image_update(request):
     if request.body:
         data = simplejson.loads(request.body)
@@ -122,16 +149,8 @@ def image_update(request):
             if path_updated:
                 path.save()
         if data.get('export', False):
-            export_dir = os.path.join(settings.MEDIA_DIR, 'export')
-            if not os.path.exists(export_dir):
-                    os.makedirs(export_dir)
             try:
-                management.call_command(
-                    'export_flashcards',
-                    context=image.filename_slug,
-                    output=os.path.join(export_dir, 'image.json'),
-                    verbosity=0,
-                    interactive=False)
+                export_image(image)
             except CommandError as e:
                 response = {
                     'type': 'danger',
@@ -143,6 +162,18 @@ def image_update(request):
             'msg': u'Změny byly uloženy',
         }
     return render_json(request, response)
+
+
+def export_image(image):
+    export_dir = os.path.join(settings.MEDIA_DIR, 'export')
+    if not os.path.exists(export_dir):
+            os.makedirs(export_dir)
+    management.call_command(
+        'export_flashcards',
+        context=image.filename_slug,
+        output=os.path.join(export_dir, 'image.json'),
+        verbosity=0,
+        interactive=False)
 
 
 @login_required
@@ -178,7 +209,7 @@ def terms(request, filename_slug=None):
 
     json = [t.to_serializable() for t in terms]
 
-    if filename_slug == 'duplicate':
+    if 'images' in request.GET:
         paths = Path.objects.exclude(
             term=None).exclude(
             term__slug__in=['too-small', 'no-practice']).select_related(

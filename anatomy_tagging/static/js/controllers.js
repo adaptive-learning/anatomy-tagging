@@ -4,7 +4,8 @@ angular.module('anatomy.tagging.controllers', [])
 })
 
 .controller('TermsController', 
-    function($scope, termsService, $window, $location, imageService, $routeParams) {
+    function($scope, termsService, $window, $location, imageService,
+      $routeParams, mergeTermsModal) {
   $scope.loading = true;
   $scope.Math = $window.Math;
   $scope.parts = [{
@@ -32,9 +33,9 @@ angular.module('anatomy.tagging.controllers', [])
 
   var urlParts = $location.absUrl().split('/');
   $scope.showCode = $routeParams.showcode;
-  var image = urlParts[urlParts.length - 1];
+  var image = urlParts[urlParts.length - 1].split('?')[0];
 
-  termsService.get(image).success(function(data) {
+  termsService.get(image, $scope.showCode).success(function(data) {
     $scope.terms = data;
     $scope.loading = false;
   });
@@ -55,18 +56,88 @@ angular.module('anatomy.tagging.controllers', [])
     });
   };
 
-  imageService.get().success(function(data){
-    $scope.image = data.image;
-  });
+  if (image && image != 'duplicate') {
+    imageService.get().success(function(data){
+      $scope.image = data.image;
+    });
+  }
 
   $scope.closeAlert = function(term, index) {
     term.alerts.splice(index, 1);
   };
 
-  termsService.get().success(function(data) {
+  termsService.get(undefined, $scope.showCode).success(function(data) {
     $scope.allTerms = data;
   });
 
+  $scope.selectTerm = function(term) {
+    if ($scope.selectedTerm) {
+      mergeTermsModal.open($scope.selectedTerm, term);
+      $scope.selectedTerm = undefined;
+    } else {
+      $scope.selectedTerm = term;
+    }
+  };
+
+})
+
+.factory('mergeTermsModal', ['$modal', function($modal) {
+    return {
+        open: function(term1, term2) {
+            $modal.open({
+                templateUrl: 'static/tpl/merge-terms.html',
+                controller: 'MergeTerms',
+                size: 'lg',
+                resolve: {
+                  term1 : function() {
+                    return term1;
+                  },
+                  term2 : function() {
+                    return term2;
+                  },
+                },
+            });
+        }
+    };  
+}])
+
+.controller('MergeTerms', function($scope, $modalInstance, termsService, 
+    $routeParams, $http, term1, term2) {
+  $scope.term1 = term1;
+  $scope.term2 = term2;
+  $scope.alerts = [];
+  $scope.exportDomain = $routeParams.exportdomain || '127.0.0.1:8003';
+
+  $scope.mergeTerms = function(){
+    $scope.saving = false;
+    termsService.mergeTerms(term1, term2).success(function() {
+      angular.forEach(term1.images, deployImage);
+    }).error(function(data) {
+      $scope.alerts.push({
+        type : 'danger',
+        msg : 'Na serveru nastala chyba při slučování pojmů',
+      });
+    });
+  };
+
+  function deployImage(image) {
+      var url = 'http://' + $scope.exportDomain + '/load_flashcards/?context=' +
+        image + '&callback=JSON_CALLBACK';
+      $http.jsonp(url).success(function(data) {
+        $scope.alerts.push(data);
+        $scope.saving = false;
+      }).error(function(data) {
+        $scope.alerts.push({
+          type : 'danger',
+          msg : 'Na serveru nastala chyba při nahrávání obrázků. Pojmy jsou ale sloučeny. Otevři si obrázky a zkus nahrát každý zvlášť.',
+        });
+        $scope.saving = false;
+      });
+  }
+  
+  $scope.cancel = function(){
+    $modalInstance.dismiss('cancel');
+  };
 })
 
 .controller('ImageListController', function($scope, imageService, $window, $routeParams, termsService, colors) {

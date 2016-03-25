@@ -19,6 +19,7 @@ urlpatterns = patterns(
     url(r'^imagejson/e$', 'images_json', name='images'),
     url(r'^imagejson/(?P<filename_slug>[\w\.-]*)$', 'image_json', name='image'),
     url(r'^termsjson/update$', 'update_term', name='terms'),
+    url(r'^termsjson/merge$', 'merge_terms', name='merge_terms'),
     url(r'^termsjson/(?P<filename_slug>[\w\.-]*)$', 'terms', name='terms'),
 
     url(r'^relationsjson/$', 'relations_json', name='images'),

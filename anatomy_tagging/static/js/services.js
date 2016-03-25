@@ -2,8 +2,9 @@ angular.module('anatomy.tagging.services', [])
 
 .service('termsService', function($http, $cookies) {
   return {
-    get : function(image) {
-      var url = '/termsjson/' + (image || '');
+    get : function(image, showImages) {
+      var url = '/termsjson/' + (image || '') + 
+        (showImages ? '?images=True' : '');
       var promise = $http.get(url);
       return promise;
     },
@@ -11,6 +12,16 @@ angular.module('anatomy.tagging.services', [])
       var url = '/termsjson/update';
       $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
       var promise = $http.post(url, term);
+      return promise;
+    },
+    mergeTerms : function(term1, term2) {
+      var url = '/termsjson/merge';
+      $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+      var data = {
+        term1 : term1,
+        term2 : term2,
+      };
+      var promise = $http.post(url, data);
       return promise;
     }
   };
