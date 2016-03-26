@@ -106,7 +106,7 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.term1 = term1;
   $scope.term2 = term2;
   $scope.alerts = [];
-  $scope.exportDomain = $routeParams.exportdomain || '127.0.0.1:8003';
+  $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
 
   $scope.mergeTerms = function(){
     $scope.saving = false;
