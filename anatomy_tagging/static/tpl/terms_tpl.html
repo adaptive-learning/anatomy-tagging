@@ -131,7 +131,8 @@
         {{term.code}}</span>
       <a ng-repeat="image in term.images"
         href="/image/{{image}}"
-        title="{{image}}">
+        tooltip-placement="left"
+        tooltip="{{image}}">
         [{{$index}}]
       </a>
 
