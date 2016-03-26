@@ -139,6 +139,7 @@
       <a class="btn btn-sm" 
           ng-if="showCode"
           ng-click="selectTerm(term)"
+          ng-disabled="term == selectedTerm"
           ng-class="{
             'btn-success' : term == selectedTerm,
             'btn-default' : term != selectedTerm}">
