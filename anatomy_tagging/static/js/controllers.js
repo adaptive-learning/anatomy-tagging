@@ -109,7 +109,7 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
 
   $scope.mergeTerms = function(){
-    $scope.saving = false;
+    $scope.saving = true;
     termsService.mergeTerms(term1, term2).success(function() {
       angular.forEach(term1.images, deployImage);
     }).error(function(data) {
