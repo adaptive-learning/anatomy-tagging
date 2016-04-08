@@ -32,6 +32,7 @@ angular.module('anatomy.tagging.controllers', [])
   }];
 
   var urlParts = $location.absUrl().split('/');
+  $scope.search = $routeParams.search;
   $scope.showCode = $routeParams.showcode;
   var image = urlParts[urlParts.length - 1].split('?')[0];
 
