@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import CommandError
 from django.shortcuts import render_to_response
-from models import Term, Path, Image, Bbox
+from models import Term, Path, Image, Bbox, Relation
 from django.http import HttpResponse
 from django.db import connection
 import json as simplejson
@@ -229,16 +229,40 @@ def terms(request, filename_slug=None):
 @login_required
 def relations_json(request, filename_slug=None):
     from anatomy_tagging.management.commands.scrape_wiki import Command
-    relations = Command().get_relations()
-    for r in relations:
+    raw_relations = Command().get_relations()
+    for r in raw_relations:
         if r['term1'] is not None:
             r['term1'] = r['term1'].to_serializable()
         if r['term2'] is not None:
             r['term2'] = r['term2'].to_serializable()
+    relations = [r.to_serializable() for r in Relation.objects.all()]
     json = {
+        'raw': raw_relations,
         'relations': relations,
     }
     return render_json(request, json)
+
+
+@login_required
+def update_relations(request):
+    if request.body:
+        data = simplejson.loads(request.body)
+        for r_data in data:
+            if 'id' in r_data:
+                relation = Relation.objects.get(id=r_data['id'])
+            else:
+                relation = Relation()
+            relation.text1 = r_data['text1']
+            relation.text2 = r_data['text2']
+            relation.name = r_data['name']
+            relation.term1 = Term.objects.get_term_from_dict(r_data, 'term1')
+            relation.term2 = Term.objects.get_term_from_dict(r_data, 'term2')
+            relation.save()
+        response = {
+            'type': 'success',
+            'msg': u'Změny byly uloženy',
+        }
+    return render_json(request, response)
 
 
 @login_required

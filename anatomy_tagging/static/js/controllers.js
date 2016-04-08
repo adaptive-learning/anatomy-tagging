@@ -501,14 +501,14 @@ angular.module('anatomy.tagging.controllers', [])
 })
 
 .controller('RelationsController',
-    function($scope, $http, termsService) {
+    function($scope, $http, termsService, $cookies) {
   $scope.loading = true;
   $http.get("relationsjson").success(function(data) {
     $scope.relationsDict = {};
     $scope.relationTypes = [];
     $scope.relations = [];
-    for (var i = 0; i < data.relations.length; i++) {
-      var r = data.relations[i];
+    for (var i = 0; i < data.raw.length; i++) {
+      var r = data.raw[i];
       var key = r.text1;
       var rObject = $scope.relationsDict[key];
       if (!rObject) {
@@ -528,9 +528,61 @@ angular.module('anatomy.tagging.controllers', [])
         $scope.relationTypes.push(r.type);
       }
     }
+    for (i = 0; i < data.relations.length; i++) {
+      var r = data.relations[i];
+      var key = r.text1;
+      var rObject = $scope.relationsDict[key];
+      if (rObject) {
+        rObject.Muscle = {
+          term : r.term1,
+          text : r.text1,
+          id : r.id,
+        };
+        rObject[r.name] = {
+          term : r.term2,
+          text : r.text2,
+          id : r.id,
+        };
+      }
+    }
     $scope.loading = false;
   });
   termsService.get().success(function(data) {
     $scope.allTerms = data;
   });
+
+  $scope.save = function(relation) {
+    console.log(relation);
+    relation.saving = true;
+    var data = [];
+    for (var i in relation) {
+      var r  = relation[i];
+      if (i != 'Muscle' && r.term && relation.Muscle.term) {
+        data.push({
+          name : i,
+          text1 : relation.Muscle.text,
+          term1 : relation.Muscle.term,
+          text2 : r.text,
+          term2 : r.term,
+          id : r.id,
+        });
+      }
+    }
+    relation.alerts = [];
+    $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+    $http.post("relationsjson/update", data).success(function(data) {
+      relation.alerts.push(data);
+      relation.saving = false;
+    }).error(function(data) {
+      relation.alerts = relation.alerts || [];
+      relation.alerts.push({
+        type : 'danger',
+        msg : 'Na serveru nastala chyba.',
+      });
+      relation.saving = false;
+    });
+  };
+  $scope.closeAlert = function(relation, index) {
+    relation.alerts.splice(index, 1);
+  };
 });

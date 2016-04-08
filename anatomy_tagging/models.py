@@ -279,5 +279,23 @@ class Path(models.Model):
         }
 
 
+class Relation(models.Model):
+    term1 = models.ForeignKey(Term, null=True, related_name='term1')
+    text1 = models.TextField()
+    term2 = models.ForeignKey(Term, null=True, related_name='term2')
+    text2 = models.TextField()
+    name = models.TextField(max_length=10)
+
+    def to_serializable(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'term1': to_serializable_or_none(self.term1),
+            'term2': to_serializable_or_none(self.term2),
+            'text1': self.text1,
+            'text2': self.text2,
+        }
+
+
 def to_serializable_or_none(obj):
     return obj.to_serializable() if obj is not None else None

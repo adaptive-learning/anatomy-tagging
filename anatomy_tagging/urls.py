@@ -22,6 +22,7 @@ urlpatterns = patterns(
     url(r'^termsjson/merge$', 'merge_terms', name='merge_terms'),
     url(r'^termsjson/(?P<filename_slug>[\w\.-]*)$', 'terms', name='terms'),
 
+    url(r'^relationsjson/update$', 'update_relations', name='update_relations'),
     url(r'^relationsjson/$', 'relations_json', name='images'),
     # url(r'^blog/', include('blog.urls')),
 

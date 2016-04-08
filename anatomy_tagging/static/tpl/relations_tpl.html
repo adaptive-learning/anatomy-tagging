@@ -14,7 +14,7 @@
 <div ng-hide="loading"  class="table table-striped col-sm-12">
   <div class="row header-row">
     <span class="col-sm-2" >Muscle </span>
-    <span class="col-sm-10" >
+    <span class="col-sm-9" >
       <span class="col-sm-2" 
         ng-bind="type"
         ng-repeat="type in relationTypes"></span>
@@ -27,17 +27,18 @@
         '#f2dede'}}">
       <input class="form-control input-sm"
         ng-model="relation.Muscle.term" 
+        style="background-color: {{relation.Muscle.id ? ' #dff0d8' : ''}}"
         typeahead-template-url="termTemplate.html"
         typeahead="term as term.name_la for term in allTerms |
           filter:{name_la: $viewValue} | 
           limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
       {{relation.Muscle.text}}
     </span>
-    <span class="col-sm-10" >
+    <span class="col-sm-9" >
       <span class="col-sm-2" 
-          style="boder-top: solid black 2px; border-color: {{relation[type].term ? ' #dff0d8' : '#f2dede'}}"
           ng-repeat="type in relationTypes">
         <input class="form-control input-sm"
+          style="background-color: {{relation[type].id ? ' #dff0d8' : ''}}"
           ng-model="relation[type].term" 
           typeahead-template-url="termTemplate.html"
           typeahead="term as term.name_la for term in allTerms |
@@ -45,6 +46,15 @@
             limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
         {{relation[type].text}}
       </span>
+    </span>
+    <span class="col-sm-1" >
+      <a class="btn btn-primary"
+        ng-disabled="relation.saving"
+        ng-hide="relation.alerts.length"
+        ng-click="save(relation)">
+        Uložit</a>
+      <alert ng-repeat="alert in relation.alerts" type="{{alert.type}}"
+        close="closeAlert(relation, $index)">{{alert.msg}}</alert>
     </span>
   </div>
 </div>
