@@ -26,7 +26,10 @@ class Command(BaseCommand):
         count = 0
         duplicate_count = 0
 
-        for t in Term.objects.all().exclude(code__in=['no-practice', 'too-small']):
+        terms = Term.objects.all().exclude(code__in=['no-practice', 'too-small'])
+        self.remove_unused_terms(terms)
+
+        for t in terms:
             name_la = t.name_la
             name_la = name_la.capitalize()
 
@@ -44,6 +47,15 @@ class Command(BaseCommand):
                 duplicate_count += 1
         print count, 'terms updated'
         print duplicate_count, 'duplicate terms found'
+
+    def remove_unused_terms(self, terms):
+        paths = Path.objects.all().select_related('term')
+        used_terms_ids = list(set([p.term_id for p in paths if p.term_id is not None]))
+        unused_terms = [t for t in terms if t.id not in used_terms_ids and t.code == '']
+        for t in unused_terms:
+            print 'Removing', t.name_la
+            t.delete()
+        print len(unused_terms), "unused terms found and deleted"
 
     def find_duplicate_terms(self, t):
         terms = Term.objects.filter(name_la=t.name_la).exclude(id=t.id)
