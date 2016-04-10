@@ -190,6 +190,8 @@ class Command(BaseCommand):
             result[c_json['id']] = c_json
         for c in self.LOCATION_CATEGORIES:
             c['type'] = 'location'
+            c['name-la'] = c['name-en']
+            c['name-cc'] = c['name-cs']
             c['not-in-model'] = True
             result[c['id']] = c
         return result
