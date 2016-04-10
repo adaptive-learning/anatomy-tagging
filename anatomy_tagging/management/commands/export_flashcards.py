@@ -35,7 +35,7 @@ class Command(BaseCommand):
         contexts, used_terms, used_categories = self.load_contexts(
             terms, options['context'])
         terms = dict(filter(lambda (i, t): i in used_terms, terms.items()))
-        flashcards = self.load_flashcards(contexts)
+        flashcards = self.load_flashcards(contexts, terms)
         if options['context'] is not None:
             options['output'] = options['output'].replace(
                 '.json', '-' + options['context'] + '.json')
@@ -70,7 +70,7 @@ class Command(BaseCommand):
                     u'Duplicitní pojem s názvem "%s"' % term[key])
             terms_by_name_cs[term[key]] = term
 
-    def load_flashcards(self, contexts):
+    def load_flashcards(self, contexts, terms):
         result = {}
         for c in contexts.itervalues():
             for p in c['content']['paths']:
@@ -82,8 +82,19 @@ class Command(BaseCommand):
                     'context': c['id'],
                     'description': p['term'],
                     'active': c['active'],
+                    'categories': terms[p['term']]['categories']
                 }
+                if c['category'] == '15' and '15' not in f_json['categories']:
+                    f_json['categories'].append(c['category'])
+                if len(terms[p['term']]['systems']) == 0 and c['category'] is not None:
+                    f_json['categories'].append(c['category'])
+                    f_json['categories'] = list(set(f_json['categories']))
                 result[f_json['id']] = f_json
+        for t in terms.itervalues():
+            del t['categories']
+            del t['systems']
+        for c in contexts.itervalues():
+            del c['category']
         return result
 
     def load_contexts(self, terms, context):
@@ -115,7 +126,6 @@ class Command(BaseCommand):
                     if i.category is not None:
                         term_json = terms[p_json['term']]
                         term_categories = term_json.get('categories', [])
-                        term_categories.append(self._get_category_id(i.category))
                         term_json['categories'] = list(set(term_categories))
                         used_categories |= set(term_json['categories'])
                 if p.stroke is not None:
@@ -138,6 +148,7 @@ class Command(BaseCommand):
                 'name-en': self._empty(i.name_en),
                 'name-en-la': self._empty(i.name_en),
                 'active': i.active and len(terms_in_image) > 1,
+                'category': self._get_category_id(i.category) if i.category is not None else None,
             }
             if len(terms_in_image) <= 1:
                 print "WARNING: Deactivating image with %s terms:" % len(terms_in_image), i.filename.encode('utf8')
@@ -156,6 +167,10 @@ class Command(BaseCommand):
             }
             if t.body_part is not None:
                 t_json['categories'] = self._body_part_to_categories(t.body_part)
+            if t.system is not None:
+                t_json['systems'] = self._system_to_categories(t.system)
+                t_json['categories'] = t_json['systems'] + (
+                    t_json.get('categories', []))
             result[t_json['id']] = t_json
         return result
 
@@ -189,6 +204,14 @@ class Command(BaseCommand):
             'height': bbox.height,
         }
 
+    def _system_to_categories(self, systems):
+        result = []
+        for i in range(0, len(systems), 2):
+            system_id = systems[i: i + 2]
+            if system_id != '15':
+                result.append(system_id)
+        return result
+
     def _body_part_to_categories(self, body_part):
         result = []
         for c in ['Hf', 'Hb', 'UE', 'LE']:
@@ -202,8 +225,11 @@ class Command(BaseCommand):
                 result.append(c)
         return result
 
-    def _empty(self, x):
-        return '' if x is None else x
+    def _empty(self, x, y=None):
+        ret = '' if x is None else x
+        if ret == '' and y is not None:
+            ret = y
+        return ret
 
     def _stip_number(self, x):
         return filter(lambda c: not c.isdigit(), x).strip()
