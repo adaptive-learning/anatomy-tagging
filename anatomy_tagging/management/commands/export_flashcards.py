@@ -134,7 +134,9 @@ class Command(BaseCommand):
                 'id': i.filename_slug[:50],
                 'content': content,
                 'name-cs': self._empty(i.name_cs),
+                'name-cs-cs': self._empty(i.name_cs),
                 'name-en': self._empty(i.name_en),
+                'name-en-la': self._empty(i.name_en),
                 'active': i.active and len(terms_in_image) > 1,
             }
             if len(terms_in_image) <= 1:
@@ -147,8 +149,10 @@ class Command(BaseCommand):
         for t in Term.objects.all().exclude(code__in=['no-practice', 'too-small']):
             t_json = {
                 'id': t.code if t.code else hashlib.sha1(t.slug).hexdigest(),
-                'name-cs': self._empty(t.name_la),
+                'name-cs': self._empty(t.name_la, t.name_la),
+                'name-cs-cs': self._empty(t.name_cs),
                 'name-en': self._empty(t.name_en),
+                'name-en-la': self._empty(t.name_la, t.name_en),
             }
             if t.body_part is not None:
                 t_json['categories'] = self._body_part_to_categories(t.body_part)
@@ -161,7 +165,9 @@ class Command(BaseCommand):
             c_json = {
                 'id': self._get_category_id(c),
                 'name-cs': self._stip_number(self._empty(c.name_cs)),
+                'name-cs-cs': self._stip_number(self._empty(c.name_cs)),
                 'name-en': self._get_category_english_name(c),
+                'name-en-la': self._get_category_english_name(c),
                 'type': 'system',
             }
             if c.parent is not None:
