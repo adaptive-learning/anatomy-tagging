@@ -205,10 +205,11 @@ class Command(BaseCommand):
         }
 
     def _system_to_categories(self, systems):
+        system_ids = [str(i).zfill(2) for i in range(1, 14)]
         result = []
         for i in range(0, len(systems), 2):
             system_id = systems[i: i + 2]
-            if system_id != '15':
+            if system_id in system_ids:
                 result.append(system_id)
         return result
 
