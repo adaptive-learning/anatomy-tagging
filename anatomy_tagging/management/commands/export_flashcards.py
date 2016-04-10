@@ -82,7 +82,7 @@ class Command(BaseCommand):
                     'context': c['id'],
                     'description': p['term'],
                     'active': c['active'],
-                    'categories': terms[p['term']]['categories']
+                    'categories': list(terms[p['term']]['categories'])
                 }
                 if c['category'] == '15' and '15' not in f_json['categories']:
                     f_json['categories'].append(c['category'])
