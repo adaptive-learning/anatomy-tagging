@@ -160,7 +160,7 @@ class Command(BaseCommand):
         for t in Term.objects.all().exclude(code__in=['no-practice', 'too-small']):
             t_json = {
                 'id': t.code if t.code else hashlib.sha1(t.slug).hexdigest(),
-                'name-cs': self._empty(t.name_la, t.name_la),
+                'name-cs': self._empty(t.name_la, t.name_cs),
                 'name-cc': self._empty(t.name_cs),
                 'name-en': self._empty(t.name_en),
                 'name-la': self._empty(t.name_la, t.name_en),
