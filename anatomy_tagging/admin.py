@@ -1,4 +1,4 @@
-from models import Image, Path, Term, Category, Bbox
+from models import Image, Path, Term, Category, Bbox, Relation
 from django.contrib import admin
 
 
@@ -25,8 +25,16 @@ class BboxAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     pass
 
+
+class RelationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'term1', 'term2', 'text1', 'text2')
+    search_fields = list_display
+    list_filter = ('name',)
+    pass
+
 admin.site.register(Image, ImageAdmin)
 admin.site.register(Path, PathAdmin)
 admin.site.register(Term, TermAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Bbox, BboxAdmin)
+admin.site.register(Relation, RelationAdmin)

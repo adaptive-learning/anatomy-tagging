@@ -296,6 +296,9 @@ class Relation(models.Model):
             'text2': self.text2,
         }
 
+    def __unicode__(self):
+        return u'{0}( {1}, {2})'.format(self.name, self.term1, self.term2)
+
 
 def to_serializable_or_none(obj):
     return obj.to_serializable() if obj is not None else None
