@@ -231,9 +231,9 @@ def relations_json(request, filename_slug=None):
     from anatomy_tagging.management.commands.scrape_wiki import Command
     raw_relations = Command().get_relations()
     for r in raw_relations:
-        if r['term1'] is not None:
+        if isinstance(r['term1'], Term):
             r['term1'] = r['term1'].to_serializable()
-        if r['term2'] is not None:
+        if isinstance(r['term2'], Term):
             r['term2'] = r['term2'].to_serializable()
     relations = [r.to_serializable() for r in Relation.objects.all()]
     json = {

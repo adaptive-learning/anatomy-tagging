@@ -4,6 +4,10 @@ from anatomy_tagging.models import Term
 from optparse import make_option
 import wikipedia
 from bs4 import BeautifulSoup
+import json
+import os
+from django.conf import settings
+import copy
 
 
 class Command(BaseCommand):
@@ -25,7 +29,14 @@ class Command(BaseCommand):
         print len(relations_db)
 
     def get_relations(self):
-        page = wikipedia.page('List_of_muscles_of_the_human_body')
+        name = 'List_of_muscles_of_the_human_body'
+        json_name = os.path.join(settings.MEDIA_DIR, name + '.json')
+        if os.path.isfile(json_name):
+            with open(json_name, 'r') as f:
+                relations_db = json.load(f)
+                return relations_db
+
+        page = wikipedia.page(name)
         soup = BeautifulSoup(page.html())
         # page = ''.join(open('List_of_muscles.html', 'r').readlines())
         # soup = BeautifulSoup(page)
@@ -35,6 +46,15 @@ class Command(BaseCommand):
         for table in tables:
             relations = self.process_table(table)
             relations_db = relations_db + relations
+
+        with open(json_name, 'w') as f:
+            raw_relations = copy.deepcopy(relations_db)
+            for r in raw_relations:
+                if r['term1'] is not None:
+                    r['term1'] = r['term1'].to_serializable()
+                if r['term2'] is not None:
+                    r['term2'] = r['term2'].to_serializable()
+            json.dump(raw_relations, f)
         return relations_db
 
     def load_terms(self):
