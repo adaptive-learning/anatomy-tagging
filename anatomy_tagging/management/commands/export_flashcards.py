@@ -93,6 +93,8 @@ class Command(BaseCommand):
         for t in terms.itervalues():
             del t['categories']
             del t['systems']
+            if t['name-cc'] == '':
+                del t['name-cc']
         for c in contexts.itervalues():
             del c['category']
         return result
