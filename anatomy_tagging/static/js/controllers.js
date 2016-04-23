@@ -522,7 +522,7 @@ angular.module('anatomy.tagging.controllers', [])
         text : r.text1,
       };
       rObject[r.type] = {
-        term : r.term2,
+        terms : r.term2 ? [{term: r.term2}] : [],
         text : r.text2,
       };
       if ($scope.relationTypes.indexOf(r.type) == -1) {
@@ -539,11 +539,17 @@ angular.module('anatomy.tagging.controllers', [])
           text : r.text1,
           id : r.id,
         };
-        rObject[r.name] = {
-          term : r.term2,
+        rObject[r.name] = rObject[r.name] || {
+          terms : [],
           text : r.text2,
-          id : r.id,
         };
+        if (rObject[r.name].terms[0] && !rObject[r.name].terms[0].id) {
+          rObject[r.name].terms = [];
+        }
+        rObject[r.name].terms.push({
+          term  :r.term2,
+          id : r.id,
+        });
       }
     }
     $scope.loading = false;
@@ -558,15 +564,18 @@ angular.module('anatomy.tagging.controllers', [])
     var data = [];
     for (var i in relation) {
       var r  = relation[i];
-      if (i != 'Muscle' && r.term && relation.Muscle.term) {
-        data.push({
-          name : i,
-          text1 : relation.Muscle.text,
-          term1 : relation.Muscle.term,
-          text2 : r.text,
-          term2 : r.term,
-          id : r.id,
-        });
+      if (i != 'Muscle' && r.terms && relation.Muscle.term) {
+        var terms = r.terms;
+        for (var j = 0; j < terms.length; j++) {
+          data.push({
+            name : i,
+            text1 : relation.Muscle.text,
+            term1 : relation.Muscle.term,
+            text2 : r.text,
+            term2 : terms[j].term,
+            id : terms[j].id,
+          });
+        }
       }
     }
     relation.alerts = [];
@@ -583,6 +592,18 @@ angular.module('anatomy.tagging.controllers', [])
       relation.saving = false;
     });
   };
+
+  $scope.addField = function(relation, type) {
+    if (!relation[type].terms) {
+      relation[type].terms = [relation[type].term];
+    }
+    relation[type].terms.push({});
+  };
+
+  $scope.removeField = function(relation, type, index) {
+    relation[type].terms.splice(index, 1);
+  };
+
   $scope.closeAlert = function(relation, index) {
     relation.alerts.splice(index, 1);
   };

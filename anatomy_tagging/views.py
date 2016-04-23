@@ -247,6 +247,12 @@ def relations_json(request, filename_slug=None):
 def update_relations(request):
     if request.body:
         data = simplejson.loads(request.body)
+        if len(data) > 0:
+            Relation.objects.filter(
+                term1=Term.objects.get_term_from_dict(data[0], 'term1')
+            ).exclude(
+                id__in=[r['id'] for r in data if 'id' in r],
+            ).delete()
         for r_data in data:
             if 'id' in r_data:
                 relation = Relation.objects.get(id=r_data['id'])
