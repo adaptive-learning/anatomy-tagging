@@ -7,12 +7,12 @@ from django.db import connection
 import json as simplejson
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core import management
 import os
 
 
-@login_required
+@staff_member_required
 def home(request):
     js_files = [
         "/static/lib/jquery-1.11.0.js",
@@ -41,7 +41,7 @@ def home(request):
     return render_to_response('home.html', c)
 
 
-@login_required
+@staff_member_required
 def images_json(request):
     images = Image.objects.all().select_related('bbox', 'category')
     json = {
@@ -55,7 +55,7 @@ def images_json(request):
     return render_json(request, json)
 
 
-@login_required
+@staff_member_required
 def image(request, filename_slug):
     c = {
         'filename_slug': filename_slug,
@@ -64,7 +64,7 @@ def image(request, filename_slug):
     return render_to_response('image.html', c)
 
 
-@login_required
+@staff_member_required
 def update_term(request):
     if request.body:
         data = simplejson.loads(request.body)
@@ -83,7 +83,7 @@ def update_term(request):
     return render_json(request, response)
 
 
-@login_required
+@staff_member_required
 def merge_terms(request):
     if request.body:
         data = simplejson.loads(request.body)
@@ -110,7 +110,7 @@ def merge_terms(request):
     return render_json(request, response)
 
 
-@login_required
+@staff_member_required
 def image_update(request):
     if request.body:
         data = simplejson.loads(request.body)
@@ -176,7 +176,7 @@ def export_image(image):
         interactive=False)
 
 
-@login_required
+@staff_member_required
 def image_json(request, filename_slug):
     image = get_object_or_404(Image, filename_slug=filename_slug)
     paths = Path.objects.filter(image=image).select_related('term', 'bbox')
@@ -187,7 +187,7 @@ def image_json(request, filename_slug):
     return render_json(request, json)
 
 
-@login_required
+@staff_member_required
 def terms(request, filename_slug=None):
     terms = Term.objects.exclude(slug__in=['too-small', 'no-practice'])
     terms = terms.select_related('parent')
@@ -226,7 +226,7 @@ def terms(request, filename_slug=None):
     return render_json(request, json)
 
 
-@login_required
+@staff_member_required
 def relations_json(request, filename_slug=None):
     from anatomy_tagging.management.commands.scrape_wiki import Command
     raw_relations = Command().get_relations()
@@ -243,7 +243,7 @@ def relations_json(request, filename_slug=None):
     return render_json(request, json)
 
 
-@login_required
+@staff_member_required
 def update_relations(request):
     if request.body:
         data = simplejson.loads(request.body)
@@ -265,7 +265,7 @@ def update_relations(request):
     return render_json(request, response)
 
 
-@login_required
+@staff_member_required
 def render_json(request, json, status=None,):
     if 'html' in request.GET:
         return HttpResponse(
