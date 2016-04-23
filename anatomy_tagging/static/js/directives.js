@@ -240,18 +240,24 @@ angular.module('anatomy.tagging.directives', [])
               }); 
               return panZoom;
             };
+
+            var zoomStep = 0.1;
+            var initialZoomX = (1 - viewBox.width/paper.width) / zoomStep;
+            var initialZoomY = (1 - viewBox.height/paper.height) / zoomStep;
+            var initialZoom = Math.min(initialZoomX, initialZoomY);
             var panZoomOptions = {
              initialPosition : {
-               x : viewBox.x,
-               y : viewBox.y,
-             }
+               x : viewBox.x - Math.max(0,
+                 (paper.width / (paper.height / viewBox.height) - viewBox.width) / 2),
+               y : viewBox.y - Math.max(0, 
+                 (paper.height / (paper.width / viewBox.width) - viewBox.height) / 2),
+             },
+             initialZoom : initialZoom,
+             minZoom : initialZoom,
+             zoomStep : zoomStep,
             };
-
-            $('#init-zoom').click(function(e) {
-              initMapZoom(r, panZoomOptions);
-              scope.zoomInited = true;
-              $(this).hide();
-            });
+            initMapZoom(r, panZoomOptions);
+            scope.zoomInited = true;
 
             focusRect = r.rect(-100,10, 10, 10);
             focusRect.attr({
