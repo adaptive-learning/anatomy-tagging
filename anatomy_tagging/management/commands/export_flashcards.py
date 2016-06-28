@@ -145,10 +145,10 @@ class Command(BaseCommand):
             c_json = {
                 'id': i.filename_slug[:50],
                 'content': content,
-                'name-cs': self._empty(i.name_cs),
-                'name-cc': self._empty(i.name_cs),
-                'name-en': self._empty(i.name_en),
-                'name-la': self._empty(i.name_en),
+                'name-cs': ExportUtils._empty(i.name_cs),
+                'name-cc': ExportUtils._empty(i.name_cs),
+                'name-en': ExportUtils._empty(i.name_en),
+                'name-la': ExportUtils._empty(i.name_en),
                 'active': i.active and len(terms_in_image) > 1,
                 'category': self._get_category_id(i.category) if i.category is not None else None,
             }
@@ -160,19 +160,7 @@ class Command(BaseCommand):
     def load_terms(self):
         result = {}
         for t in Term.objects.all().exclude(code__in=['no-practice', 'too-small']):
-            t_json = {
-                'id': t.code if t.code else hashlib.sha1(t.slug).hexdigest(),
-                'name-cs': self._empty(t.name_la, t.name_cs),
-                'name-cc': self._empty(t.name_cs, t.name_la),
-                'name-en': self._empty(t.name_en, t.name_la),
-                'name-la': self._empty(t.name_la, t.name_en),
-            }
-            if t.body_part is not None:
-                t_json['categories'] = self._body_part_to_categories(t.body_part)
-            if t.system is not None:
-                t_json['systems'] = self._system_to_categories(t.system)
-                t_json['categories'] = t_json['systems'] + (
-                    t_json.get('categories', []))
+            t_json = ExportUtils.term_to_json(t)
             result[t_json['id']] = t_json
         return result
 
@@ -181,8 +169,8 @@ class Command(BaseCommand):
         for c in Category.objects.exclude(name_cs=''):
             c_json = {
                 'id': self._get_category_id(c),
-                'name-cs': self._stip_number(self._empty(c.name_cs)),
-                'name-cc': self._stip_number(self._empty(c.name_cs)),
+                'name-cs': self._stip_number(ExportUtils._empty(c.name_cs)),
+                'name-cc': self._stip_number(ExportUtils._empty(c.name_cs)),
                 'name-en': self._get_category_english_name(c),
                 'name-la': self._get_category_english_name(c),
                 'type': 'system',
@@ -208,34 +196,6 @@ class Command(BaseCommand):
             'height': bbox.height,
         }
 
-    def _system_to_categories(self, systems):
-        system_ids = [str(i).zfill(2) for i in range(1, 14)]
-        result = []
-        for i in range(0, len(systems), 2):
-            system_id = systems[i: i + 2]
-            if system_id in system_ids:
-                result.append(system_id)
-        return result
-
-    def _body_part_to_categories(self, body_part):
-        result = []
-        for c in ['Hf', 'Hb', 'UE', 'LE']:
-            if c in body_part:
-                result.append(c)
-                body_part = body_part.replace(c, '')
-        for c in body_part:
-            if c == 'H':
-                result.extend(['Hf', 'Hb'])
-            else:
-                result.append(c)
-        return result
-
-    def _empty(self, x, y=None):
-        ret = '' if x is None else x
-        if ret == '' and y is not None:
-            ret = y
-        return ret
-
     def _stip_number(self, x):
         return filter(lambda c: not c.isdigit(), x).strip()
 
@@ -252,7 +212,7 @@ class Command(BaseCommand):
             id = int(c.name_cs.split()[0])
             return self.ENGLISH_CATEGORY_NAMES[id]
         except (ValueError, IndexError):
-            return self._empty(c.name_en)
+            return ExportUtils._empty(c.name_en)
 
     LOCATION_CATEGORIES = [
         {
@@ -319,3 +279,57 @@ class Command(BaseCommand):
         14: 'Endocrine system',
         15: 'Topography',
     }
+
+
+class ExportUtils(object):
+    @staticmethod
+    def _empty(x, y=None):
+        ret = '' if x is None else x
+        if ret == '' and y is not None:
+            ret = y
+        return ret
+
+    @staticmethod
+    def _body_part_to_categories(body_part):
+        result = []
+        for c in ['Hf', 'Hb', 'UE', 'LE']:
+            if c in body_part:
+                result.append(c)
+                body_part = body_part.replace(c, '')
+        for c in body_part:
+            if c == 'H':
+                result.extend(['Hf', 'Hb'])
+            else:
+                result.append(c)
+        return result
+
+    @staticmethod
+    def _system_to_categories(systems):
+        system_ids = [str(i).zfill(2) for i in range(1, 14)]
+        result = []
+        for i in range(0, len(systems), 2):
+            system_id = systems[i: i + 2]
+            if system_id in system_ids:
+                result.append(system_id)
+        return result
+
+    @staticmethod
+    def term_to_json(t):
+        t_json = {
+            'id': t.code if t.code else hashlib.sha1(t.slug).hexdigest(),
+            'name-cs': ExportUtils._empty(t.name_la, t.name_cs),
+            'name-cc': ExportUtils._empty(t.name_cs, t.name_la),
+            'name-en': ExportUtils._empty(t.name_en, t.name_la),
+            'name-la': ExportUtils._empty(t.name_la, t.name_en),
+        }
+        if t.body_part is not None:
+            t_json['categories'] = ExportUtils._body_part_to_categories(t.body_part)
+        if t.system is not None:
+            t_json['systems'] = ExportUtils._system_to_categories(t.system)
+            t_json['categories'] = t_json['systems'] + (
+                t_json.get('categories', []))
+        return t_json
+
+    @staticmethod
+    def get_term_id(t):
+        return t.code if t.code else hashlib.sha1(t.slug).hexdigest()
