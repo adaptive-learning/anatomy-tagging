@@ -64,10 +64,10 @@ class Command(BaseCommand):
             'content': json.dumps({
                 'question': self.QUESTIONS[id],
             }),
-            'name-cs': id,
-            'name-cc': id,
-            'name-en': id,
-            'name-la': id,
+            'name-cs': self.CATEGORIES[id]['cs'],
+            'name-cc': self.CATEGORIES[id]['cs'],
+            'name-en': self.CATEGORIES[id]['en'],
+            'name-la': self.CATEGORIES[id]['en'],
             'active': True,
         }
         return c_json
@@ -88,22 +88,40 @@ class Command(BaseCommand):
         return r_json
     QUESTIONS = {
         'nerve': {
-            'cs': u'Který nerv inervuje sval {}?',
+            'cs': {
+                't2ts': u'Který nerv inervuje sval {}?',
+                'ts2t': u'Který sval inervuje nerv {}?',
+            },
         },
         'artery': {
-            'cs': u'Která arterie zásobuje sval {}?',
+            'cs': {
+                't2ts': u'Která arterie zásobuje sval {}?',
+                'ts2t': u'Který sval zásobuje arterie {}?',
+            },
         },
         'action': {
-            'cs': u'Jaká je funkce svalu {}?',
+            'cs': {
+                't2ts': u'Jaká je funkce svalu {}?',
+                'ts2t': u'Který sval má funkci {}?',
+            },
         },
         'antagonist': {
-            'cs': u'Co je antagonistou svalu {}?',
+            'cs': {
+                't2ts': u'Co je antagonistou svalu {}?',
+                'ts2t': u'Co je antagonistou svalu {}?',
+            },
         },
         'insertion': {
-            'cs': u'Kde má úpon sval {}?',
+            'cs': {
+                't2ts': u'Kde má úpon sval {}?',
+                'ts2t': u'Který sval má úpon na {}?',
+            },
         },
         'origin': {
-            'cs': u'Kde má počátek sval {}?',
+            'cs': {
+                't2ts': u'Kde má počátek sval {}?',
+                'ts2t': u'Který sval má počátek na {}?',
+            },
         },
     }
     CATEGORIES = {
