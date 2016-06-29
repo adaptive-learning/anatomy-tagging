@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from optparse import make_option
-from anatomy_tagging.models import Category, Term, Image, Relation
-import hashlib
+from anatomy_tagging.models import Relation
 import json
 from clint.textui import progress
 from anatomy_tagging.management.commands.export_flashcards import ExportUtils
@@ -18,20 +17,22 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        relations = Relation.objects.all()
+        relations = Relation.objects.all().select_related('term1,term2')
         terms = {}
-        categories = {}
+        categories = {
+            'relations': self.RELATIONS_CATEGORY
+        }
         contexts = {}
         flashcards = {}
-        for r in relations:
+        for r in progress.bar(relations, every=max(1, len(relations) / 100)):
             if r.term1 is not None and r.term2 is not None:
                 terms[r.term1.id] = ExportUtils.term_to_json(r.term1)
                 terms[r.term2.id] = ExportUtils.term_to_json(r.term2)
                 flashcards[r.id] = self.relation_to_json(r)
                 contexts[r.name] = self.relation_to_context(r)
                 categories[r.name] = self.relation_to_category(r)
-                print r
-        print 'hey'
+            else:
+                print 'Missing term in relation %s' % r
         output_dict = {
             'categories': categories.values(),
             'terms': terms.values(),
@@ -74,13 +75,13 @@ class Command(BaseCommand):
         term2_id = ExportUtils.get_term_id(relation.term2)
 
         r_json = {
-            "term1": term1_id,
-            "term2": term2_id,
+            "term": term1_id,
+            "term-secondary": term2_id,
             "context": relation.name.lower(),
             "active": True,
             "id": "",
             'id': ('%s-%s-%s' % (relation.name, term1_id, term2_id))[:50],
-            "categories": [relation.name.lower()],
+            "categories": [relation.name.lower(), 'relations'],
         }
         return r_json
     QUESTIONS = {
@@ -128,4 +129,12 @@ class Command(BaseCommand):
             'cs': u'Počátky',
             'en': u'Origins',
         },
+    }
+    RELATIONS_CATEGORY = {
+        'id': 'relations',
+        'name-cs': 'Souvislosti',
+        'name-cc': 'Souvislosti',
+        'name-en': 'Relations',
+        'name-la': 'Relations',
+        'active': True,
     }
