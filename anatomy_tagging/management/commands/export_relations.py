@@ -19,9 +19,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         relations = Relation.objects.all().select_related('term1,term2')
         terms = {}
-        categories = {
+        categories = ExportUtils.load_categories()
+        categories = categories
+        categories.update({
             'relations': self.RELATIONS_CATEGORY
-        }
+        })
         contexts = {}
         flashcards = {}
         for r in progress.bar(relations, every=max(1, len(relations) / 100)):
@@ -59,13 +61,13 @@ class Command(BaseCommand):
         id = relation.name.lower()
         c_json = {
             'id': id,
-            'content': {
+            'content': json.dumps({
                 'question': self.QUESTIONS[id],
-            },
-            'name-cs': '',
-            'name-cc': '',
-            'name-en': '',
-            'name-la': '',
+            }),
+            'name-cs': id,
+            'name-cc': id,
+            'name-en': id,
+            'name-la': id,
             'active': True,
         }
         return c_json

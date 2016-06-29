@@ -30,7 +30,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        categories = self.load_categories()
+        categories = ExportUtils.load_categories()
         terms = self.load_terms()
         contexts, used_terms, used_categories = self.load_contexts(
             terms, options['context'])
@@ -150,7 +150,7 @@ class Command(BaseCommand):
                 'name-en': ExportUtils._empty(i.name_en),
                 'name-la': ExportUtils._empty(i.name_en),
                 'active': i.active and len(terms_in_image) > 1,
-                'category': self._get_category_id(i.category) if i.category is not None else None,
+                'category': ExportUtils._get_category_id(i.category) if i.category is not None else None,
             }
             if len(terms_in_image) <= 1:
                 print "WARNING: Deactivating image with %s terms:" % len(terms_in_image), i.filename.encode('utf8')
@@ -164,28 +164,6 @@ class Command(BaseCommand):
             result[t_json['id']] = t_json
         return result
 
-    def load_categories(self):
-        result = {}
-        for c in Category.objects.exclude(name_cs=''):
-            c_json = {
-                'id': self._get_category_id(c),
-                'name-cs': self._stip_number(ExportUtils._empty(c.name_cs)),
-                'name-cc': self._stip_number(ExportUtils._empty(c.name_cs)),
-                'name-en': self._get_category_english_name(c),
-                'name-la': self._get_category_english_name(c),
-                'type': 'system',
-            }
-            if c.parent is not None:
-                c_json['parent-categories'] = [self._get_category_id(c.parent)]
-            result[c_json['id']] = c_json
-        for c in self.LOCATION_CATEGORIES:
-            c['type'] = 'location'
-            c['name-la'] = c['name-en']
-            c['name-cc'] = c['name-cs']
-            c['not-in-model'] = True
-            result[c['id']] = c
-        return result
-
     def _bbox_to_json(self, bbox):
         if bbox is None:
             return None
@@ -196,21 +174,26 @@ class Command(BaseCommand):
             'height': bbox.height,
         }
 
-    def _stip_number(self, x):
+
+class ExportUtils(object):
+    @staticmethod
+    def _stip_number(x):
         return filter(lambda c: not c.isdigit(), x).strip()
 
-    def _get_category_id(self, c):
+    @staticmethod
+    def _get_category_id(c):
         try:
             return str(int(c.name_cs.split()[0])).zfill(2)
         except (ValueError, IndexError):
             return str(c.id)
 
-    def _get_category_english_name(self, c):
+    @staticmethod
+    def _get_category_english_name(c):
         if c.name_en is not None and c.name_en != '':
             return c.name_en
         try:
             id = int(c.name_cs.split()[0])
-            return self.ENGLISH_CATEGORY_NAMES[id]
+            return ExportUtils.ENGLISH_CATEGORY_NAMES[id]
         except (ValueError, IndexError):
             return ExportUtils._empty(c.name_en)
 
@@ -280,8 +263,29 @@ class Command(BaseCommand):
         15: 'Topography',
     }
 
+    @staticmethod
+    def load_categories():
+        result = {}
+        for c in Category.objects.exclude(name_cs=''):
+            c_json = {
+                'id': ExportUtils._get_category_id(c),
+                'name-cs': ExportUtils._stip_number(ExportUtils._empty(c.name_cs)),
+                'name-cc': ExportUtils._stip_number(ExportUtils._empty(c.name_cs)),
+                'name-en': ExportUtils._get_category_english_name(c),
+                'name-la': ExportUtils._get_category_english_name(c),
+                'type': 'system',
+            }
+            if c.parent is not None:
+                c_json['parent-categories'] = [ExportUtils._get_category_id(c.parent)]
+            result[c_json['id']] = c_json
+        for c in ExportUtils.LOCATION_CATEGORIES:
+            c['type'] = 'location'
+            c['name-la'] = c['name-en']
+            c['name-cc'] = c['name-cs']
+            c['not-in-model'] = True
+            result[c['id']] = c
+        return result
 
-class ExportUtils(object):
     @staticmethod
     def _empty(x, y=None):
         ret = '' if x is None else x
