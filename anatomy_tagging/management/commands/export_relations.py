@@ -19,8 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         relations = Relation.objects.all().select_related('term1,term2')
         terms = {}
-        categories = ExportUtils.load_categories()
-        categories = categories
+        categories = {}
         categories.update({
             'relations': self.RELATIONS_CATEGORY
         })
@@ -35,6 +34,11 @@ class Command(BaseCommand):
                 categories[r.name] = self.relation_to_category(r)
             else:
                 print 'Missing term in relation %s' % r
+        for t in terms.itervalues():
+            del t['categories']
+            del t['systems']
+            if t['name-cc'] == '':
+                del t['name-cc']
         output_dict = {
             'categories': categories.values(),
             'terms': terms.values(),
