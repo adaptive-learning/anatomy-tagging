@@ -32,6 +32,9 @@ class Command(BaseCommand):
                 flashcards[r.id] = self.relation_to_json(r)
                 contexts[r.name] = self.relation_to_context(r)
                 categories[r.name] = self.relation_to_category(r)
+                if r.name == 'Action':
+                    # HACK: Use Czech Actions in Czech-Latin terms
+                    terms[r.term2.id]['name-cs'] = terms[r.term2.id]['name-cc']
             else:
                 print 'Missing term in relation %s' % r
         for t in terms.itervalues():
