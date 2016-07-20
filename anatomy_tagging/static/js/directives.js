@@ -190,7 +190,7 @@ angular.module('anatomy.tagging.directives', [])
               path.click(clickHandler);
               path.hover(hoverInHandler, hoverOutHandler);
               p.bbox = p.bbox || path.getBBox();
-              if (p.bbox.width < 4 && p.bbox.height < 4) {
+              if (p.bbox.width < 4 && p.bbox.height < 4 && p.bbox.width / data.image.bbox.width < 0.01 && p.bbox.height / data.image.bbox.height < 0.01) {
                 p.isTooSmall = true;
                 p.term = {
                   code : 'too-small',
