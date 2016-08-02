@@ -529,8 +529,17 @@ angular.module('anatomy.tagging.controllers', [])
         $scope.relationTypes.push(r.type);
       }
     }
-    for (i = 0; i < data.relations.length; i++) {
-      var r = data.relations[i];
+    $scope.loading = false;
+    addRelationsToDict(data.relations);
+  });
+
+  termsService.get().success(function(data) {
+    $scope.allTerms = data;
+  });
+
+  function addRelationsToDict(relations) {
+    for (i = 0; i < relations.length; i++) {
+      var r = relations[i];
       var key = r.text1;
       var rObject = $scope.relationsDict[key];
       if (rObject) {
@@ -552,11 +561,7 @@ angular.module('anatomy.tagging.controllers', [])
         });
       }
     }
-    $scope.loading = false;
-  });
-  termsService.get().success(function(data) {
-    $scope.allTerms = data;
-  });
+  }
 
   $scope.save = function(relation) {
     console.log(relation);
