@@ -58,7 +58,7 @@
                 ng-if="relationField.term">
             <a target="_blank"
                 class="btn btn-default"
-                href="/terms/?search={{relationField.term.name_la}}">
+                href="/terms/?search={{relationField.term.name_la || relationField.term}}">
               <i class="glyphicon glyphicon-edit"></i>
             </a>
           </span>
