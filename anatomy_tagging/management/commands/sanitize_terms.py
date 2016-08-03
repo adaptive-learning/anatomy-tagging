@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
-from anatomy_tagging.models import Term, Path
+from anatomy_tagging.models import Term, Path, Relation
 import re
 
 
@@ -27,16 +27,30 @@ class Command(BaseCommand):
         duplicate_count = 0
 
         terms = Term.objects.all().exclude(code__in=['no-practice', 'too-small'])
-        self.remove_unused_terms(terms)
+        # TODO: this seems too dangerous at the moment
+        # self.remove_unused_terms(terms)
+
+        def fix(name):
+            name = re.sub('[\(\)]', '', name)
+            return '; '.join([n.capitalize() for n in name.split('; ')])
 
         for t in terms:
-            name_la = t.name_la
-            name_la = name_la.capitalize()
-
+            name_la = fix(t.name_la)
             name_la = pattern.sub(lambda x: rev_subs[x.group()], name_la)
-            if t.name_la != name_la:
-                print t.name_la, '->', name_la
-                t.name_la = name_la
+
+            name_cs = fix(t.name_cs)
+            name_en = fix(t.name_en)
+
+            if t.name_la != name_la or t.name_cs != name_cs or t.name_en != name_en:
+                if t.name_la != name_la:
+                    print t.name_la, '->', name_la
+                    t.name_la = name_la
+                if t.name_cs != name_cs:
+                    print t.name_cs, '->', name_cs
+                    t.name_cs = name_cs
+                if t.name_en != name_en:
+                    print t.name_en, '->', name_en
+                    t.name_en = name_en
                 t.save()
                 count += 1
             # TODO merge if on more terms on the same image
@@ -50,7 +64,13 @@ class Command(BaseCommand):
 
     def remove_unused_terms(self, terms):
         paths = Path.objects.all().select_related('term')
-        used_terms_ids = list(set([p.term_id for p in paths if p.term_id is not None]))
+        relations = Relation.objects.all().select_related('term1,term2')
+        used_terms_ids = list(set(
+            [p.term_id for p in paths if p.term_id is not None] +
+            [r.term1_id for r in relations if r.term1_id is not None] +
+            [r.term2_id for r in relations if r.term2_id is not None] +
+            [r.term2.parent_id for r in relations if r.term2_id is not None]
+        ))
         unused_terms = [t for t in terms if t.id not in used_terms_ids and t.code == '']
         for t in unused_terms:
             print 'Removing', t.name_la
