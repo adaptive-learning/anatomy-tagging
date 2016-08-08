@@ -142,6 +142,8 @@ class Command(BaseCommand):
         stroke_width = 0
         if 'd' in attributes.keys():
             d = attributes['d'].value
+            if 'z' not in d and 'Z' not in d:
+                stroke_width = 1
         elif 'points' in attributes.keys():
             d = self.create_path_from_polyline(attributes)
             stroke_width = 2
