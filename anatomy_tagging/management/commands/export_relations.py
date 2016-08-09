@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
 from optparse import make_option
-from anatomy_tagging.models import Relation
+from anatomy_tagging.models import Relation, Path
 import json
 from clint.textui import progress
 from anatomy_tagging.management.commands.export_flashcards import ExportUtils
@@ -82,6 +82,7 @@ class Command(BaseCommand):
     def relation_to_json(self, relation):
         term1_id = ExportUtils.get_term_id(relation.term1)
         term2_id = ExportUtils.get_term_id(relation.term2)
+        contexts = self.get_contexts_of_relation(relation)
 
         r_json = {
             "term": term1_id,
@@ -91,8 +92,28 @@ class Command(BaseCommand):
             "id": "",
             'id': ('%s-%s-%s' % (relation.name, term1_id, term2_id))[:50],
             "categories": [relation.name.lower(), 'relations'],
+            "additional-info": json.dumps(contexts),
         }
         return r_json
+
+    def get_contexts_of_relation(self, relation):
+        return {
+            'contexts': [
+                self.get_context_of_term(relation.term1),
+                self.get_context_of_term(relation.term2),
+            ],
+        }
+
+    def get_context_of_term(self, term):
+        paths = Path.objects.filter(term_id=term.id).select_related('image')
+        images = list(set([p.image for p in paths if
+                           p.image.category is None or
+                           '15' not in p.image.category.name_cs]))
+        if len(images) > 0:
+            return images[0].filename_slug[:50]
+        else:
+            print "WARNING:", 'Term with no image', term
+
     QUESTIONS = {
         'nerve': {
             'cs': {
@@ -164,4 +185,5 @@ class Command(BaseCommand):
         'name-en': 'Relations',
         'name-la': 'Relations',
         'active': True,
+        'type': 'super',
     }
