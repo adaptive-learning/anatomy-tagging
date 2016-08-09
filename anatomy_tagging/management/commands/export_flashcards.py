@@ -84,11 +84,11 @@ class Command(BaseCommand):
                     'active': c['active'],
                     'categories': list(terms[p['term']]['categories'])
                 }
-                if c['category'] == '15' and '15' not in f_json['categories']:
+                if c['category'] == '15':
                     f_json['categories'].append(c['category'])
                 if len(terms[p['term']]['systems']) == 0 and c['category'] is not None:
                     f_json['categories'].append(c['category'])
-                    f_json['categories'] = list(set(f_json['categories']))
+                f_json['categories'] = list(set(f_json['categories'] + ['images']))
                 result[f_json['id']] = f_json
         for t in terms.itervalues():
             del t['categories']
@@ -284,6 +284,14 @@ class ExportUtils(object):
             c['name-cc'] = c['name-cs']
             c['not-in-model'] = True
             result[c['id']] = c
+        result['images'] = {
+            'id': 'images',
+            'name-cs': 'Najdi na obrázku',
+            'name-cc': 'Najdi na obrázku',
+            'name-en': 'Find in the picture',
+            'name-la': 'Find in the picture',
+            'type': 'super',
+        }
         return result
 
     @staticmethod
