@@ -238,7 +238,7 @@ class Term(models.Model):
         super(Term, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return u'{0} ({1})'.format(self.name_cs, self.slug)
+        return u'{0} ({1})'.format(self.name_la, self.slug)
 
     def to_serializable(self, subterm=False):
         obj = {
