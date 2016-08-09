@@ -280,10 +280,10 @@ class Path(models.Model):
 
 
 class Relation(models.Model):
-    term1 = models.ForeignKey(Term, null=True, related_name='term1')
+    term1 = models.ForeignKey(Term, null=True, blank=True, related_name='term1')
     text1 = models.TextField()
-    term2 = models.ForeignKey(Term, null=True, related_name='term2')
-    text2 = models.TextField()
+    term2 = models.ForeignKey(Term, null=True, blank=True, related_name='term2')
+    text2 = models.TextField(blank=True)
     name = models.TextField(max_length=10)
 
     def to_serializable(self):
