@@ -286,10 +286,10 @@ class ExportUtils(object):
             result[c['id']] = c
         result['images'] = {
             'id': 'images',
-            'name-cs': 'Najdi na obrázku',
-            'name-cc': 'Najdi na obrázku',
-            'name-en': 'Find in the picture',
-            'name-la': 'Find in the picture',
+            'name-cs': 'Pojmy na obrázku',
+            'name-cc': 'Pojmy na obrázku',
+            'name-en': 'Terms in images',
+            'name-la': 'Terms in images',
             'type': 'super',
         }
         return result

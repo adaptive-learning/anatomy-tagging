@@ -36,7 +36,7 @@ class Command(BaseCommand):
                     # HACK: Use Czech Actions in Czech-Latin terms
                     terms[r.term2.id]['name-cs'] = terms[r.term2.id]['name-cc']
             else:
-                print 'Missing term in relation %s' % r
+                print 'WARNING: Missing term in relation %s' % r
         for t in terms.itervalues():
             del t['categories']
             del t['systems']
@@ -60,6 +60,7 @@ class Command(BaseCommand):
             'name-cc': self.CATEGORIES[id]['cs'],
             'name-en': self.CATEGORIES[id]['en'],
             'name-la': self.CATEGORIES[id]['en'],
+            'type': 'relation',
             'active': True,
         }
         return c_json
@@ -98,10 +99,10 @@ class Command(BaseCommand):
 
     def get_contexts_of_relation(self, relation):
         return {
-            'contexts': [
-                self.get_context_of_term(relation.term1),
-                self.get_context_of_term(relation.term2),
-            ],
+            'contexts': {
+                't2ts': self.get_context_of_term(relation.term1),
+                'ts2t': self.get_context_of_term(relation.term2),
+            },
         }
 
     def get_context_of_term(self, term):
