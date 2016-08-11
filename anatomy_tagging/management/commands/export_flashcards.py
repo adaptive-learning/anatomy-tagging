@@ -334,6 +334,10 @@ class ExportUtils(object):
             'name-en': ExportUtils._empty(t.name_en, t.name_la),
             'name-la': ExportUtils._empty(t.name_la, t.name_en),
         }
+        # Translations hack: name_la is likely in English, so use name_cs
+        #  for Czech Latin instead
+        if 'of the' in t.name_la:
+            t_json['name-cs'] = t.name_cs
         if t.body_part is not None:
             t_json['categories'] = ExportUtils._body_part_to_categories(t.body_part)
         if t.system is not None:
