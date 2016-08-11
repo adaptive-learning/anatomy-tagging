@@ -103,6 +103,10 @@ class Command(BaseCommand):
                 't2ts': self.get_context_of_term(relation.term1),
                 'ts2t': self.get_context_of_term(relation.term2),
             },
+            'descriptions': {
+                't2ts': ExportUtils.term_to_json(relation.term1).get('id'),
+                'ts2t': ExportUtils.term_to_json(relation.term2).get('id'),
+            },
         }
 
     def get_context_of_term(self, term):
