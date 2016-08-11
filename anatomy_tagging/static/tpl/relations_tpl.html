@@ -46,6 +46,7 @@
       <span class="col-sm-2" 
           ng-repeat="type in relationTypes">
         <div class="input-group"
+          tooltip=" CZ:&nbsp;{{relationField.term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EN:&nbsp;{{relationField.term.name_en}}"
           ng-repeat="relationField in relation[type].terms">
           <input class="form-control input-sm"
             style="background-color: {{relationField.id ? ' #dff0d8' : ''}}"
