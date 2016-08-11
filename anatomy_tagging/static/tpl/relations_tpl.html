@@ -23,7 +23,10 @@
   <div class="row table-row"
       ng-repeat="relation in relations">
     <span class="col-sm-2">
-      <div class="input-group">
+      <div class="input-group"
+          tooltip="
+          CZ:&nbsp;{{relation.Muscle.term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          EN:&nbsp;{{relation.Muscle.term.name_en}}">
         <input class="form-control input-sm"
           ng-model="relation.Muscle.term" 
           style="background-color: {{relation.Muscle.id ? ' #dff0d8' : ''}}"
