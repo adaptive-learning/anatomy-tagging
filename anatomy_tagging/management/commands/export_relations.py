@@ -122,38 +122,38 @@ class Command(BaseCommand):
     QUESTIONS = {
         'nerve': {
             'cs': {
-                't2ts': u'Který nerv inervuje sval {}?',
-                'ts2t': u'Který sval inervuje nerv {}?',
+                't2ts': u'Který nerv inervuje sval {}',
+                'ts2t': u'Který sval inervuje nerv {}',
             },
         },
         'artery': {
             'cs': {
-                't2ts': u'Která arterie zásobuje sval {}?',
-                'ts2t': u'Který sval zásobuje arterie {}?',
+                't2ts': u'Která arterie zásobuje sval {}',
+                'ts2t': u'Který sval zásobuje arterie {}',
             },
         },
         'action': {
             'cs': {
-                't2ts': u'Jaká je funkce svalu {}?',
-                'ts2t': u'Který sval má funkci {}?',
+                't2ts': u'Jaká je funkce svalu {}',
+                'ts2t': u'Který sval má funkci {}',
             },
         },
         'antagonist': {
             'cs': {
-                't2ts': u'Co je antagonistou svalu {}?',
-                'ts2t': u'Co je antagonistou svalu {}?',
+                't2ts': u'Co je antagonistou svalu {}',
+                'ts2t': u'Co je antagonistou svalu {}',
             },
         },
         'insertion': {
             'cs': {
-                't2ts': u'Kde má úpon sval {}?',
-                'ts2t': u'Který sval má úpon na {}?',
+                't2ts': u'Kde má úpon sval {}',
+                'ts2t': u'Který sval má úpon na {}',
             },
         },
         'origin': {
             'cs': {
-                't2ts': u'Kde má počátek sval {}?',
-                'ts2t': u'Který sval má počátek na {}?',
+                't2ts': u'Kde má počátek sval {}',
+                'ts2t': u'Který sval má počátek na {}',
             },
         },
     }
