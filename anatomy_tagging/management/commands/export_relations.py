@@ -167,7 +167,7 @@ class Command(BaseCommand):
             'en': u'Arterial supply',
         },
         'action': {
-            'cs': u'Funkce',
+            'cs': u'Funkce svalů',
             'en': u'Actions',
         },
         'antagonist': {
@@ -175,11 +175,11 @@ class Command(BaseCommand):
             'en': u'Antagonists',
         },
         'insertion': {
-            'cs': u'Úpony',
+            'cs': u'Úpony svalů',
             'en': u'Insertions',
         },
         'origin': {
-            'cs': u'Počátky',
+            'cs': u'Začátky svalů',
             'en': u'Origins',
         },
     }
