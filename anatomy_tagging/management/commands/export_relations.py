@@ -125,11 +125,19 @@ class Command(BaseCommand):
                 't2ts': u'Který nerv inervuje sval {}',
                 'ts2t': u'Který sval je inervován nervem {}',
             },
+            'en': {
+                't2ts': u'Which nerve inerves muscle {}',
+                'ts2t': u'Which muscle is inerved by {}',
+            },
         },
         'artery': {
             'cs': {
                 't2ts': u'Která arterie zásobuje sval {}',
                 'ts2t': u'Který sval je zásoben arterií {}',
+            },
+            'en': {
+                't2ts': u'Which artery supplies muscle {}',
+                'ts2t': u'Which muscle is supplied by {}',
             },
         },
         'action': {
@@ -137,11 +145,19 @@ class Command(BaseCommand):
                 't2ts': u'Jaká je funkce svalu {}',
                 'ts2t': u'Který sval má funkci {}',
             },
+            'en': {
+                't2ts': u'What is function of {}',
+                'ts2t': u'Which muscle has function {}',
+            },
         },
         'antagonist': {
             'cs': {
                 't2ts': u'Co je antagonistou svalu {}',
                 'ts2t': u'Co je antagonistou svalu {}',
+            },
+            'en': {
+                't2ts': u'What is antagonist of {}',
+                'ts2t': u'What is antagonist of {}',
             },
         },
         'insertion': {
@@ -149,11 +165,19 @@ class Command(BaseCommand):
                 't2ts': u'Kde má úpon sval {}',
                 'ts2t': u'Který sval má úpon na {}',
             },
+            'en': {
+                't2ts': u'Where is insertion of {}',
+                'ts2t': u'Which muscle has insertion on {}',
+            },
         },
         'origin': {
             'cs': {
                 't2ts': u'Kde má počátek sval {}',
                 'ts2t': u'Který sval má počátek na {}',
+            },
+            'en': {
+                't2ts': u'Where is origin of {}',
+                'ts2t': u'Which muscle has origin on {}',
             },
         },
     }
