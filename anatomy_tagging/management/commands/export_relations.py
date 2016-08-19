@@ -123,13 +123,13 @@ class Command(BaseCommand):
         'nerve': {
             'cs': {
                 't2ts': u'Který nerv inervuje sval {}',
-                'ts2t': u'Který sval inervuje nerv {}',
+                'ts2t': u'Který sval je inervován nervem {}',
             },
         },
         'artery': {
             'cs': {
                 't2ts': u'Která arterie zásobuje sval {}',
-                'ts2t': u'Který sval zásobuje arterie {}',
+                'ts2t': u'Který sval je zásoben arterií {}',
             },
         },
         'action': {
