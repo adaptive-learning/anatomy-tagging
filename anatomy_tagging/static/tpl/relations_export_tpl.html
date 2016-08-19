@@ -13,11 +13,15 @@
 </div>
 <ul class="nav nav-tabs">
   <li role="presentation" ng-class="{'active': !activeContext}">
-    <a href="" ng-click="setContext()">Vše</a>
+    <a href="" ng-click="setContext()">Vše
+      ({{flashcards.length}})</a>
+    </a>
   </li>
   <li role="presentation" ng-class="{'active': activeContext == c}"
     ng-repeat="c in contexts">
-    <a href="" ng-click="setContext(c)" ng-bind="c['name-' + lang]"></a>
+    <a href="" ng-click="setContext(c)">
+      {{c['name-' + lang]}}
+      ({{(flashcards | filter : {contextId:c.id}).length}})</a>
   </li>
 </ul>
 <div ng-hide="loading"  class="table table-striped col-sm-12">
