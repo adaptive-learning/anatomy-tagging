@@ -23,7 +23,8 @@ urlpatterns = patterns(
     url(r'^termsjson/(?P<filename_slug>[\w\.-]*)$', 'terms', name='terms'),
 
     url(r'^relationsjson/update$', 'update_relations', name='update_relations'),
-    url(r'^relationsjson/$', 'relations_json', name='images'),
+    url(r'^relationsjson/$', 'relations_json', name='relations_json'),
+    url(r'^relationsexport/$', 'relations_export', name='relations_export'),
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='static/img/favicon.png')),

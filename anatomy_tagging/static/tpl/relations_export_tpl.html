@@ -1,0 +1,52 @@
+<div class="header">
+  <div class="col-sm-12">
+    <h1>
+      <a href="/">
+        <i class="glyphicon glyphicon-home"></i>
+      </a>
+      Anatom.cz -
+      {{image.filename || 'souvislosti - přehled'}}
+    </h1>
+  </div>
+  <div class="clearfix"></div>
+  <br>
+</div>
+<ul class="nav nav-tabs">
+  <li role="presentation" ng-class="{'active': !activeContext}">
+    <a href="" ng-click="setContext()">Vše</a>
+  </li>
+  <li role="presentation" ng-class="{'active': activeContext == c}"
+    ng-repeat="c in contexts">
+    <a href="" ng-click="setContext(c)" ng-bind="c['name-' + lang]"></a>
+  </li>
+</ul>
+<div ng-hide="loading"  class="table table-striped col-sm-12">
+  <div class="row table-row"
+      ng-repeat="flashcard in flashcards | filter : {contextId:activeContext.id}">
+      <span class="col-sm-5">
+        {{flashcard.context.content.question[lang].t2ts.replace('{}', '')}}
+        <a class="label label-default"
+            href="/terms/?search={{flashcard.term['name-' + lang]}}">
+          {{flashcard.term['name-' + lang]}}</a>
+        <a ng-if="flashcard['additional-info'].contexts.t2ts"
+          href="/image/{{flashcard['additional-info'].contexts.t2ts}}">[img]</a>
+      </span>
+      <span class="col-sm-5">
+        {{flashcard.context.content.question[lang].ts2t.replace('{}', '')}}
+        <a class="label label-default"
+            href="/terms/?search={{flashcard.['term-secondary']['name-' + lang]}}">
+          {{flashcard['term-secondary']['name-' + lang]}}</a>
+        <a ng-if="flashcard['additional-info'].contexts.ts2t"
+          href="/image/{{flashcard['additional-info'].contexts.ts2t}}">[img]</a>
+      </span>
+  </div>
+</div>
+  <div class="col-sm-12" ng-show="loading">
+    <br>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active"
+        style="width: 100%">
+        Načítání
+      </div>
+    </div>
+  </div>

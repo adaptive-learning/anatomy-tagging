@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core import management
 import os
+from django.core.management import call_command
 
 
 @staff_member_required
@@ -241,6 +242,15 @@ def relations_json(request, filename_slug=None):
         'relations': relations,
     }
     return render_json(request, json)
+
+
+@staff_member_required
+def relations_export(request, filename_slug=None):
+    call_command('export_relations')
+    file_name = 'relations-flashcards.json'
+    with open(file_name, 'rb') as f:
+        data = simplejson.load(f)
+        return render_json(request, data)
 
 
 @staff_member_required

@@ -30,7 +30,10 @@ angular.module('anatomy.tagging', [
   }).when('/terms/:image?', {
     controller : 'TermsController',
     templateUrl : 'static/tpl/terms_tpl.html'
-  }).when('/relations/:image?', {
+  }).when('/relations/export', {
+    controller : 'RelationsExportController',
+    templateUrl : 'static/tpl/relations_export_tpl.html'
+  }).when('/relations/', {
     controller : 'RelationsController',
     templateUrl : 'static/tpl/relations_tpl.html'
   }).otherwise({

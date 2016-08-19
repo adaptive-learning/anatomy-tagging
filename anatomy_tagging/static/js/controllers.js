@@ -612,4 +612,39 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.closeAlert = function(relation, index) {
     relation.alerts.splice(index, 1);
   };
+})
+
+.controller('RelationsExportController',
+    function($scope, $http, $routeParams) {
+  $scope.loading = true;
+  $scope.lang = $routeParams.lang || 'cs';
+  $http.get("relationsexport").success(function(data) {
+    $scope.loading = false;
+    $scope.contexts = data.contexts;
+    $scope.flashcards = data.flashcards;
+    $scope.terms = data.terms;
+    var contextsById = {};
+    angular.forEach($scope.contexts, function(c) {
+      contextsById[c.id] = c;
+      c.content = angular.fromJson(c.content);
+    });
+    var termsById = {};
+    angular.forEach($scope.terms, function(t) {
+      termsById[t.id] = t;
+    });
+    angular.forEach($scope.flashcards, function(f) {
+      f.contextId = f.context;
+      f.context = contextsById[f.context];
+      f.term = termsById[f.term];
+      f['term-secondary'] = termsById[f['term-secondary']];
+      f['additional-info'] = angular.fromJson(f['additional-info']);
+    });
+    $scope.flashcards = $scope.flashcards.sort(function(a, b) {
+      return b.term['name-cs'] - a.term['name-cs'];
+    });
+
+    $scope.setContext = function(c) {
+      $scope.activeContext = c;
+    };
+  });
 });
