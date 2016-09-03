@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import CommandError
-from django.shortcuts import render_to_response
-from models import Term, Path, Image, Bbox, Relation
-from django.http import HttpResponse
-from django.db import connection
-import json as simplejson
-from django.shortcuts import get_object_or_404
+from anatomy_tagging.management.commands.scrape_wiki import Command, WIKI_PAGE_MUSCLES
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core import management
-import os
 from django.core.management import call_command
-from anatomy_tagging.management.commands.scrape_wiki import Command, WIKI_PAGE_MUSCLES
+from django.core.management.base import CommandError
+from django.db import connection
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render_to_response
+from models import Term, Path, Image, Bbox, Relation
+import json as simplejson
+import os
 
 
 @staff_member_required

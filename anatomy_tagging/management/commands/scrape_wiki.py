@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand
 from anatomy_tagging.models import Term
-from optparse import make_option
-import wikipedia
 from bs4 import BeautifulSoup
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from optparse import make_option
+import copy
 import json
 import os
-from django.conf import settings
-import copy
+import wikipedia
 
 
 WIKI_PAGE_MUSCLES = 'List_of_muscles_of_the_human_body'
