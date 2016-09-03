@@ -11,6 +11,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core import management
 import os
 from django.core.management import call_command
+from anatomy_tagging.management.commands.scrape_wiki import Command, WIKI_PAGE_MUSCLES
 
 
 @staff_member_required
@@ -229,13 +230,7 @@ def terms(request, filename_slug=None):
 
 @staff_member_required
 def relations_json(request, filename_slug=None):
-    from anatomy_tagging.management.commands.scrape_wiki import Command
-    raw_relations = Command().get_relations()
-    for r in raw_relations:
-        if isinstance(r['term1'], Term):
-            r['term1'] = r['term1'].to_serializable()
-        if isinstance(r['term2'], Term):
-            r['term2'] = r['term2'].to_serializable()
+    raw_relations = Command().get_relations(WIKI_PAGE_MUSCLES)
     relations = [r.to_serializable() for r in Relation.objects.all()]
     json = {
         'raw': raw_relations,

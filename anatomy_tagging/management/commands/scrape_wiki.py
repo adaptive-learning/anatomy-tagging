@@ -10,8 +10,12 @@ from django.conf import settings
 import copy
 
 
+WIKI_PAGE_MUSCLES = 'List_of_muscles_of_the_human_body'
+
+
 class Command(BaseCommand):
     help = u"""Scrape info about terms from wikipedia"""
+
     option_list = BaseCommand.option_list + (
         make_option(
             '--delete',
@@ -20,44 +24,42 @@ class Command(BaseCommand):
             default=False,
             help='Delete images and paths at first',
         ),
+        make_option(
+            '--page',
+            type=str,
+            dest='page',
+            default=WIKI_PAGE_MUSCLES,
+            help='Name of the WIKI page'
+        )
     )
-    IMAGES_DIR = '/svg/'
 
     def handle(self, *args, **options):
-        relations_db = self.get_relations()
-        print relations_db
-        print len(relations_db)
+        self.get_relations(options['page'])
 
-    def get_relations(self):
-        name = 'List_of_muscles_of_the_human_body'
-        json_name = os.path.join(settings.MEDIA_DIR, name + '.json')
+    def get_relations(self, page_name):
+        self.init_terms()
+        json_name = os.path.join(settings.MEDIA_DIR, page_name + '.json')
         if os.path.isfile(json_name):
             with open(json_name, 'r') as f:
-                relations_db = json.load(f)
-                return relations_db
+                raw_relations = json.load(f)
+                return raw_relations
 
-        page = wikipedia.page(name)
+        page = wikipedia.page(page_name)
         soup = BeautifulSoup(page.html())
-        # page = ''.join(open('List_of_muscles.html', 'r').readlines())
-        # soup = BeautifulSoup(page)
         tables = soup.findAll("table", {"class": "wikitable"})
-        relations_db = []
-        self.load_terms()
+        raw_relations = []
         for table in tables:
             relations = self.process_table(table)
-            relations_db = relations_db + relations
+            raw_relations = raw_relations + relations
 
         with open(json_name, 'w') as f:
-            raw_relations = copy.deepcopy(relations_db)
-            for r in raw_relations:
-                if r['term1'] is not None:
-                    r['term1'] = r['term1'].to_serializable()
-                if r['term2'] is not None:
-                    r['term2'] = r['term2'].to_serializable()
             json.dump(raw_relations, f)
-        return relations_db
 
-    def load_terms(self):
+        return copy.deepcopy(raw_relations)
+
+    def init_terms(self):
+        if hasattr(self, 'terms'):
+            return
         terms = Term.objects.all()
         self.terms = {}
         for t in terms:
@@ -67,8 +69,7 @@ class Command(BaseCommand):
                 self.terms[name.lower()] = t
 
     def get_term_name(self, cell):
-        text = " ".join(cell.findAll(text=True))
-        return text
+        return " ".join([c.strip() for c in cell.findAll(text=True)]).strip()
 
     def get_term_from_cell(self, cell):
         term = None
@@ -92,7 +93,7 @@ class Command(BaseCommand):
             term = self.terms.get(name, None)
             if term is None:
                 term = self.terms.get(name.replace(" muscle", ""), None)
-        return term
+        return None if term is None else term.to_serializable()
 
     def process_table(self, table):
         relations = []
@@ -115,16 +116,3 @@ class Command(BaseCommand):
                     }
                     relations.append(relation)
         return relations
-
-    def scrape_terms(self):
-        terms = Term.objects.exclude(
-            code__in=['no-practice', 'too-small']).filter(
-            name_en__in=['Biceps brachii'])[:1]
-        for term in terms:
-            print "Fetching", term.name_en
-            if term.name_en != "":
-                try:
-                    page = wikipedia.page(term.name_en)
-                    print page.content
-                except wikipedia.exceptions.PageError:
-                    print 'Page missing', term.name_en
