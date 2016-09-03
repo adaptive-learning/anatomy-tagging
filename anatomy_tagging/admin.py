@@ -27,10 +27,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class RelationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'term1', 'term2', 'text1', 'text2')
+    list_display = ('type_name', 'term1', 'term2', 'text1', 'text2')
     search_fields = list_display
-    list_filter = ('name',)
-    pass
+    list_filter = ('type__identifier', 'type__source')
+
+    def type_name(self, instance):
+        return '{}: {}'.format(instance.type.source, instance.type.identifier)
 
 admin.site.register(Image, ImageAdmin)
 admin.site.register(Path, PathAdmin)

@@ -283,10 +283,49 @@ class Path(models.Model):
         }
 
 
+class RelationTypeManager(models.Manager):
+
+    def make_synonyms(self, first, second):
+        first_synonyms = list(first.synonyms.all()) + [first]
+        second_synonyms = list(second.synonyms.all()) + [second]
+        for f in first_synonyms:
+            for s in second_synonyms:
+                f.synonyms.add(s)
+
+    def from_identifier(self, identifier, source=None):
+        if source is not None:
+            return self.get_or_create(identifier=identifier, source=source)[0]
+        else:
+            found = list(self.filter(identifier=identifier))
+            if len(found) == 0:
+                raise Exception('There is no relation type of the given identifier {}.'.format(identifier))
+            elif len(found) > 1:
+                raise Exception('There are multiple relation types of the given identifier {}.'.format(identifier))
+            return found[0]
+
+
+class RelationType(models.Model):
+
+    identifier = models.CharField(max_length=255)
+    source = models.CharField(max_length=255)
+    synonyms = models.ManyToManyField('self')
+
+    objects = RelationTypeManager()
+
+    def to_serializable(self, nested=False):
+        result = {
+            'identifier': self.identifier,
+            'source': self.source
+        }
+        if not nested:
+            result['synonyms'] = [rt.to_serializable(nested=True) for rt in self.synonyms.all()]
+        return result
+
+
 class RelationManager(models.Manager):
 
     def prepare_related(self):
-        return self.select_related('term1', 'term2', 'term1__parent', 'term2__parent')
+        return self.select_related('term1', 'term2', 'term1__parent', 'term2__parent', 'type')
 
 
 class Relation(models.Model):
@@ -295,22 +334,23 @@ class Relation(models.Model):
     text1 = models.TextField()
     term2 = models.ForeignKey(Term, null=True, blank=True, related_name='term2')
     text2 = models.TextField(blank=True)
-    name = models.TextField(max_length=10)
+    type = models.ForeignKey(RelationType, null=True, blank=True, related_name='relations')
 
     objects = RelationManager()
 
     def to_serializable(self):
         return {
             'id': self.id,
-            'name': self.name,
+            'name': self.type.identifier,
             'term1': to_serializable_or_none(self.term1),
             'term2': to_serializable_or_none(self.term2),
             'text1': self.text1,
             'text2': self.text2,
+            'type': self.type.to_serializable(nested=True),
         }
 
     def __unicode__(self):
-        return u'{0}( {1}, {2})'.format(self.name, self.term1, self.term2)
+        return u'{0}( {1}, {2})'.format(self.type.identifier, self.term1, self.term2)
 
 
 def to_serializable_or_none(obj):

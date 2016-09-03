@@ -17,7 +17,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        relations = Relation.objects.all().select_related('term1,term2')
+        relations = Relation.objects.prepare_related().filter(type__source='wikipedia')
         terms = {}
         categories = {}
         categories.update({
@@ -30,9 +30,9 @@ class Command(BaseCommand):
                 terms[r.term1.id] = ExportUtils.term_to_json(r.term1)
                 terms[r.term2.id] = ExportUtils.term_to_json(r.term2)
                 flashcards[r.id] = self.relation_to_json(r)
-                contexts[r.name] = self.relation_to_context(r)
-                categories[r.name] = self.relation_to_category(r)
-                if r.name == 'Action':
+                contexts[r.type.identifier] = self.relation_to_context(r)
+                categories[r.type.identifier] = self.relation_to_category(r)
+                if r.type.identifier == 'Action':
                     # HACK: Use Czech Actions in Czech-Latin terms
                     terms[r.term2.id]['name-cs'] = terms[r.term2.id]['name-cc']
             else:
@@ -53,7 +53,7 @@ class Command(BaseCommand):
             print 'Flashcards exported to file: \'%s\'' % options['output']
 
     def relation_to_category(self, relation):
-        id = relation.name.lower()
+        id = relation.type.identifier.lower()
         c_json = {
             'id': id,
             'name-cs': self.CATEGORIES[id]['cs'],
@@ -66,7 +66,7 @@ class Command(BaseCommand):
         return c_json
 
     def relation_to_context(self, relation):
-        id = relation.name.lower()
+        id = relation.type.identifier.lower()
         c_json = {
             'id': id,
             'content': json.dumps({
@@ -88,11 +88,11 @@ class Command(BaseCommand):
         r_json = {
             "term": term1_id,
             "term-secondary": term2_id,
-            "context": relation.name.lower(),
+            "context": relation.type.identifier.lower(),
             "active": True,
             "id": "",
-            'id': ('%s-%s-%s' % (relation.name, term1_id, term2_id))[:50],
-            "categories": [relation.name.lower(), 'relations'],
+            'id': ('%s-%s-%s' % (relation.type.identifier, term1_id, term2_id))[:50],
+            "categories": [relation.type.identifier.lower(), 'relations'],
             "additional-info": json.dumps(contexts),
         }
         return r_json

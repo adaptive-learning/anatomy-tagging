@@ -9,7 +9,7 @@ from django.db import connection
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
-from models import Term, Path, Image, Bbox, Relation
+from models import Term, Path, Image, Bbox, Relation, RelationType
 import json as simplejson
 import os
 
@@ -265,7 +265,7 @@ def update_relations(request):
                 relation = Relation()
             relation.text1 = r_data['text1']
             relation.text2 = r_data['text2']
-            relation.name = r_data['name']
+            relation.type = RelationType.objects.from_identifier(identifier=r_data['name'])
             relation.term1 = Term.objects.get_term_from_dict(r_data, 'term1')
             relation.term2 = Term.objects.get_term_from_dict(r_data, 'term2')
             relation.save()
