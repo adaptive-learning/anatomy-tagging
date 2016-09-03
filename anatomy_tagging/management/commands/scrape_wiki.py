@@ -60,7 +60,7 @@ class Command(BaseCommand):
     def init_terms(self):
         if hasattr(self, 'terms'):
             return
-        terms = Term.objects.all()
+        terms = Term.objects.prepare_related().all()
         self.terms = {}
         for t in terms:
             for name in t.name_la.split(';'):

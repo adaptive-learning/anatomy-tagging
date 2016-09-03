@@ -168,6 +168,10 @@ class Image(models.Model):
 
 
 class TermManager(models.Manager):
+
+    def prepare_related(self):
+        return self.select_related('parent')
+
     def get_term_from_dict(self, path_dict, term_key='term'):
         term = None
         if (term_key in path_dict and
@@ -279,12 +283,21 @@ class Path(models.Model):
         }
 
 
+class RelationManager(models.Manager):
+
+    def prepare_related(self):
+        return self.select_related('term1', 'term2', 'term1__parent', 'term2__parent')
+
+
 class Relation(models.Model):
+
     term1 = models.ForeignKey(Term, null=True, blank=True, related_name='term1')
     text1 = models.TextField()
     term2 = models.ForeignKey(Term, null=True, blank=True, related_name='term2')
     text2 = models.TextField(blank=True)
     name = models.TextField(max_length=10)
+
+    objects = RelationManager()
 
     def to_serializable(self):
         return {

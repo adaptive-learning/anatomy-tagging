@@ -231,7 +231,7 @@ def terms(request, filename_slug=None):
 @staff_member_required
 def relations_json(request, filename_slug=None):
     raw_relations = Command().get_relations(WIKI_PAGE_MUSCLES)
-    relations = [r.to_serializable() for r in Relation.objects.all()]
+    relations = [r.to_serializable() for r in Relation.objects.prepare_related().all()]
     json = {
         'raw': raw_relations,
         'relations': relations,
