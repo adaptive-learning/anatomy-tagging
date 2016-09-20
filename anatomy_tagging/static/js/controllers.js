@@ -502,9 +502,15 @@ angular.module('anatomy.tagging.controllers', [])
 })
 
 .controller('RelationsController',
-    function($scope, $http, termsService, $cookies) {
+    function($scope, $http, termsService, $cookies, $routeParams) {
   $scope.loading = true;
-  $http.get("relationsjson").success(function(data) {
+  var wikiPage = $routeParams.wikiPage || 'List_of_muscles_of_the_human_body';
+  $scope.mainTerm = {
+    'List_of_muscles_of_the_human_body' : 'Muscle',
+    'List_of_foramina_of_the_human_body' : 'Foramina',
+  }[wikiPage];
+  var url = "relationsjson/" + wikiPage;
+  $http.get(url).success(function(data) {
     $scope.relationsDict = {};
     $scope.relationTypes = [];
     $scope.relations = [];

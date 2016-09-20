@@ -33,7 +33,7 @@ angular.module('anatomy.tagging', [
   }).when('/relations/export', {
     controller : 'RelationsExportController',
     templateUrl : 'static/tpl/relations_export_tpl.html'
-  }).when('/relations/', {
+  }).when('/relations/:wikiPage?', {
     controller : 'RelationsController',
     templateUrl : 'static/tpl/relations_tpl.html'
   }).otherwise({

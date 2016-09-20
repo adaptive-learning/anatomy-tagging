@@ -11,6 +11,7 @@ import wikipedia
 
 
 WIKI_PAGE_MUSCLES = 'List_of_muscles_of_the_human_body'
+WIKI_PAGE_FORAMINA = 'List_of_foramina_of_the_human_body'
 
 
 class Command(BaseCommand):
@@ -36,7 +37,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.get_relations(options['page'])
 
-    def get_relations(self, page_name):
+    def get_relations(self, page_name, main_term_column_index=0):
+        if page_name == WIKI_PAGE_FORAMINA:
+            main_term_column_index = 2
         self.init_terms()
         json_name = os.path.join(settings.MEDIA_DIR, page_name + '.json')
         if os.path.isfile(json_name):
@@ -49,7 +52,7 @@ class Command(BaseCommand):
         tables = soup.findAll("table", {"class": "wikitable"})
         raw_relations = []
         for table in tables:
-            relations = self.process_table(table)
+            relations = self.process_table(table, main_term_column_index)
             raw_relations = raw_relations + relations
 
         with open(json_name, 'w') as f:
@@ -95,7 +98,7 @@ class Command(BaseCommand):
                 term = self.terms.get(name.replace(" muscle", ""), None)
         return None if term is None else term.to_serializable()
 
-    def process_table(self, table):
+    def process_table(self, table, main_term_column_index):
         relations = []
         header = table.find("tr").findAll("th")
         header = [h.find(text=True).strip() for h in header]
@@ -103,16 +106,17 @@ class Command(BaseCommand):
             cells = row.findAll("td")
             if len(cells) == len(header):
                 relations_dict = {}
-                main_term = self.get_term_from_cell(cells[0])
-                for h, c in zip(header[1:], cells[1:]):
+                main_term = self.get_term_from_cell(cells[main_term_column_index])
+                for h, c in zip(header, cells):
                     term = self.get_term_from_cell(c)
-                    relations_dict[h] = c
-                    relation = {
-                        'type': h,
-                        'term1': main_term,
-                        'term2': term,
-                        'text1': self.get_term_name(cells[0]),
-                        'text2': self.get_term_name(c),
-                    }
-                    relations.append(relation)
+                    if term != main_term:
+                        relations_dict[h] = c
+                        relation = {
+                            'type': h,
+                            'term1': main_term,
+                            'term2': term,
+                            'text1': self.get_term_name(cells[main_term_column_index]),
+                            'text2': self.get_term_name(c),
+                        }
+                        relations.append(relation)
         return relations
