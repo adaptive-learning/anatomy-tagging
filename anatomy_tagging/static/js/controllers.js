@@ -516,7 +516,7 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.relations = [];
     for (var i = 0; i < data.raw.length; i++) {
       var r = data.raw[i];
-      var key = r.text1;
+      var key = r.text1.trim();
       var rObject = $scope.relationsDict[key];
       if (!rObject) {
         rObject = {};
@@ -546,7 +546,7 @@ angular.module('anatomy.tagging.controllers', [])
   function addRelationsToDict(relations) {
     for (i = 0; i < relations.length; i++) {
       var r = relations[i];
-      var key = r.text1;
+      var key = r.text1.trim();
       var rObject = $scope.relationsDict[key];
       if (rObject) {
         rObject.Muscle = {
