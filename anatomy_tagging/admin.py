@@ -1,4 +1,4 @@
-from models import Image, Path, Term, Category, Bbox, Relation
+from models import Image, Path, Term, Category, Bbox, Relation, RelationType
 from django.contrib import admin
 
 
@@ -22,6 +22,10 @@ class BboxAdmin(admin.ModelAdmin):
     list_display = ('x', 'y', 'width', 'height')
 
 
+class RelationTypeAdmin(admin.ModelAdmin):
+    pass
+
+
 class CategoryAdmin(admin.ModelAdmin):
     pass
 
@@ -40,3 +44,4 @@ admin.site.register(Term, TermAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Bbox, BboxAdmin)
 admin.site.register(Relation, RelationAdmin)
+admin.site.register(RelationType, RelationTypeAdmin)

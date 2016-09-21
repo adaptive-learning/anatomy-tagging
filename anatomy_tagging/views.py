@@ -265,7 +265,9 @@ def update_relations(request):
                 relation = Relation()
             relation.text1 = r_data['text1']
             relation.text2 = r_data['text2']
-            relation.type = RelationType.objects.from_identifier(identifier=r_data['name'])
+            relation.type = RelationType.objects.from_identifier(
+                identifier=r_data['name'],
+                source='wikipedia',)
             relation.term1 = Term.objects.get_term_from_dict(r_data, 'term1')
             relation.term2 = Term.objects.get_term_from_dict(r_data, 'term2')
             relation.save()
