@@ -70,7 +70,7 @@ class Command(BaseCommand):
         c_json = {
             'id': id,
             'content': json.dumps({
-                'question': self.QUESTIONS[id],
+                'question': self.QUESTIONS.get(id),
             }),
             'name-cs': self.CATEGORIES[id]['cs'],
             'name-cc': self.CATEGORIES[id]['cs'],
@@ -205,6 +205,22 @@ class Command(BaseCommand):
         'origin': {
             'cs': u'Začátky svalů',
             'en': u'Origins',
+        },
+        'bone': {
+            'cs': u'Kosti',
+            'en': u'Bones',
+        },
+        'cranial fossa': {
+            'cs': u'Jámy lebeční',
+            'en': u'Cranial fossa',
+        },
+        'vessels': {
+            'cs': u'Cévy',
+            'en': u'Vessels',
+        },
+        'nerves': {
+            'cs': u'Nervy',
+            'en': u'Nerves',
         },
     }
     RELATIONS_CATEGORY = {
