@@ -3,6 +3,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.db.models import Count
 from django.db.models import Q
+import re
 
 
 class CategoryManager(models.Manager):
@@ -355,3 +356,56 @@ class Relation(models.Model):
 
 def to_serializable_or_none(obj):
     return obj.to_serializable() if obj is not None else None
+
+
+def canonical_term_name(name):
+    canonical_name = re.sub('[\(\)]', '', name)
+    canonical_name = re.sub(r'(\S)([-])(\S)', r'\1 \2 \3', canonical_name, re.UNICODE)
+    canonical_name = re.sub(r',(\S)', r', \1', canonical_name, re.UNICODE)
+    parts = '; '.join(p.strip() for p in canonical_name.split(';')).split(' ')
+    canonical_name = ' '.join([_make_canonical_term_name_part(p.strip()) for p in parts]).replace(' A ', ' a ').replace(' S ', ' s ')
+    return canonical_name
+
+
+def _make_canonical_term_name_part(value):
+    if _is_roman_number(value) or _is_location(value):
+        return value.upper()
+    if _is_name(value):
+        return '\''.join(p.title() if i == 0 else p for i, p in enumerate(value.split('\'')))
+    filtered = ''.join(re.findall("\w+", value, flags=re.UNICODE))
+    if filtered.lower() in ['vb', 'va', 'vc']:
+        return value.lower().replace('v', 'V')
+    if filtered.lower() in ['co']:
+        return value.lower().replace('c', 'C')
+    letters = {l for l in ''.join(re.findall("[^\W\d_]+", value, flags=re.UNICODE)).lower()}
+    if letters == {'t', 'h'}:
+        return re.sub(r'([^\d]|^)th', r'\1Th', value.lower(), re.UNICODE)
+    return value.lower()
+
+
+def _is_roman_number(value):
+    value = value.lower()
+    letters = {l for l in ''.join(re.findall("[^\W\d_]+", value, flags=re.UNICODE))}
+    if letters <= {u'i', u'v', u'x'}:
+        return True
+    else:
+        return False
+
+
+def _is_location(value):
+    filtered = ''.join(re.findall("\w+", value, flags=re.UNICODE))
+    if len(filtered) == 1:
+        return True
+    letters = {l for l in ''.join(re.findall("[^\W\d_]+", value, flags=re.UNICODE)).lower()}
+    if letters == {'t', 'h'}:
+        return False
+    return bool(re.search(r'\d', value))
+
+
+def _is_name(value):
+    value_lower = value.lower().strip(';')
+    if any([value_lower.endswith(ext) for ext in ['ovo', u'ův', 'ova', 'ovi', 'ovy']]) or value_lower.endswith('\'s'):
+        return True
+    if value_lower in ['sorgius']:
+        return True
+    return False
