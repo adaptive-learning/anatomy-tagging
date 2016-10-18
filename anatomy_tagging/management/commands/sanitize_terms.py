@@ -101,10 +101,10 @@ class Command(BaseCommand):
         unused_terms = [t for t in terms if t.id not in used_terms_ids and t.code == '']
         for t in unused_terms:
             if not dry:
-                print 'Removing', t.name_la
+                print 'Removing', t.name_la.encode('utf-8')
                 t.delete()
             else:
-                print '    ', t.name_la
+                print '    ', t.name_la.encode('utf-8')
         print len(unused_terms), "unused terms found", ("and deleted" if not dry else "")
 
     def find_duplicates(self, t):
