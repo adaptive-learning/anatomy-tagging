@@ -199,11 +199,11 @@ class Command(BaseCommand):
             'en': u'Antagonists',
         },
         'insertion': {
-            'cs': u'Úpony svalů',
+            'cs': u'Úpon svalu',
             'en': u'Insertions',
         },
         'origin': {
-            'cs': u'Začátky svalů',
+            'cs': u'Začátek svalu',
             'en': u'Origins',
         },
         'bone': {
