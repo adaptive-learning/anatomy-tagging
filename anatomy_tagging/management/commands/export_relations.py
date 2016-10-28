@@ -100,7 +100,7 @@ class Command(BaseCommand):
             "context": relation.type.identifier.lower(),
             "active": True,
             "id": "",
-            'id': ('%s-%s-%s' % (relation.type.identifier, term1_id, term2_id))[:50],
+            'id': ('%s-%s-%s' % (relation.type.identifier, term1_id[:20], term2_id))[:50],
             "categories": list(set([relation.type.identifier.lower(), 'relations'] +
                                    terms[relation.term1.id]['categories'] +
                                    terms[relation.term2.id]['categories'])),
