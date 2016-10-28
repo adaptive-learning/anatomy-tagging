@@ -20,6 +20,12 @@ class Command(BaseCommand):
         relations = Relation.objects.prepare_related().filter(type__source='wikipedia')
         terms = {}
         categories = {}
+        for c in ExportUtils.LOCATION_CATEGORIES:
+            c['type'] = 'location'
+            c['name-la'] = c['name-en']
+            c['name-cc'] = c['name-cs']
+            c['not-in-model'] = True
+            categories[c['id']] = c
         categories.update({
             'relations': self.RELATIONS_CATEGORY
         })
@@ -29,7 +35,7 @@ class Command(BaseCommand):
             if r.term1 is not None and r.term2 is not None:
                 terms[r.term1.id] = ExportUtils.term_to_json(r.term1)
                 terms[r.term2.id] = ExportUtils.term_to_json(r.term2)
-                flashcards[r.id] = self.relation_to_json(r)
+                flashcards[r.id] = self.relation_to_json(r, terms)
                 contexts[r.type.identifier] = self.relation_to_context(r)
                 categories[r.type.identifier] = self.relation_to_category(r)
                 if r.type.identifier == 'Action':
@@ -80,7 +86,7 @@ class Command(BaseCommand):
         }
         return c_json
 
-    def relation_to_json(self, relation):
+    def relation_to_json(self, relation, terms):
         term1_id = ExportUtils.get_term_id(relation.term1)
         term2_id = ExportUtils.get_term_id(relation.term2)
         contexts = self.get_contexts_of_relation(relation)
@@ -92,7 +98,9 @@ class Command(BaseCommand):
             "active": True,
             "id": "",
             'id': ('%s-%s-%s' % (relation.type.identifier, term1_id, term2_id))[:50],
-            "categories": [relation.type.identifier.lower(), 'relations'],
+            "categories": list(set([relation.type.identifier.lower(), 'relations'] +
+                                   terms[relation.term1.id]['categories'] +
+                                   terms[relation.term2.id]['categories'])),
             "additional-info": json.dumps(contexts),
         }
         return r_json
@@ -191,7 +199,7 @@ class Command(BaseCommand):
             'en': u'Arterial supply',
         },
         'action': {
-            'cs': u'Funkce svalů',
+            'cs': u'Funkce svalu',
             'en': u'Actions',
         },
         'antagonist': {
