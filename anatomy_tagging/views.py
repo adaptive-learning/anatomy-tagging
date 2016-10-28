@@ -3,7 +3,6 @@ from anatomy_tagging.management.commands.scrape_wiki import Command, WIKI_PAGE_M
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core import management
-from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import connection
 from django.http import HttpResponse
@@ -241,9 +240,15 @@ def relations_json(request, wiki_page=None):
 
 @staff_member_required
 def relations_export(request, filename_slug=None):
-    call_command('export_relations')
+    export_dir = os.path.join(settings.MEDIA_DIR, 'export')
     file_name = 'image-relations-flashcards.json'
-    with open(file_name, 'rb') as f:
+    out_file = os.path.join(export_dir, file_name)
+    management.call_command(
+        'export_relations',
+        output=out_file,
+        verbosity=0,
+        interactive=False)
+    with open(out_file, 'rb') as f:
         data = simplejson.load(f)
         return render_json(request, data)
 

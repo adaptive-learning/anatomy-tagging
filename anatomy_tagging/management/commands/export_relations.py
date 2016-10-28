@@ -17,6 +17,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
+        self.options = options
         relations = Relation.objects.prepare_related().filter(type__source='wikipedia')
         terms = {}
         categories = {}
@@ -41,7 +42,7 @@ class Command(BaseCommand):
                 if r.type.identifier == 'Action':
                     # HACK: Use Czech Actions in Czech-Latin terms
                     terms[r.term2.id]['name-cs'] = terms[r.term2.id]['name-cc']
-            else:
+            elif options.get('verbosity') > 0:
                 print 'WARNING: Missing term in relation %s' % r
         for t in terms.itervalues():
             del t['categories']
@@ -124,7 +125,7 @@ class Command(BaseCommand):
                            '15' not in p.image.category.name_cs]))
         if len(images) > 0:
             return images[0].filename_slug[:50]
-        else:
+        elif self.options.get('verbosity') > 0:
             print "WARNING:", 'Term with no image', term
 
     QUESTIONS = {
