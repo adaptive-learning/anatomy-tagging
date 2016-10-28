@@ -654,6 +654,7 @@ angular.module('anatomy.tagging.controllers', [])
   });
 
   $scope.publish = function(production) {
+    $scope.saving = true;
     exportService.export('relations-flashcards').success(function(data) {
       $scope.alerts.push(data);
       $scope.saving = false;
