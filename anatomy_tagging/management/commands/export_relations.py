@@ -28,13 +28,7 @@ class Command(BaseCommand):
         if relation_type is not None and relation_type != '':
             relations = relations.filter(type__identifier=relation_type)
         terms = {}
-        categories = {}
-        for c in ExportUtils.LOCATION_CATEGORIES:
-            c['type'] = 'location'
-            c['name-la'] = c['name-en']
-            c['name-cc'] = c['name-cs']
-            c['not-in-model'] = True
-            categories[c['id']] = c
+        categories = ExportUtils.load_categories()
         categories.update({
             'relations': self.RELATIONS_CATEGORY
         })
