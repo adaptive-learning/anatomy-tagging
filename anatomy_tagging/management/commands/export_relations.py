@@ -24,8 +24,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.options = options
         relations = Relation.objects.prepare_related().filter(type__source='wikipedia')
-        if options.get('relationtype') is not None:
-            relations = relations.filter(type__identifier=options.get('relationtype'))
+        relation_type = options.get('relationtype')
+        if relation_type is not None and relation_type != '':
+            relations = relations.filter(type__identifier=relation_type)
         terms = {}
         categories = {}
         for c in ExportUtils.LOCATION_CATEGORIES:
