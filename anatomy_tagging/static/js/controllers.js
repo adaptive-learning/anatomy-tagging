@@ -103,7 +103,7 @@ angular.module('anatomy.tagging.controllers', [])
 }])
 
 .controller('MergeTerms', function($scope, $modalInstance, termsService, 
-    $routeParams, $http, term1, term2) {
+    exportService, term1, term2) {
   $scope.term1 = term1;
   $scope.term2 = term2;
   $scope.alerts = [];
@@ -122,9 +122,7 @@ angular.module('anatomy.tagging.controllers', [])
   };
 
   function deployImage(image) {
-      var url = 'http://' + $scope.exportDomain + '/load_flashcards/?context=' +
-        image + '&callback=JSON_CALLBACK';
-      $http.jsonp(url).success(function(data) {
+      exportService.export(image).success(function(data) {
         $scope.alerts.push(data);
         $scope.saving = false;
       }).error(function(data) {
@@ -203,7 +201,7 @@ angular.module('anatomy.tagging.controllers', [])
   };
 })
 
-.controller('ImageController', function($scope, imageService, termsService, colorService, Slug, $http, $routeParams) {
+.controller('ImageController', function($scope, imageService, termsService, colorService, Slug, $routeParams, exportService) {
   $scope.pathsByColor = {};
   $scope.loading = true;
   $scope.alerts = [];
@@ -219,7 +217,7 @@ angular.module('anatomy.tagging.controllers', [])
     }
   ];
   $scope.showBbox = $routeParams.showbbox;
-  $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
+  $scope.exportDomain = $routeParams.exportdomain;
   if ($routeParams.exportdomain) {
     $scope.forceexport = true;
   }
@@ -369,9 +367,7 @@ angular.module('anatomy.tagging.controllers', [])
         $scope.alerts.push(data);
         $scope.saving = false;
       } else if (production) {
-        var url = 'http://' + $scope.exportDomain + '/load_flashcards/?context=' +
-          $scope.image.filename_slug + '&callback=JSON_CALLBACK';
-        $http.jsonp(url).success(function(data) {
+        exportService.export($scope.image.filename_slug).success(function(data) {
           $scope.alerts.push(data);
           $scope.saving = false;
         }).error(function(data) {
@@ -621,9 +617,12 @@ angular.module('anatomy.tagging.controllers', [])
 })
 
 .controller('RelationsExportController',
-    function($scope, $http, $routeParams) {
+    function($scope, $http, $routeParams, exportService) {
   $scope.loading = true;
   $scope.lang = $routeParams.lang || 'cs';
+  $scope.alerts = [];
+  $scope.exportDomain = $routeParams.exportdomain;
+
   $http.get("relationsexport").success(function(data) {
     $scope.loading = false;
     $scope.contexts = data.contexts;
@@ -653,4 +652,17 @@ angular.module('anatomy.tagging.controllers', [])
       $scope.activeContext = c;
     };
   });
+
+  $scope.publish = function(production) {
+    exportService.export('relations-flashcards').success(function(data) {
+      $scope.alerts.push(data);
+      $scope.saving = false;
+    }).error(function(data) {
+      $scope.alerts.push({
+        type : 'danger',
+        msg : 'Na serveru nastala chyba',
+      });
+      $scope.saving = false;
+    });
+  };
 });

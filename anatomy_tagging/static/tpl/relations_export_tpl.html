@@ -1,5 +1,12 @@
 <div class="header">
   <div class="col-sm-12">
+        <a ng-click="publish()"
+          ng-disabled="saving"
+          tooltip="Nahrát na {{exportDomain}}"
+          tooltip-placement="bottom"
+          class="btn btn-primary btn-lg pull-right">
+            {{saving ? 'Ukládání...' : 'Zveřejnit' }}
+        </a>
     <h1>
       <a href="/">
         <i class="glyphicon glyphicon-home"></i>
@@ -11,6 +18,8 @@
   <div class="clearfix"></div>
   <br>
 </div>
+<alert ng-repeat="alert in alerts" type="{{alert.type}}"
+  close="closeAlert($index)">{{alert.msg}}</alert>
 <ul class="nav nav-tabs">
   <li role="presentation" ng-class="{'active': !activeContext}">
     <a href="" ng-click="setContext()">Vše

@@ -110,6 +110,18 @@ angular.module('anatomy.tagging.services', [])
   };
 })
 
+.service('exportService', function($http, $routeParams) {
+  var exportDomain = $routeParams.exportdomain || 'anatom.cz';
+  return {
+    export: function(image_slug) {
+      var url = 'http://' + exportDomain + '/load_flashcards/?context=' +
+        image_slug + '&callback=JSON_CALLBACK';
+      var promise = $http.jsonp(url);
+      return promise;
+    }
+  };
+})
+
 .service('practiceService', function(termsService, $location) {
   var callback;
   var questions = [];

@@ -242,7 +242,7 @@ def relations_json(request, wiki_page=None):
 @staff_member_required
 def relations_export(request, filename_slug=None):
     call_command('export_relations')
-    file_name = 'relations-flashcards.json'
+    file_name = 'image-relations-flashcards.json'
     with open(file_name, 'rb') as f:
         data = simplejson.load(f)
         return render_json(request, data)
