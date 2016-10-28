@@ -11,13 +11,23 @@
   <div class="clearfix"></div>
   <br>
 </div>
+<alert ng-repeat="alert in alerts" type="{{alert.type}}"
+  close="closeAlert($index)">{{alert.msg}}</alert>
 <div ng-hide="loading"  class="table table-striped col-sm-12">
   <div class="row header-row">
     <span class="col-sm-2" ng-bind="mainTerm"> </span>
     <span class="col-sm-9" >
       <span class="col-sm-2" 
-        ng-bind="type"
-        ng-repeat="type in relationTypes"></span>
+          ng-repeat="type in relationTypes">
+        <span ng-bind="type">
+        </span>
+        <a ng-click="publish(type)"
+          ng-disabled="saving == type"
+          tooltip="Nahrát tento sloupec na {{exportDomain}}"
+          tooltip-placement="bottom"
+          class="btn btn-default btn-sm pull-right">
+            {{saving == type ? 'Zveřejňování...' : 'Zveřejnit' }}
+        </a>
     </span>
   </div>
   <div class="row table-row"

@@ -498,7 +498,7 @@ angular.module('anatomy.tagging.controllers', [])
 })
 
 .controller('RelationsController',
-    function($scope, $http, termsService, $cookies, $routeParams) {
+    function($scope, $http, termsService, $cookies, $routeParams, exportService) {
   $scope.loading = true;
   var wikiPage = $routeParams.wikiPage || 'List_of_muscles_of_the_human_body';
   $scope.mainTerm = {
@@ -614,6 +614,32 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.closeAlert = function(relation, index) {
     relation.alerts.splice(index, 1);
   };
+
+  $scope.alerts = [];
+  $scope.exportDomain = $routeParams.exportdomain;
+
+  $scope.publish = function(type) {
+    $scope.saving = type;
+    $http.get("relationsexport/" + type + '?empty=true').success(function(data) {
+      exportService.export(type).success(function(data) {
+        $scope.alerts.push(data);
+        $scope.saving = false;
+      }).error(function(data) {
+        $scope.alerts.push({
+          type : 'danger',
+          msg : 'Na serveru nastala chyba',
+        });
+        $scope.saving = false;
+      });
+    })
+    .error(function(data) {
+      $scope.alerts.push({
+        type : 'danger',
+        msg : 'Na serveru nastala chyba',
+      });
+      $scope.saving = false;
+    });
+  };
 })
 
 .controller('RelationsExportController',
@@ -653,7 +679,7 @@ angular.module('anatomy.tagging.controllers', [])
     };
   });
 
-  $scope.publish = function(production) {
+  $scope.publish = function() {
     $scope.saving = true;
     exportService.export('relations-flashcards').success(function(data) {
       $scope.alerts.push(data);

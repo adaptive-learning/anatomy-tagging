@@ -24,7 +24,7 @@ urlpatterns = patterns(
 
     url(r'^relationsjson/update$', 'update_relations', name='update_relations'),
     url(r'^relationsjson/(?P<wiki_page>[\w\.-]*)$', 'relations_json', name='relations_json'),
-    url(r'^relationsexport/$', 'relations_export', name='relations_export'),
+    url(r'^relationsexport/(?P<relation_type>[\w\.-]*)$', 'relations_export', name='relations_export'),
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^favicon\.ico$', RedirectView.as_view(url='static/img/favicon.png')),
