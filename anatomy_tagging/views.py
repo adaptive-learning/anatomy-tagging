@@ -248,7 +248,7 @@ def relations_export(request, relation_type=None):
     out_file = os.path.join(export_dir, file_name)
     management.call_command(
         'export_relations',
-        relation_type=relation_type,
+        relationtype=relation_type,
         output=out_file,
         verbosity=0,
         interactive=False)

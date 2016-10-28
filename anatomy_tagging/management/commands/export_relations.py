@@ -15,8 +15,8 @@ class Command(BaseCommand):
             type=str,
             default='relations-flashcards.json'),
         make_option(
-            '--relation-type',
-            dest='relation-type',
+            '--relationtype',
+            dest='relationtype',
             type=str,
             default=None),
     )
@@ -24,8 +24,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.options = options
         relations = Relation.objects.prepare_related().filter(type__source='wikipedia')
-        if options.get('relation-type') is not None:
-            relations = relations.filter(type__identifier=options.get('relation-type'))
+        if options.get('relationtype') is not None:
+            relations = relations.filter(type__identifier=options.get('relationtype'))
         terms = {}
         categories = {}
         for c in ExportUtils.LOCATION_CATEGORIES:
