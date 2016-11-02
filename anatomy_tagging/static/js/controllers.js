@@ -523,10 +523,17 @@ angular.module('anatomy.tagging.controllers', [])
         term : r.term1,
         text : r.text1,
       };
-      rObject[r.type] = {
-        terms : r.term2 ? [{term: r.term2}] : [],
-        text : r.text2,
+      rObject[r.type] = rObject[r.type] || {
+        terms : [],
+        texts : [],
       };
+      if (r.term2) {
+          rObject[r.type].terms.push({term: r.term2});
+      }
+      if (r.text2) {
+        rObject[r.type].texts.push(r.text2);
+      }
+      console.log(rObject[r.type]);
       if ($scope.relationTypes.indexOf(r.type) == -1) {
         $scope.relationTypes.push(r.type);
       }

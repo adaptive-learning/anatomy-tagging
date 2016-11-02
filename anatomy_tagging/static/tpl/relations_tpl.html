@@ -87,7 +87,7 @@
                 ng-click="addField(relation, type)">
               <i class="glyphicon glyphicon-plus"></i>
             </a>
-        {{relation[type].text}}
+        <div class="relation-original-text" ng-repeat="text in relation[type].texts">{{text}}</div>
       </span>
     </span>
     <span class="col-sm-1" >
