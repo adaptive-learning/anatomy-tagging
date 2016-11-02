@@ -30,7 +30,8 @@ class Command(BaseCommand):
         terms = {}
         categories = ExportUtils.load_categories()
         categories.update({
-            'relations': self.RELATIONS_CATEGORY
+            'relations': self.RELATIONS_CATEGORY,
+            'premium-demo': self.PREMIUM_DEMO_CATEGORY,
         })
         contexts = {}
         flashcards = {}
@@ -44,7 +45,7 @@ class Command(BaseCommand):
                 if r.type.identifier == 'Action':
                     # HACK: Use Czech Actions in Czech-Latin terms
                     terms[r.term2.id]['name-cs'] = terms[r.term2.id]['name-cc']
-            elif options.get('verbosity') > 0:
+            elif int(options.get('verbosity')) > 0:
                 print 'WARNING: Missing term in relation %s' % r
         for t in terms.itervalues():
             del t['categories']
@@ -105,6 +106,9 @@ class Command(BaseCommand):
                                    terms[relation.term1.id]['categories'])),
             "additional-info": json.dumps(contexts),
         }
+        hardcoded_category = self.HARDCODED_CATEGORIES.get('{}:{}'.format(r_json['term'], r_json['context']))
+        if hardcoded_category is not None:
+            r_json['categories'].append(hardcoded_category)
         return r_json
 
     def get_contexts_of_relation(self, relation):
@@ -126,7 +130,7 @@ class Command(BaseCommand):
                            '15' not in p.image.category.name_cs]))
         if len(images) > 0:
             return images[0].filename_slug[:50]
-        elif self.options.get('verbosity') > 0:
+        elif int(self.options.get('verbosity')) > 0:
             print "WARNING:", 'Term with no image', term
 
     QUESTIONS = {
@@ -232,6 +236,27 @@ class Command(BaseCommand):
             'cs': u'Nervy',
             'en': u'Nerves',
         },
+    }
+    HARDCODED_CATEGORIES = {
+        # {term primary}:{context} -> category
+        'A04.6.02.036:insertion': 'premium-demo',
+        'A04.6.02.010:action': 'premium-demo',
+        'A04.6.02.008:nerve': 'premium-demo',
+        'A04.3.01.001:insertion': 'premium-demo',
+        'A04.7.02.007:artery': 'premium-demo',
+        'A04.7.02.004:antagonist': 'premium-demo',
+        'A04.7.02.016:action': 'premium-demo',
+        'A04.7.02.053:origin': 'premium-demo',
+        'A15.2.07.020:antagonist': 'premium-demo',
+        'A05.1.04.105:nerve': 'premium-demo',
+    }
+    PREMIUM_DEMO_CATEGORY = {
+        'id': 'premium-demo',
+        'name-cs': u'Předplatné: Demo',
+        'name-cc': u'Předplatné: Demo',
+        'name-en': u'Premium Demo',
+        'name-la': u'Premium Demo',
+        'active': True,
     }
     RELATIONS_CATEGORY = {
         'id': 'relations',
