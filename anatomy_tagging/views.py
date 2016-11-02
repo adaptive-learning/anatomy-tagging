@@ -241,7 +241,7 @@ def relations_json(request, wiki_page=None):
 @staff_member_required
 def relations_export(request, relation_type=None):
     export_dir = os.path.join(settings.MEDIA_DIR, 'export')
-    if relation_type is not None:
+    if relation_type is not None and relation_type != '':
         file_name = 'image-' + relation_type + '.json'
     else:
         file_name = 'image-relations-flashcards.json'
