@@ -17,6 +17,7 @@ setup(
         'clint',
         'wikipedia',
         'beautifulsoup4',
+        'pyyaml',
     ],
     license='Gnu GPL v3',
 )
