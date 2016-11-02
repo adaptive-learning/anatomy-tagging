@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from anatomy_tagging.management.commands.export_flashcards import ExportUtils
+from anatomy_tagging.models import Relation, Path, Image
+from clint.textui import progress
+from collections import defaultdict
 from django.core.management.base import BaseCommand
 from optparse import make_option
-from anatomy_tagging.models import Relation, Path
 import json
-from clint.textui import progress
-from anatomy_tagging.management.commands.export_flashcards import ExportUtils
 
 
 class Command(BaseCommand):
@@ -129,9 +130,20 @@ class Command(BaseCommand):
                            p.image.category is None or
                            '15' not in p.image.category.name_cs]))
         if len(images) > 0:
-            return images[0].filename_slug[:50]
+            image = max(images, key=lambda im: self.get_image_size(im, term.system))
+            return image.filename_slug[:50]
         elif int(self.options.get('verbosity')) > 0:
             print "WARNING:", 'Term with no image', term
+
+    def get_image_size(self, image, system):
+        if not hasattr(self, '_image_sizes'):
+            self._image_sizes = {}
+            for im in Image.objects.all():
+                image_size = defaultdict(set)
+                for path in im.path_set.exclude(term=None).select_related('term'):
+                    image_size[path.term.system].add(path.term.pk)
+                self._image_sizes[im.pk] = {s: len(ts) for s, ts in image_size.items()}
+        return self._image_sizes[image.pk].get(system, 0)
 
     QUESTIONS = {
         'nerve': {
