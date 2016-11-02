@@ -17,7 +17,7 @@
   <div class="row header-row">
     <span class="col-sm-2" ng-bind="mainTerm"> </span>
     <span class="col-sm-9" >
-      <span class="col-sm-2" 
+      <span class="col-sm-2"
           ng-repeat="type in relationTypes">
         <span ng-bind="type">
         </span>
@@ -38,11 +38,11 @@
           CZ:&nbsp;{{relation.Muscle.term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           EN:&nbsp;{{relation.Muscle.term.name_en}}">
         <input class="form-control input-sm"
-          ng-model="relation.Muscle.term" 
+          ng-model="relation.Muscle.term"
           style="background-color: {{relation.Muscle.id ? ' #dff0d8' : ''}}"
           typeahead-template-url="termTemplate.html"
           typeahead="term as term.name_la for term in allTerms |
-            filter:{name_la: $viewValue} | 
+            filter:{name_la: $viewValue} |
             limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
         <span class="input-group-btn"
             ng-if="relation.Muscle.term">
@@ -56,17 +56,17 @@
       {{relation.Muscle.text}}
     </span>
     <span class="col-sm-9" >
-      <span class="col-sm-2" 
+      <span class="col-sm-2"
           ng-repeat="type in relationTypes">
         <div class="input-group"
           tooltip=" CZ:&nbsp;{{relationField.term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EN:&nbsp;{{relationField.term.name_en}}"
           ng-repeat="relationField in relation[type].terms">
           <input class="form-control input-sm"
             style="background-color: {{relationField.id ? ' #dff0d8' : ''}}"
-            ng-model="relationField.term" 
+            ng-model="relationField.term"
             typeahead-template-url="termTemplate.html"
             typeahead="term as term.name_la for term in allTerms |
-              filter:{name_la: $viewValue} | 
+              filter:{name_la: $viewValue} |
               limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
           <span class="input-group-btn"
                 ng-if="relationField.term">
@@ -111,20 +111,20 @@
     <span class="col-sm-2" >
       {{relation.text1}}<br>
       <input class="form-control input-sm"
-        ng-model="relation.term1" 
+        ng-model="relation.term1"
         typeahead-template-url="termTemplate.html"
         typeahead="term as term.name_la for term in allTerms |
-          filter:{name_la: $viewValue} | 
+          filter:{name_la: $viewValue} |
           limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
     </span>
     <span class="col-sm-2" >{{relation.type}} </span>
     <span class="col-sm-2" >
       {{relation.text2}}<br>
       <input class="form-control input-sm"
-        ng-model="relation.term2" 
+        ng-model="relation.term2"
         typeahead-template-url="termTemplate.html"
         typeahead="term as term.name_la for term in allTerms |
-          filter:{name_la: $viewValue} | 
+          filter:{name_la: $viewValue} |
           limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
     </span>
   </div>

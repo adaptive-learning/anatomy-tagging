@@ -3,7 +3,7 @@ angular.module('anatomy.tagging.controllers', [])
 .controller('anatomyMain', function($scope) {
 })
 
-.controller('TermsController', 
+.controller('TermsController',
     function($scope, termsService, $window, $location, imageService,
       $routeParams, mergeTermsModal) {
   $scope.loading = true;
@@ -99,10 +99,10 @@ angular.module('anatomy.tagging.controllers', [])
                 },
             });
         }
-    };  
+    };
 }])
 
-.controller('MergeTerms', function($scope, $modalInstance, termsService, 
+.controller('MergeTerms', function($scope, $modalInstance, termsService,
     exportService, term1, term2) {
   $scope.term1 = term1;
   $scope.term2 = term2;
@@ -133,7 +133,7 @@ angular.module('anatomy.tagging.controllers', [])
         $scope.saving = false;
       });
   }
-  
+
   $scope.cancel = function(){
     $modalInstance.dismiss('cancel');
   };
@@ -195,9 +195,9 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.clickTerm = function(term) {
     $scope.activeTerm = term;
     $scope.$root.imageController.clearHighlights();
-    $scope.$root.imageController.highlightTerm(term.code, 
+    $scope.$root.imageController.highlightTerm(term.code,
       colors.HIGHLIGHTS[i++ % colors.HIGHLIGHTS.length]);
-    
+
   };
 })
 
@@ -236,7 +236,7 @@ angular.module('anatomy.tagging.controllers', [])
         continue;
       }
       $scope.pathTermUpdated(p);
-      if ((colorService.isGray(p.color) || p.color === 'none') && 
+      if ((colorService.isGray(p.color) || p.color === 'none') &&
           (!p.term || p.term.code === 'no-practice')) {
         c = 'gray';
         if (!p.term) {
@@ -251,7 +251,7 @@ angular.module('anatomy.tagging.controllers', [])
         };
       }
       $scope.pathsByColor[c].paths.push(p);
-      if ($scope.pathsByColor[c].term && $scope.pathsByColor[c].term.code && 
+      if ($scope.pathsByColor[c].term && $scope.pathsByColor[c].term.code &&
           (!p.term || $scope.pathsByColor[c].term.code != p.term.code)) {
         $scope.pathsByColor[c].showDetails = true;
         $scope.pathsByColor[c].term = {
@@ -260,11 +260,11 @@ angular.module('anatomy.tagging.controllers', [])
         };
         $scope.pathsByColor[c].disabled = false;
       }
-      if (!$scope.pathsByColor[c].term || 
+      if (!$scope.pathsByColor[c].term ||
           $scope.pathsByColor[c].term.code !== 'split') {
         $scope.pathsByColor[c].term = p.term;
       }
-      if ($scope.pathsByColor[c].term && 
+      if ($scope.pathsByColor[c].term &&
           $scope.pathsByColor[c].term.code === 'no-practice') {
         $scope.pathsByColor[c].disabled = true;
       }
@@ -406,7 +406,7 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.loading = false;
     $timeout(function() {
       $scope.$root.imageController.click(function(clickedCode) {
-        var isInOptions = !$scope.question.options || 
+        var isInOptions = !$scope.question.options ||
             $scope.question.options.filter(function(o) {
               return o.code == clickedCode;
             }).length == 1;
