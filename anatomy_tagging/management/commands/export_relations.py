@@ -32,7 +32,7 @@ class Command(BaseCommand):
         categories = ExportUtils.load_categories()
         categories.update({
             'relations': self.RELATIONS_CATEGORY,
-            'premium-demo': self.PREMIUM_DEMO_CATEGORY,
+            'demo': self.PREMIUM_DEMO_CATEGORY,
         })
         contexts = {}
         flashcards = {}
@@ -251,19 +251,19 @@ class Command(BaseCommand):
     }
     HARDCODED_CATEGORIES = {
         # {term primary}:{context} -> category
-        'A04.6.02.036:insertion': 'premium-demo',
-        'A04.6.02.010:action': 'premium-demo',
-        'A04.6.02.008:nerve': 'premium-demo',
-        'A04.3.01.001:insertion': 'premium-demo',
-        'A04.7.02.007:artery': 'premium-demo',
-        'A04.7.02.004:antagonist': 'premium-demo',
-        'A04.7.02.016:action': 'premium-demo',
-        'A04.7.02.053:origin': 'premium-demo',
-        'A15.2.07.020:antagonist': 'premium-demo',
-        'A05.1.04.105:nerve': 'premium-demo',
+        'A04.6.02.036:insertion': 'demo',
+        'A04.6.02.010:action': 'demo',
+        'A04.6.02.008:nerve': 'demo',
+        'A04.3.01.001:insertion': 'demo',
+        'A04.7.02.007:artery': 'demo',
+        'A04.7.02.004:antagonist': 'demo',
+        'A04.7.02.016:action': 'demo',
+        'A04.7.02.053:origin': 'demo',
+        'A15.2.07.020:antagonist': 'demo',
+        'A05.1.04.105:nerve': 'demo',
     }
     PREMIUM_DEMO_CATEGORY = {
-        'id': 'premium-demo',
+        'id': 'demo',
         'name-cs': u'Předplatné: Demo',
         'name-cc': u'Předplatné: Demo',
         'name-en': u'Premium Demo',
