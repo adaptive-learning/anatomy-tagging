@@ -364,6 +364,7 @@ def canonical_term_name(name):
     canonical_name = re.sub(r',(\S)', r', \1', canonical_name, re.UNICODE)
     parts = '; '.join(p.strip() for p in canonical_name.split(';')).split(' ')
     canonical_name = ' '.join([_make_canonical_term_name_part(p.strip()) for p in parts]).replace(' A ', ' a ').replace(' S ', ' s ')
+    canonical_name = re.sub(r' V (\w)', r' v \1', canonical_name, re.UNICODE)
     return canonical_name
 
 
