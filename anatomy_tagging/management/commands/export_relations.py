@@ -252,15 +252,18 @@ class Command(BaseCommand):
     HARDCODED_CATEGORIES = {
         # {term primary}:{context} -> category
         'A04.6.02.036:insertion': 'demo',
-        'A04.6.02.010:action': 'demo',
+        'A04.6.02.025:insertion': 'demo',
         'A04.6.02.008:nerve': 'demo',
         'A04.3.01.001:insertion': 'demo',
         'A04.7.02.007:artery': 'demo',
-        'A04.7.02.004:antagonist': 'demo',
-        'A04.7.02.016:action': 'demo',
+        'A04.7.02.004:insertion': 'demo',
         'A04.7.02.053:origin': 'demo',
         'A15.2.07.020:antagonist': 'demo',
         'A05.1.04.105:nerve': 'demo',
+        'A04.7.02.044:action': 'demo',
+        # 'A04.6.02.010:action': 'demo',
+        # 'A04.6.02.008:nerve': 'demo',
+        # 'A04.7.02.016:action': 'demo',
     }
     PREMIUM_DEMO_CATEGORY = {
         'id': 'demo',
