@@ -17,7 +17,7 @@
   <div class="row header-row">
     <span class="col-sm-2" ng-bind="mainTerm"> </span>
     <span class="col-sm-9" >
-      <span class="col-sm-2"
+      <span class="col-sm-{{colWidth}}"
           ng-repeat="type in relationTypes">
         <span ng-bind="type">
         </span>
@@ -56,7 +56,7 @@
       {{relation.Muscle.text}}
     </span>
     <span class="col-sm-9" >
-      <span class="col-sm-2"
+      <span class="col-sm-{{colWidth}}"
           ng-repeat="type in relationTypes">
         <div class="input-group"
           tooltip=" CZ:&nbsp;{{relationField.term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EN:&nbsp;{{relationField.term.name_en}}"
