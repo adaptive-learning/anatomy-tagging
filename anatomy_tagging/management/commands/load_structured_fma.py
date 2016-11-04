@@ -52,9 +52,10 @@ class Command(BaseCommand):
             visited = set()
             for term in data.values():
                 self.traverse_structure_and_collect(term, to_save, visited=visited)
-        if (data.get('fmaid'), data.get('taid')) in visited:
             return
-        visited.add((data.get('fmaid'), data.get('taid')))
+        if data['fmaid'] in visited:
+            return
+        visited.add(data['fmaid'])
         for follow in Command.FOLLOW:
             inserted = set()
             for child in data.get(follow, []):
