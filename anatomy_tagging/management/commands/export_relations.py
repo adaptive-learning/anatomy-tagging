@@ -254,7 +254,7 @@ class Command(BaseCommand):
         'A04.6.02.036:insertion': 'demo',
         'A04.6.02.025:insertion': 'demo',
         'A04.6.02.008:nerve': 'demo',
-        'A04.3.01.001:insertion': 'demo',
+        'A04.3.01.001:artery': 'demo',
         'A04.7.02.007:artery': 'demo',
         'A04.7.02.004:insertion': 'demo',
         'A04.7.02.053:origin': 'demo',
