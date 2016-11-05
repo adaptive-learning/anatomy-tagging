@@ -449,4 +449,20 @@ angular.module('anatomy.tagging.directives', [])
     }
     return simplePathString;
   };
+})
+
+.directive('tablePager', function() {
+  return {
+    restrict: 'A', 
+      scope: {
+        data: '=tablePager',
+        page: '=page',
+        pageSize: '=pageSize',
+        defaultPageSize: '=defaultPageSize',
+      },   
+    templateUrl : 'static/tpl/pager.html',
+    link: function(scope) {
+      scope.Math = Math;
+    }
+  };
 });

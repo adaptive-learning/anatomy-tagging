@@ -1,5 +1,16 @@
 <div class="header">
   <div class="col-sm-12">
+    <div class="pull-right input-group col-sm-3">
+      <input class="form-control input-sm" ng-model="search2"/>
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" ng-click="search=search2">
+          <i class="glyphicon glyphicon-search"></i>
+        </button>
+        <button class="btn btn-default" type="button" ng-click="search=''; search2=''">
+          <i class="glyphicon glyphicon-trash"></i>
+        </button>
+      </span>
+    </div>
     <h1>
       <a href="/">
         <i class="glyphicon glyphicon-home"></i>
@@ -30,8 +41,14 @@
         </a>
     </span>
   </div>
+  <div table-pager="filteredRelations"
+    page="page"
+    default-page-size="10"
+    page-size="pageSize">
+  </div>
   <div class="row table-row"
-      ng-repeat="relation in relations">
+     ng-repeat="relation in filteredRelations = (relations | filter: search) |
+      startFrom: (page -1) * pageSize | limitTo: pageSize">
     <span class="col-sm-2">
       <div class="input-group"
           tooltip="
@@ -101,6 +118,11 @@
     </span>
   </div>
 </div>
+  <div table-pager="relations"
+    page="page"
+    default-page-size="10"
+    page-size="pageSize">
+  </div>
 <div ng-hide="true" class="table table-striped col-sm-12">
   <div class="row header-row">
     <span class="col-sm-2" >&nbsp;&nbsp;  Sval </span>

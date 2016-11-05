@@ -1,0 +1,35 @@
+  <div class="row header-row paging">
+    <span class="pull-left col-sm-3">
+      <select ng-init="pageSize = defaultPageSize || 20"
+        class="per-page-select" 
+        ng-model="pageSize"
+        ng-options="v for v in [5, 10, 20, 50, 100]">
+      </select>
+      na stránku 
+    </span>
+    <span class="pull-right">
+      {{Math.min((page - 1) * pageSize + 1, data.length) || '...'}} 
+       - 
+      {{Math.min(page * pageSize, data.length) || '...'}}
+       z
+      {{data.length || '...'}}
+      <button ng-click="page = 1" class="btn btn-default" title="First page">&laquo;</button>
+      <button ng-click="page = page - 1"
+        ng-disabled="page == 1" 
+        title="Previous page"
+        class="btn btn-default">&lsaquo;</button>
+      <input ng-init="page = 1" ng-model="page"
+      class="page-input">
+      z
+      {{Math.ceil(data.length / pageSize) || '...'}}
+      <button ng-disabled="page == Math.ceil(data.length / pageSize)"
+        ng-click="page = page + 1" 
+        class="btn btn-default" 
+        title="Next page">&rsaquo;</button>
+      <button ng-click="page = Math.ceil(data.length / pageSize)"
+        class="btn btn-default" 
+        title="Last page">&raquo;</button>
+    </span>
+    <div class="clearfix"></div>
+  </div>
+
