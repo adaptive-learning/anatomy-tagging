@@ -12,7 +12,7 @@ import json
 class Command(BaseCommand):
     help = u"""Load relations about structures from prepared FMA file"""
 
-    FOLLOW = ['branch', 'tributary']
+    FOLLOW = ['branch', 'tributary', 'regional_part', 'receives_input_from']
 
     option_list = BaseCommand.option_list + (
         make_option(
