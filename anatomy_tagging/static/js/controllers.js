@@ -586,7 +586,7 @@ angular.module('anatomy.tagging.controllers', [])
             name : i,
             text1 : relation.Muscle.text,
             term1 : relation.Muscle.term,
-            text2 : r.text,
+            text2 : r.texts.join(' !! '),
             term2 : terms[j].term,
             id : terms[j].id,
           });
