@@ -81,7 +81,7 @@ class Command(BaseCommand):
         c_json = {
             'id': id,
             'content': json.dumps({
-                'question': self.QUESTIONS.get(id),
+                'question': self.QUESTIONS.get(id, self.MISSING_QUESTION),
             }),
             'name-cs': self.CATEGORIES[id]['cs'],
             'name-cc': self.CATEGORIES[id]['cs'],
@@ -145,6 +145,16 @@ class Command(BaseCommand):
                 self._image_sizes[im.pk] = {s: len(ts) for s, ts in image_size.items()}
         return self._image_sizes[image.pk].get(system, 0)
 
+    MISSING_QUESTION = {
+        'cs': {
+            't2ts': u'Chybí text otázky {}',
+            'ts2t': u'Chybí text otázky {}',
+        },
+        'en': {
+            't2ts': u'Question text missing {}',
+            'ts2t': u'Question text missing {}',
+        },
+    }
     QUESTIONS = {
         'nerve': {
             'cs': {
