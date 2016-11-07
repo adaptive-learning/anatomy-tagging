@@ -103,7 +103,7 @@ angular.module('anatomy.tagging.controllers', [])
 }])
 
 .controller('MergeTerms', function($scope, $modalInstance, termsService,
-    exportService, term1, term2) {
+    exportService, term1, term2, $routeParams) {
   $scope.term1 = term1;
   $scope.term2 = term2;
   $scope.alerts = [];
@@ -217,7 +217,7 @@ angular.module('anatomy.tagging.controllers', [])
     }
   ];
   $scope.showBbox = $routeParams.showbbox;
-  $scope.exportDomain = $routeParams.exportdomain;
+  $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
   if ($routeParams.exportdomain) {
     $scope.forceexport = true;
   }
@@ -358,7 +358,7 @@ angular.module('anatomy.tagging.controllers', [])
     return !path.isTooSmall;
   };
 
-  $scope.save= function(production) {
+  $scope.save = function(production) {
     $scope.updateFocused();
     $scope.saving = true;
     imageService.save($scope.image, $scope.paths, production)
@@ -623,7 +623,7 @@ angular.module('anatomy.tagging.controllers', [])
   };
 
   $scope.alerts = [];
-  $scope.exportDomain = $routeParams.exportdomain;
+  $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
 
   $scope.publish = function(type) {
     $scope.saving = type;
@@ -654,7 +654,7 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.loading = true;
   $scope.lang = $routeParams.lang || 'cs';
   $scope.alerts = [];
-  $scope.exportDomain = $routeParams.exportdomain;
+  $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
 
   $http.get("relationsexport").success(function(data) {
     $scope.loading = false;
