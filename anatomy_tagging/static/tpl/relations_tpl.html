@@ -52,25 +52,25 @@
     <span class="col-sm-2">
       <div class="input-group"
           tooltip="
-          CZ:&nbsp;{{relation.Muscle.term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          EN:&nbsp;{{relation.Muscle.term.name_en}}">
+          CZ:&nbsp;{{relation[mainTerm].term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          EN:&nbsp;{{relation[mainTerm].term.name_en}}">
         <input class="form-control input-sm"
-          ng-model="relation.Muscle.term"
-          style="background-color: {{relation.Muscle.id ? ' #dff0d8' : ''}}"
+          ng-model="relation[mainTerm].term"
+          style="background-color: {{relation[mainTerm].id ? ' #dff0d8' : ''}}"
           typeahead-template-url="termTemplate.html"
           typeahead="term as term.name_la for term in allTerms |
             filter:{name_la: $viewValue} |
             limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
         <span class="input-group-btn"
-            ng-if="relation.Muscle.term">
+            ng-if="relation[mainTerm].term">
           <a target="_blank"
               class="btn btn-default"
-              href="/terms/?search={{relation.Muscle.term.name_la}}">
+              href="/terms/?search={{relation[mainTerm].term.name_la}}">
             <i class="glyphicon glyphicon-edit"></i>
           </a>
         </span>
       </div>
-      {{relation.Muscle.text}}
+      {{relation[mainTerm].text}}
     </span>
     <span class="col-sm-9" >
       <span class="col-sm-{{colWidth}}"

@@ -505,6 +505,7 @@ angular.module('anatomy.tagging.controllers', [])
     'List_of_muscles_of_the_human_body' : 'Muscle',
     'List_of_foramina_of_the_human_body' : 'Foramina',
   }[wikiPage];
+  var mainTerm = $scope.mainTerm;
   var url = "relationsjson/" + wikiPage;
   $http.get(url).success(function(data) {
     $scope.relationsDict = {};
@@ -519,7 +520,7 @@ angular.module('anatomy.tagging.controllers', [])
         $scope.relations.push(rObject);
         $scope.relationsDict[key] = rObject;
       }
-      rObject.Muscle = {
+      rObject[mainTerm] = {
         term : r.term1,
         text : r.text1,
       };
@@ -533,7 +534,6 @@ angular.module('anatomy.tagging.controllers', [])
       if (r.text2) {
         rObject[r.type].texts.push(r.text2);
       }
-      console.log(rObject[r.type]);
       if ($scope.relationTypes.indexOf(r.type) == -1) {
         $scope.relationTypes.push(r.type);
       }
@@ -553,7 +553,7 @@ angular.module('anatomy.tagging.controllers', [])
       var key = r.text1.trim();
       var rObject = $scope.relationsDict[key];
       if (rObject) {
-        rObject.Muscle = {
+        rObject[mainTerm] = {
           term : r.term1,
           text : r.text1,
           id : r.id,
@@ -574,18 +574,17 @@ angular.module('anatomy.tagging.controllers', [])
   }
 
   $scope.save = function(relation) {
-    console.log(relation);
     relation.saving = true;
     var data = [];
     for (var i in relation) {
       var r  = relation[i];
-      if (i != 'Muscle' && r.terms && relation.Muscle.term) {
+      if (i != mainTerm && r.terms && relation[mainTerm].term) {
         var terms = r.terms;
         for (var j = 0; j < terms.length; j++) {
           data.push({
             name : i,
-            text1 : relation.Muscle.text,
-            term1 : relation.Muscle.term,
+            text1 : relation[mainTerm].text,
+            term1 : relation[mainTerm].term,
             text2 : r.texts.join(' !! '),
             term2 : terms[j].term,
             id : terms[j].id,
