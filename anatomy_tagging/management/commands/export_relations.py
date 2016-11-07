@@ -65,29 +65,31 @@ class Command(BaseCommand):
 
     def relation_to_category(self, relation):
         id = relation.type.identifier.lower()
+        default = {'cs': id, 'en': id}
         c_json = {
             'id': id,
-            'name-cs': self.CATEGORIES[id]['cs'],
-            'name-cc': self.CATEGORIES[id]['cs'],
-            'name-en': self.CATEGORIES[id]['en'],
-            'name-la': self.CATEGORIES[id]['en'],
+            'name-cs': self.CATEGORIES.get(id, default)['cs'],
+            'name-cc': self.CATEGORIES.get(id, default)['cs'],
+            'name-en': self.CATEGORIES.get(id, default)['en'],
+            'name-la': self.CATEGORIES.get(id, default)['en'],
             'type': 'relation',
-            'active': True,
+            'active': id in self.QUESTIONS,
         }
         return c_json
 
     def relation_to_context(self, relation):
         id = relation.type.identifier.lower()
+        default = {'cs': id, 'en': id}
         c_json = {
             'id': id,
             'content': json.dumps({
                 'question': self.QUESTIONS.get(id, self.MISSING_QUESTION),
             }),
-            'name-cs': self.CATEGORIES[id]['cs'],
-            'name-cc': self.CATEGORIES[id]['cs'],
-            'name-en': self.CATEGORIES[id]['en'],
-            'name-la': self.CATEGORIES[id]['en'],
-            'active': True,
+            'name-cs': self.CATEGORIES.get(id, default)['cs'],
+            'name-cc': self.CATEGORIES.get(id, default)['cs'],
+            'name-en': self.CATEGORIES.get(id, default)['en'],
+            'name-la': self.CATEGORIES.get(id, default)['en'],
+            'active': id in self.QUESTIONS,
         }
         return c_json
 
@@ -100,13 +102,12 @@ class Command(BaseCommand):
             "term": term1_id,
             "term-secondary": term2_id,
             "context": relation.type.identifier.lower(),
-            "active": True,
-            "id": "",
             'id': ('%s-%s-%s' % (relation.type.identifier, term1_id[:20], term2_id))[:50],
             "categories": list(set([relation.type.identifier.lower(), 'relations'] +
                                    terms[relation.term1.id]['categories'])),
             "additional-info": json.dumps(contexts),
         }
+        r_json['active'] = r_json['context'] in self.QUESTIONS
         hardcoded_category = self.HARDCODED_CATEGORIES.get('{}:{}'.format(r_json['term'], r_json['context']))
         if hardcoded_category is not None:
             r_json['categories'].append(hardcoded_category)
