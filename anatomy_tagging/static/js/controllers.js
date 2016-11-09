@@ -543,7 +543,7 @@ angular.module('anatomy.tagging.controllers', [])
       }
     }
     $scope.loading = false;
-    $scope.colWidth = Math.floor(12 / ($scope.relationTypes.length));
+    $scope.colWidth = Math.min(6, Math.floor(12 / ($scope.relationTypes.length)));
     addRelationsToDict(data.relations);
   });
 
