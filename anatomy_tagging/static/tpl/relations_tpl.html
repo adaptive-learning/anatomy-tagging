@@ -128,6 +128,10 @@
         ng-hide="relation.alerts.length"
         ng-click="save(relation)">
         Uložit</a>
+      <a class="btn btn-default"
+        ng-if="relation.editting"
+        ng-click="relation.editting=false;">
+        Zrušit</a>
       <a class="btn btn-primary"
         ng-if="!relation.editting && !relation.alerts.length"
         ng-click="relation.editting=true;">
