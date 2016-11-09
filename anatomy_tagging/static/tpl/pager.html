@@ -1,7 +1,6 @@
   <div class="row header-row paging">
     <span class="pull-left col-sm-3">
-      <select ng-init="pageSize = defaultPageSize || 20"
-        class="per-page-select" 
+      <select class="per-page-select" 
         ng-model="pageSize"
         ng-options="v for v in [5, 10, 20, 50, 100]">
       </select>
@@ -18,7 +17,7 @@
         ng-disabled="page == 1" 
         title="Previous page"
         class="btn btn-default">&lsaquo;</button>
-      <input ng-init="page = 1" ng-model="page"
+      <input ng-model="page"
       class="page-input">
       z
       {{Math.ceil(data.length / pageSize) || '...'}}

@@ -50,7 +50,11 @@
      ng-repeat="relation in filteredRelations = (relations | filter: search) |
       startFrom: (page -1) * pageSize | limitTo: pageSize">
     <span class="col-sm-2">
+      <div class="label label-default relation-term-label"
+          ng-if="!relation.editting"
+          ng-bind="relation[mainTerm].term.name_la"></div>
       <div class="input-group"
+          ng-if="relation.editting"
           tooltip="
           CZ:&nbsp;{{relation[mainTerm].term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           EN:&nbsp;{{relation[mainTerm].term.name_en}}">
@@ -75,7 +79,14 @@
     <span class="col-sm-9" >
       <span class="col-sm-{{colWidth}}"
           ng-repeat="type in relationTypes">
+        <div ng-if="!relation.editting"
+            ng-repeat="relationField in relation[type].terms">
+          <div class="label label-default relation-term-label"
+            ng-bind="relationField.term.name_la">
+          </div>
+        </div>
         <div class="input-group"
+          ng-if="relation.editting"
           tooltip=" CZ:&nbsp;{{relationField.term.name_cs}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EN:&nbsp;{{relationField.term.name_en}}"
           ng-repeat="relationField in relation[type].terms">
           <input class="form-control input-sm"
@@ -100,19 +111,27 @@
             </a>
           </span>
         </div>
-            <a class="btn btn-default pull-right"
-                ng-click="addField(relation, type)">
-              <i class="glyphicon glyphicon-plus"></i>
-            </a>
-        <div class="relation-original-text" ng-repeat="text in relation[type].texts">{{text}}</div>
+        <a class="btn btn-default pull-right"
+        `   ng-if="relation.editting"
+            ng-click="addField(relation, type)">
+          <i class="glyphicon glyphicon-plus"></i>
+        </a>
+        <div class="relation-original-text"
+            ng-repeat="text in relation[type].texts track by $index">
+          {{text}}</div>
       </span>
     </span>
     <span class="col-sm-1" >
       <a class="btn btn-primary"
         ng-disabled="relation.saving"
+        ng-if="relation.editting"
         ng-hide="relation.alerts.length"
         ng-click="save(relation)">
         Uložit</a>
+      <a class="btn btn-primary"
+        ng-if="!relation.editting && !relation.alerts.length"
+        ng-click="relation.editting=true;">
+        Upravit</a>
       <alert ng-repeat="alert in relation.alerts" type="{{alert.type}}"
         close="closeAlert(relation, $index)">{{alert.msg}}</alert>
     </span>

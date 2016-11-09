@@ -169,6 +169,11 @@ select.per-page-select {
   position: absolute;
   top: 0px;
 }
+.relation-term-label {
+  white-space: normal;
+  display: block;
+  margin-bottom: 5px;
+}
 
 /* PRACTICE */
 

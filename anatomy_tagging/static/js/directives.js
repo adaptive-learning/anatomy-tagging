@@ -458,7 +458,6 @@ angular.module('anatomy.tagging.directives', [])
         data: '=tablePager',
         page: '=page',
         pageSize: '=pageSize',
-        defaultPageSize: '=defaultPageSize',
       },   
     templateUrl : 'static/tpl/pager.html',
     link: function(scope) {

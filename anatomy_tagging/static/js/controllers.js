@@ -33,6 +33,8 @@ angular.module('anatomy.tagging.controllers', [])
 
   var urlParts = $location.absUrl().split('/');
   $scope.search = $routeParams.search;
+  $scope.page = 1;
+  $scope.pageSize = 20;
   $scope.showCode = $routeParams.showcode;
   var image = urlParts[urlParts.length - 1].split('?')[0];
 
@@ -505,6 +507,8 @@ angular.module('anatomy.tagging.controllers', [])
     'List_of_muscles_of_the_human_body' : 'Muscle',
     'List_of_foramina_of_the_human_body' : 'Foramina',
   }[wikiPage];
+  $scope.page = 1;
+  $scope.pageSize = 20;
   var mainTerm = $scope.mainTerm;
   var url = "relationsjson/" + wikiPage;
   $http.get(url).success(function(data) {
@@ -597,6 +601,7 @@ angular.module('anatomy.tagging.controllers', [])
     $http.post("relationsjson/update", data).success(function(data) {
       relation.alerts.push(data);
       relation.saving = false;
+      relation.editting = false;
     }).error(function(data) {
       relation.alerts = relation.alerts || [];
       relation.alerts.push({
