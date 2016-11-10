@@ -54,7 +54,7 @@ class Command(BaseCommand):
         if data['fmaid'] in visited:
             return
         visited.add(data['fmaid'])
-        for follow in set(data.keys()) - {'fmaid', 'taid', 'name'}:
+        for follow in set(data.keys()) - {'fmaid', 'taid', 'anatomid', 'name'}:
             inserted = set()
             for child in data.get(follow, []):
                 child_id = '{}:{}'.format(child.get('taid'), child.get('fmaid'))
