@@ -32,14 +32,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         categories = ExportUtils.load_categories()
         terms = self.load_terms()
-        contexts, used_terms, used_categories = self.load_contexts(
+        contexts, used_terms = self.load_contexts(
             terms, options['context'])
         terms = dict(filter(lambda (i, t): i in used_terms, terms.items()))
         flashcards = self.load_flashcards(contexts, terms)
         if options['context'] is not None:
             options['output'] = options['output'].replace(
                 '.json', '-' + options['context'] + '.json')
-            categories = dict(filter(lambda (i, c): i in used_categories, categories.items()))
         for c in contexts.itervalues():
             c['content'] = json.dumps(c['content'])
         output_dict = {
@@ -102,7 +101,6 @@ class Command(BaseCommand):
     def load_contexts(self, terms, context):
         result = {}
         used_terms = set()
-        used_categories = set()
         print "\nLoading contexts"
         images = Image.objects.select_related('bbox').prefetch_related('path_set').all()
         if context is not None:
@@ -129,7 +127,6 @@ class Command(BaseCommand):
                         term_json = terms[p_json['term']]
                         term_categories = term_json.get('categories', [])
                         term_json['categories'] = list(set(term_categories))
-                        used_categories |= set(term_json['categories'])
                 if p.stroke is not None:
                     p_json['stroke'] = p.stroke
                     p_json['stroke_width'] = p.stroke_width
@@ -155,7 +152,7 @@ class Command(BaseCommand):
             if len(terms_in_image) <= 1:
                 print "WARNING: Deactivating image with %s terms:" % len(terms_in_image), i.filename.encode('utf8')
             result[c_json['id']] = c_json
-        return result, used_terms, used_categories
+        return result, used_terms
 
     def load_terms(self):
         result = {}
