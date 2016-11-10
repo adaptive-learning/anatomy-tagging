@@ -231,7 +231,12 @@ def terms(request, filename_slug=None):
 @staff_member_required
 def relations_json(request, source=None):
     if source.startswith('FMA_'):
-        raw_relations = FMACommand().get_relations(os.path.join(settings.MEDIA_DIR, source.replace('FMA_', '') + '.yaml'))
+        basename = os.path.join(settings.MEDIA_DIR, source.replace('FMA_', ''))
+        if os.path.exists(basename + '.yaml'):
+            filename = basename + '.yaml'
+        else:
+            filename = basename + '.json'
+        raw_relations = FMACommand().get_relations(filename)
     else:
         raw_relations = WikiCommand().get_relations(source or WIKI_PAGE_MUSCLES)
     relations = [r.to_serializable() for r in Relation.objects.prepare_related().all()]

@@ -12,8 +12,6 @@ import json
 class Command(BaseCommand):
     help = u"""Load relations about structures from prepared FMA file"""
 
-    FOLLOW = ['branch', 'tributary', 'regional_part', 'receives_input_from']
-
     option_list = BaseCommand.option_list + (
         make_option(
             '--source',
@@ -32,13 +30,13 @@ class Command(BaseCommand):
 
     def get_relations(self, source, destination=None, force=False):
         if destination is None:
-            destination = os.path.join(settings.MEDIA_DIR, '.'.join(os.path.basename(source).split('.')[:-1]) + '.json')
+            destination = os.path.join(settings.MEDIA_DIR, '.'.join(os.path.basename(source).split('.')[:-1]) + '.processed.json')
         if os.path.isfile(destination) and not force:
             with open(destination, 'r') as f:
                 raw_relations = json.load(f)
                 return raw_relations
         with open(source, 'r') as f:
-            data = yaml.load(f)
+            data = yaml.load(f) if source.endswith('.yaml') else json.load(f)
         result = []
         self.init_terms()
         self.traverse_structure_and_collect(data, result)
@@ -56,7 +54,7 @@ class Command(BaseCommand):
         if data['fmaid'] in visited:
             return
         visited.add(data['fmaid'])
-        for follow in Command.FOLLOW:
+        for follow in set(data.keys()) - {'fmaid', 'taid', 'name'}:
             inserted = set()
             for child in data.get(follow, []):
                 child_id = '{}:{}'.format(child.get('taid'), child.get('fmaid'))
