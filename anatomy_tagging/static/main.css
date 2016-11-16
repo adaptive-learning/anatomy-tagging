@@ -225,3 +225,6 @@ select.per-page-select {
 .input-group .btn {
   padding: 7px 12px;
 }
+.nav>li>a:hover, .nav>li>a:focus {
+  color: black;
+}
