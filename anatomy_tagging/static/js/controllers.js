@@ -502,10 +502,13 @@ angular.module('anatomy.tagging.controllers', [])
 .controller('RelationsController',
     function($scope, $http, termsService, $cookies, $routeParams, exportService) {
   $scope.loading = true;
+  $scope.search = $routeParams.search;
+  $scope.search2 = $routeParams.search;
   var wikiPage = $routeParams.wikiPage || 'List_of_muscles_of_the_human_body';
   $scope.mainTerm = {
     'List_of_muscles_of_the_human_body' : 'Muscle',
     'List_of_foramina_of_the_human_body' : 'Foramina',
+    'FMA_branching_taid' : 'Artery',
   }[wikiPage];
   $scope.page = 1;
   $scope.pageSize = 20;
