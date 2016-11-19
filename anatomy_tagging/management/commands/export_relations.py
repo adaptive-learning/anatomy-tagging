@@ -103,8 +103,9 @@ class Command(BaseCommand):
             "term-secondary": term2_id,
             "context": relation.type.identifier.lower(),
             'id': ('%s-%s-%s' % (relation.type.identifier, term1_id[:20], term2_id))[:50],
-            "categories": sorted(list(set([relation.type.identifier.lower(), 'relations'] +
-                                   terms[relation.term1.id]['categories']))),
+            "categories": sorted(list(set(
+                [relation.type.identifier.lower(), 'relations'] +
+                terms[relation.term1.id]['categories']))),
             "additional-info": json.dumps(contexts),
         }
         r_json['active'] = r_json['context'] in self.QUESTIONS
