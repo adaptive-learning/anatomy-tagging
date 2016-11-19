@@ -2,9 +2,10 @@ angular.module('anatomy.tagging.services', [])
 
 .service('termsService', function($http, $cookies) {
   return {
-    get : function(image, showImages) {
-      var url = '/termsjson/' + (image || '') + 
-        (showImages ? '?images=True' : '');
+    get : function(image, showImages, usedOnly) {
+      var url = '/termsjson/' + (image || '') + '?' +
+        (showImages ? 'images=True&relations=True' : '') +
+        (usedOnly ? 'images=True&relations=True&usedonly=True' : '');
       var promise = $http.get(url);
       return promise;
     },

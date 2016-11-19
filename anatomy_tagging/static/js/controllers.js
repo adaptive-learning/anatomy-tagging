@@ -36,11 +36,17 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.emptyField = $routeParams.empty;
   $scope.page = 1;
   $scope.pageSize = 20;
-  $scope.showCode = $routeParams.showcode;
+  $scope.showCode = $routeParams.showcode || $routeParams.usedonly;
+  $scope.usedOnly = $routeParams.usedonly;
   var image = urlParts[urlParts.length - 1].split('?')[0];
 
-  termsService.get(image, $scope.showCode).success(function(data) {
+  termsService.get(image, $scope.showCode, $scope.usedOnly).success(function(data) {
     $scope.terms = data;
+    if ($scope.emptyField) {
+      $scope.terms = $scope.terms.filter(function(row) {
+        return !row[$scope.emptyField];
+      });
+    }
     $scope.loading = false;
   });
 

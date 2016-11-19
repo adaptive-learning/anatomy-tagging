@@ -69,8 +69,7 @@
        Vyhledáváné hodnotě "{{search}}" nevyhovuje žádný pojem.
     </div>
   </div>
-  <div ng-repeat="term in filteredTerms = (terms | filter: search | empty:
-  emptyField) |
+  <div ng-repeat="term in filteredTerms = (terms | filter: search) |
       startFrom: (page -1) * pageSize | limitTo: pageSize"
     class="row table-row">
     <span class="col-sm-2" >
@@ -100,12 +99,22 @@
       <span ng-if="showCode"
           class="label label-default">
         {{term.code}}</span>
-      <a ng-repeat="image in term.images"
-        href="/image/{{image}}"
-        tooltip-placement="left"
-        tooltip="{{image}}">
-        [{{$index}}]
-      </a>
+      <span ng-repeat="image in term.images">
+        <a class="label label-warning"
+          href="/image/{{image}}"
+          tooltip-placement="left"
+          tooltip="{{image}}">
+          [{{$index}}]
+        </a>&nbsp;
+      </span>
+      <span ng-repeat="relation in term.relations">
+        <a class="label label-info"
+          href="/relations/?search={{relation}}"
+          tooltip-placement="left"
+          tooltip="{{relation}}">
+          [{{$index}}]
+        </a>&nbsp;
+      </span>
 
       <a class="btn btn-sm" 
           ng-if="showCode"
