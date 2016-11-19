@@ -42,6 +42,14 @@
     return function(msgid) {
       return gettext(msgid);
     };
-  }]);
+  }])
+
+  .filter('empty', function() {
+    return function(data, emptyField) {
+      return !emptyField ? data : data && data.filter(function(row) {
+        return !row[emptyField];
+      });
+    };
+  });
 
 })();

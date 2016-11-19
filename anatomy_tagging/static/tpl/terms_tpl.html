@@ -69,7 +69,8 @@
        Vyhledáváné hodnotě "{{search}}" nevyhovuje žádný pojem.
     </div>
   </div>
-  <div ng-repeat="term in filteredTerms = (terms | filter: search) |
+  <div ng-repeat="term in filteredTerms = (terms | filter: search | empty:
+  emptyField) |
       startFrom: (page -1) * pageSize | limitTo: pageSize"
     class="row table-row">
     <span class="col-sm-2" >

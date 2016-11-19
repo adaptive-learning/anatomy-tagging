@@ -33,6 +33,7 @@ angular.module('anatomy.tagging.controllers', [])
 
   var urlParts = $location.absUrl().split('/');
   $scope.search = $routeParams.search;
+  $scope.emptyField = $routeParams.empty;
   $scope.page = 1;
   $scope.pageSize = 20;
   $scope.showCode = $routeParams.showcode;
