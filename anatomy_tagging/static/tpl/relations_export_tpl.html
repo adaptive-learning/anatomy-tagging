@@ -36,6 +36,12 @@
 <div ng-hide="loading"  class="table table-striped col-sm-12">
   <div class="row table-row"
       ng-repeat="flashcard in flashcards | filter : {contextId:activeContext.id}">
+      <span class="col-sm-2" title="Kategorie">
+        <span ng-repeat="c in flashcard.categories"
+            ng-if="c != 'relations'">
+          <span class="label label-info" ng-bind="c"></span>&nbsp;
+        </span>
+      </span>
       <span class="col-sm-5">
         {{flashcard.context.content.question[lang].t2ts.replace('{}', '')}}
         <a class="label label-default"
