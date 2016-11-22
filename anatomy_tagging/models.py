@@ -322,6 +322,9 @@ class RelationType(models.Model):
             result['synonyms'] = [rt.to_serializable(nested=True) for rt in self.synonyms.all()]
         return result
 
+    def __unicode__(self):
+        return '{}: {}'.format(self.source, self.identifier)
+
 
 class RelationManager(models.Manager):
 
