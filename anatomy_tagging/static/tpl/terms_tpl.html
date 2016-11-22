@@ -99,6 +99,9 @@
       <span ng-if="showCode"
           class="label label-default">
         {{term.code}}</span>
+      <span ng-if="showCode && term.fma_id != -1"
+          class="label label-default">
+        FMA: {{term.fma_id}}</span>
       <span ng-repeat="image in term.images">
         <a class="label label-warning"
           href="/image/{{image}}"

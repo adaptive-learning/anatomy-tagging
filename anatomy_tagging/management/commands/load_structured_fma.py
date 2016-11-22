@@ -63,8 +63,8 @@ class Command(BaseCommand):
                 inserted.add(child_id)
                 to_save.append({
                     'type': follow,
-                    'term1': self.get_term(data['name'], data.get('taid')),
-                    'term2': self.get_term(child['name'], child.get('taid')),
+                    'term1': self.get_term(data['name'], data.get('taid'), data['fmaid']),
+                    'term2': self.get_term(child['name'], child.get('taid'), child['fmaid']),
                     'text1': 'FMA{} : {} : {}'.format(data['fmaid'], data.get('taid', 'unknown'), data['name']),
                     'text2': 'FMA{} : {} : {}'.format(child['fmaid'], child.get('taid', 'unknown'), child['name']),
                     'relation_type': 'fma',
@@ -72,11 +72,12 @@ class Command(BaseCommand):
             for child in data.get(follow, []):
                 self.traverse_structure_and_collect(child, to_save, visited=visited)
 
-    def get_term(self, term_name, term_taid):
+    def get_term(self, term_name, term_taid, term_fmaid):
         term = self.terms_by_taid.get(term_taid)
-        if term is not None:
-            return term.to_serializable()
-        term = self.terms_by_name.get(term_name)
+        if term is None:
+            term = self.terms_by_name.get(term_name)
+        if term is None:
+            term = self.terms_by_fmaid.get(term_fmaid)
         return term.to_serializable() if term is not None else None
 
     def init_terms(self):
@@ -85,9 +86,11 @@ class Command(BaseCommand):
         terms = Term.objects.prepare_related().all()
         self.terms_by_name = {}
         self.terms_by_taid = {}
+        self.terms_by_fmaid = {}
         for t in terms:
             for name in t.name_la.split(';'):
                 self.terms_by_name[name.lower()] = t
             for name in t.name_en.split(';'):
                 self.terms_by_name[name.lower()] = t
             self.terms_by_taid[t.code] = t
+            self.terms_by_fmaid[t.fma_id] = t

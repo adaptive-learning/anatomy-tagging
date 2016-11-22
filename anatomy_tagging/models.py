@@ -217,6 +217,7 @@ class Term(models.Model):
         db_index=True,
         unique=True)
     code = models.TextField(max_length=200)
+    fma_id = models.IntegerField(default=-1)
     name_cs = models.TextField(max_length=200)
     name_en = models.TextField(max_length=200)
     name_la = models.TextField(max_length=200)
@@ -255,6 +256,7 @@ class Term(models.Model):
             'name_en': self.name_en,
             'body_part': self.body_part,
             'system': self.system,
+            'fma_id': self.fma_id,
         }
         if not subterm and self.parent is not None:
             obj['parent'] = self.parent.to_serializable(True)

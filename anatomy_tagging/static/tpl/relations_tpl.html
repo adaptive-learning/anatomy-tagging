@@ -50,7 +50,7 @@
      ng-repeat="relation in filteredRelations = (relations | filter: search) |
       startFrom: (page -1) * pageSize | limitTo: pageSize">
     <span class="col-sm-2">
-      <div class="label label-default relation-term-label"
+      <div class="label label-{{relation[mainTerm].id ? 'success' : 'default'}} relation-term-label"
           ng-if="!relation.editting"
           ng-bind="relation[mainTerm].term.name_la"></div>
       <div class="input-group"
@@ -81,7 +81,7 @@
           ng-repeat="type in relationTypes">
         <div ng-if="!relation.editting"
             ng-repeat="relationField in relation[type].terms">
-          <div class="label label-default relation-term-label"
+          <div class="label label-{{relationField.id ? 'success' : 'default'}} relation-term-label"
             ng-bind="relationField.term.name_la">
           </div>
         </div>

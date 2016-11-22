@@ -306,12 +306,27 @@ def update_relations(request):
                 source='wikipedia',)
             relation.term1 = Term.objects.get_term_from_dict(r_data, 'term1')
             relation.term2 = Term.objects.get_term_from_dict(r_data, 'term2')
+            add_fma_id(relation.term1, r_data.get('text1'))
+            add_fma_id(relation.term2, r_data.get('text2'))
             relation.save()
         response = {
             'type': 'success',
             'msg': u'Změny byly uloženy',
         }
     return render_json(request, response)
+
+
+def add_fma_id(term, text):
+    fmaid = None
+    if len(text.split(':')) == 3:
+        fmaid = text.split(':')[0].replace('FMA', '')
+
+    if term is not None and fmaid is not None and term.fma_id == -1:
+        try:
+            term.fma_id = int(fmaid)
+            term.save()
+        except ValueError:
+            pass
 
 
 @staff_member_required
