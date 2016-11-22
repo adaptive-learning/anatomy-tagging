@@ -32,7 +32,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
 class RelationAdmin(admin.ModelAdmin):
     list_display = ('type', 'term1', 'term2', 'text1', 'text2')
-    search_fields = list_display
+    search_fields = (
+        'term1__name_en', 'term2__name_en',
+        'term1__name_la', 'term2__name_la',
+        'term1__name_cs', 'term2__name_cs',
+        'text1', 'text2')
     list_filter = ('type__identifier', 'type__source')
     raw_id_fields = ('term1', 'term2')
 
