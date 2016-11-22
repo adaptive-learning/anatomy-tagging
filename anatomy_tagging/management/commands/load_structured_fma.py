@@ -75,9 +75,9 @@ class Command(BaseCommand):
     def get_term(self, term_name, term_taid, term_fmaid):
         term = self.terms_by_taid.get(term_taid)
         if term is None:
-            term = self.terms_by_name.get(term_name)
-        if term is None:
             term = self.terms_by_fmaid.get(term_fmaid)
+        if term is None:
+            term = self.terms_by_name.get(term_name)
         return term.to_serializable() if term is not None else None
 
     def init_terms(self):
