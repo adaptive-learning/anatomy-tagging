@@ -511,16 +511,16 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.loading = true;
   $scope.search = $routeParams.search;
   $scope.search2 = $routeParams.search;
-  var wikiPage = $routeParams.wikiPage || 'List_of_muscles_of_the_human_body';
+  var source = $routeParams.source || 'List_of_muscles_of_the_human_body';
   $scope.mainTerm = {
     'List_of_muscles_of_the_human_body' : 'Muscle',
     'List_of_foramina_of_the_human_body' : 'Foramina',
     'FMA_branching_taid' : 'Artery',
-  }[wikiPage];
+  }[source];
   $scope.page = 1;
   $scope.pageSize = 20;
   var mainTerm = $scope.mainTerm;
-  var url = "relationsjson/" + wikiPage;
+  var url = "relationsjson/" + source;
   $http.get(url).success(function(data) {
     $scope.relationsDict = {};
     $scope.relationTypes = [];
@@ -608,7 +608,7 @@ angular.module('anatomy.tagging.controllers', [])
     }
     relation.alerts = [];
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
-    $http.post("relationsjson/update", data).success(function(data) {
+    $http.post("relationsjson/update?source=" + source, data).success(function(data) {
       relation.alerts.push(data);
       relation.saving = false;
       relation.editting = false;

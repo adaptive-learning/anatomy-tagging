@@ -303,7 +303,7 @@ def update_relations(request):
             relation.text2 = r_data['text2']
             relation.type = RelationType.objects.from_identifier(
                 identifier=r_data['name'],
-                source='wikipedia',)
+                source=get_source(request),)
             relation.term1 = Term.objects.get_term_from_dict(r_data, 'term1')
             relation.term2 = Term.objects.get_term_from_dict(r_data, 'term2')
             add_fma_id(relation.term1, r_data.get('text1'))
@@ -314,6 +314,13 @@ def update_relations(request):
             'msg': u'Změny byly uloženy',
         }
     return render_json(request, response)
+
+
+def get_source(request):
+    return {
+        'FMA': 'fma',
+        'List': 'wikipedia'
+    }.get(request.GET.get('source', '').split('_')[0], 'unknown')
 
 
 def add_fma_id(term, text):
