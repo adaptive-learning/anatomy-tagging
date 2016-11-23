@@ -72,6 +72,7 @@ class Command(BaseCommand):
             'name-cc': self.CATEGORIES.get(id, default)['cs'],
             'name-en': self.CATEGORIES.get(id, default)['en'],
             'name-la': self.CATEGORIES.get(id, default)['en'],
+            'display-priority': self.CATEGORIES.get(id, default).get('display-priority', 0),
             'type': 'relation',
             'active': id in self.QUESTIONS,
         }
@@ -223,26 +224,32 @@ class Command(BaseCommand):
         'nerve': {
             'cs': u'Inervace',
             'en': u'Nerve supply',
+            'display-priority': 40,
         },
         'artery': {
             'cs': u'Cévní zásobení',
             'en': u'Arterial supply',
+            'display-priority': 30,
         },
         'action': {
             'cs': u'Funkce svalu',
             'en': u'Actions',
+            'display-priority': 50,
         },
         'antagonist': {
             'cs': u'Antagonisté',
             'en': u'Antagonists',
+            'display-priority': 60,
         },
         'insertion': {
             'cs': u'Úpon svalu',
             'en': u'Insertions',
+            'display-priority': 20,
         },
         'origin': {
             'cs': u'Začátek svalu',
             'en': u'Origins',
+            'display-priority': 10,
         },
         'bone': {
             'cs': u'Kosti',
