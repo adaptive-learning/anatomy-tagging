@@ -254,18 +254,22 @@ class Command(BaseCommand):
         'bone': {
             'cs': u'Kosti',
             'en': u'Bones',
+            'display-priority': 70,
         },
         'cranial fossa': {
             'cs': u'Jámy lebeční',
             'en': u'Cranial fossa',
+            'display-priority': 80,
         },
         'vessels': {
             'cs': u'Cévy',
             'en': u'Vessels',
+            'display-priority': 90,
         },
         'nerves': {
             'cs': u'Nervy',
             'en': u'Nerves',
+            'display-priority': 100,
         },
     }
     HARDCODED_CATEGORIES = {
