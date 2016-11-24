@@ -199,46 +199,55 @@ class ExportUtils(object):
             'id': 'Hf',
             'name-cs': 'Splanchnokranium',
             'name-en': 'Head - Face',
+            'display-priority': 100,
         },
         {
             'id': 'Hb',
             'name-cs': 'Neurokranium',
             'name-en': 'Head - Brain',
+            'display-priority': 200,
         },
         {
             'id': 'N',
             'name-cs': 'Krk',
             'name-en': 'Neck',
+            'display-priority': 300,
         },
         {
             'id': 'T',
             'name-cs': 'Hrudník',
             'name-en': 'Thorax',
+            'display-priority': 500,
         },
         {
             'id': 'B',
             'name-cs': 'Záda',
             'name-en': 'Back',
+            'display-priority': 700,
         },
         {
             'id': 'A',
             'name-cs': 'Břicho',
             'name-en': 'Abdomen',
+            'display-priority': 600,
         },
         {
             'id': 'P',
             'name-cs': 'Pánev',
             'name-en': 'Pelvis',
+            'display-priority': 800,
         },
         {
             'id': 'UE',
             'name-cs': 'Horní končetina',
             'name-en': 'Upper Extremity',
+            'display-priority': 400,
         },
         {
             'id': 'LE',
             'name-cs': 'Dolní končetina',
             'name-en': 'Lower Extremity',
+            'display-priority': 900,
         },
     ]
 
