@@ -279,6 +279,7 @@ class ExportUtils(object):
                 'name-cc': ExportUtils._stip_number(ExportUtils._empty(c.name_cs)),
                 'name-en': ExportUtils._get_category_english_name(c),
                 'name-la': ExportUtils._get_category_english_name(c),
+                'display-priority': int(ExportUtils._get_category_id(c)),
                 'type': 'system',
             }
             if c.parent is not None:
