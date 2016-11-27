@@ -89,13 +89,22 @@ def update_term(request):
 def merge_terms(request):
     if request.body:
         data = simplejson.loads(request.body)
-        term1 = Term.objects.get(id=data['term1']['id'])
-        term2 = Term.objects.get(id=data['term2']['id'])
-        paths = Path.objects.filter(term=term1).select_related('image')
+        term_to_be_removed = Term.objects.get(id=data['term1']['id'])
+        term_survival = Term.objects.get(id=data['term2']['id'])
+        paths = Path.objects.filter(
+            term=term_to_be_removed).select_related('image')
         for p in paths:
-            p.term = term2
+            p.term = term_survival
             p.save()
-        term1.delete()
+        relations1 = Relation.objects.filter(term1=term_to_be_removed)
+        for p in relations1:
+            p.term1 = term_survival
+            p.save()
+        relations2 = Relation.objects.filter(term2=term_to_be_removed)
+        for p in relations2:
+            p.term2 = term_survival
+            p.save()
+        term_to_be_removed.delete()
         for image in list(set([p.image for p in paths])):
             try:
                 export_image(image)
