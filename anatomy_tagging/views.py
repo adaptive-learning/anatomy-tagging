@@ -196,7 +196,13 @@ def terms(request, filename_slug=None):
     if filename_slug == 'duplicate':
         terms = terms.order_by('name_la', '-id')
         paths = Path.objects.all().select_related('term')
-        used_terms_ids = list(set([p.term_id for p in paths if p.term_id is not None]))
+        relations = Relation.objects.all().select_related('term1,term2')
+        used_terms_ids = list(set(
+            [p.term_id for p in paths if p.term_id is not None] +
+            [r.term1_id for r in relations if r.term1_id is not None] +
+            [r.term2_id for r in relations if r.term2_id is not None] +
+            [r.term2.parent_id for r in relations if r.term2_id is not None]
+        ))
         terms = [t for t in terms if t.id in used_terms_ids]
         term_dict = {}
         for t in terms:
