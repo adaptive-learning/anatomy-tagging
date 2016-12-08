@@ -42,7 +42,8 @@ class Command(BaseCommand):
                 terms[r.term2.id] = ExportUtils.term_to_json(r.term2)
                 flashcards[r.id] = self.relation_to_json(r, terms)
                 contexts[r.type.identifier] = self.relation_to_context(r)
-                categories[self.get_category_id(r)] = self.relation_to_category(r)
+                categories[r.type.identifier.lower()] = self.relation_to_category(r)
+                categories[self.get_category_id(r)] = self.get_category_by_id(self.get_category_id(r))
                 if r.type.identifier == 'Action':
                     # HACK: Use Czech Actions in Czech-Latin terms
                     terms[r.term2.id]['name-cs'] = terms[r.term2.id]['name-cc']
@@ -65,11 +66,11 @@ class Command(BaseCommand):
 
     def relation_to_category(self, relation):
         id = relation.type.identifier.lower()
+        return self.get_category_by_id(id)
+
+    def get_category_by_id(self, id):
         default = {'cs': id, 'en': id}
         category = self.CATEGORIES.get(id, default)
-        if 'parent' in category:
-            id = category['parent']
-            category = self.CATEGORIES.get(id, default)
 
         c_json = {
             'id': id,
@@ -78,7 +79,7 @@ class Command(BaseCommand):
             'name-en': category['en'],
             'name-la': category['en'],
             'display-priority': category.get('display-priority', 0),
-            'type': 'relation',
+            'type': category.get('type', 'relation'),
             'active': id in self.QUESTIONS,
         }
         return c_json
@@ -110,6 +111,7 @@ class Command(BaseCommand):
         term2_id = ExportUtils.get_term_id(relation.term2)
         contexts = self.get_contexts_of_relation(relation)
         category = self.get_category_id(relation)
+        subategory = relation.type.identifier.lower()
 
         r_json = {
             "term": term1_id,
@@ -117,7 +119,7 @@ class Command(BaseCommand):
             "context": relation.type.identifier.lower(),
             'id': ('%s-%s-%s' % (relation.type.identifier, term1_id[:20], term2_id))[:50],
             "categories": sorted(list(set(
-                [category, 'relations'] +
+                [category, subategory, 'relations'] +
                 terms[relation.term1.id]['categories']))),
             "additional-info": json.dumps(contexts),
         }
@@ -286,21 +288,25 @@ class Command(BaseCommand):
             'cs': u'Kosti',
             'en': u'Bones',
             'parent': 'foramina',
+            'type': 'subrelation',
         },
         'cranial fossa': {
             'cs': u'Jámy lebeční',
             'en': u'Cranial fossa',
             'parent': 'foramina',
+            'type': 'subrelation',
         },
         'vessels': {
             'cs': u'Cévy',
             'en': u'Vessels',
             'parent': 'foramina',
+            'type': 'subrelation',
         },
         'nerves': {
             'cs': u'Nervy',
             'en': u'Nerves',
             'parent': 'foramina',
+            'type': 'subrelation',
         },
     }
     HARDCODED_CATEGORIES = {
