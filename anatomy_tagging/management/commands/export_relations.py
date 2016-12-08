@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 terms[r.term2.id] = ExportUtils.term_to_json(r.term2)
                 flashcards[r.id] = self.relation_to_json(r, terms)
                 contexts[r.type.identifier] = self.relation_to_context(r)
-                categories[r.type.identifier] = self.relation_to_category(r)
+                categories[self.get_category_id(r)] = self.relation_to_category(r)
                 if r.type.identifier == 'Action':
                     # HACK: Use Czech Actions in Czech-Latin terms
                     terms[r.term2.id]['name-cs'] = terms[r.term2.id]['name-cc']
@@ -66,13 +66,18 @@ class Command(BaseCommand):
     def relation_to_category(self, relation):
         id = relation.type.identifier.lower()
         default = {'cs': id, 'en': id}
+        category = self.CATEGORIES.get(id, default)
+        if 'parent' in category:
+            id = category['parent']
+            category = self.CATEGORIES.get(id, default)
+
         c_json = {
             'id': id,
-            'name-cs': self.CATEGORIES.get(id, default)['cs'],
-            'name-cc': self.CATEGORIES.get(id, default)['cs'],
-            'name-en': self.CATEGORIES.get(id, default)['en'],
-            'name-la': self.CATEGORIES.get(id, default)['en'],
-            'display-priority': self.CATEGORIES.get(id, default).get('display-priority', 0),
+            'name-cs': category['cs'],
+            'name-cc': category['cs'],
+            'name-en': category['en'],
+            'name-la': category['en'],
+            'display-priority': category.get('display-priority', 0),
             'type': 'relation',
             'active': id in self.QUESTIONS,
         }
@@ -94,10 +99,17 @@ class Command(BaseCommand):
         }
         return c_json
 
+    def get_category_id(self, relation):
+        category = relation.type.identifier.lower()
+        if 'parent' in self.CATEGORIES.get(category, {}):
+            category = self.CATEGORIES.get(category)['parent']
+        return category
+
     def relation_to_json(self, relation, terms):
         term1_id = ExportUtils.get_term_id(relation.term1)
         term2_id = ExportUtils.get_term_id(relation.term2)
         contexts = self.get_contexts_of_relation(relation)
+        category = self.get_category_id(relation)
 
         r_json = {
             "term": term1_id,
@@ -105,7 +117,7 @@ class Command(BaseCommand):
             "context": relation.type.identifier.lower(),
             'id': ('%s-%s-%s' % (relation.type.identifier, term1_id[:20], term2_id))[:50],
             "categories": sorted(list(set(
-                [relation.type.identifier.lower(), 'relations'] +
+                [category, 'relations'] +
                 terms[relation.term1.id]['categories']))),
             "additional-info": json.dumps(contexts),
         }
@@ -219,6 +231,20 @@ class Command(BaseCommand):
                 'ts2t': u'Which muscle has origin on {}',
             },
         },
+        'bone': {
+            'cs': {
+                't2ts': u'Jaká kost ohraničuje foramen {}',
+                'ts2t': u'Který kanálek nebo žlábek leži v {}',
+            },
+            'en': {
+                't2ts': u'Which bone borders foramen {}',
+                'ts2t': u'Which foramen is located in {}',
+            },
+        },
+        'foramina': {
+            'dummy hack': {
+            },
+        },
     }
     CATEGORIES = {
         'nerve': {
@@ -251,25 +277,30 @@ class Command(BaseCommand):
             'en': u'Origins',
             'display-priority': 10,
         },
+        'foramina': {
+            'cs': u'Foramina',
+            'en': u'Foramina',
+            'display-priority': 70,
+        },
         'bone': {
             'cs': u'Kosti',
             'en': u'Bones',
-            'display-priority': 70,
+            'parent': 'foramina',
         },
         'cranial fossa': {
             'cs': u'Jámy lebeční',
             'en': u'Cranial fossa',
-            'display-priority': 80,
+            'parent': 'foramina',
         },
         'vessels': {
             'cs': u'Cévy',
             'en': u'Vessels',
-            'display-priority': 90,
+            'parent': 'foramina',
         },
         'nerves': {
             'cs': u'Nervy',
             'en': u'Nerves',
-            'display-priority': 100,
+            'parent': 'foramina',
         },
     }
     HARDCODED_CATEGORIES = {
