@@ -96,11 +96,11 @@ def merge_terms(request):
         for p in paths:
             p.term = term_survival
             p.save()
-        relations1 = Relation.objects.filter(term1=term_to_be_removed)
+        relations1 = Relation.objects.filter(term1=term_to_be_removed).select_related('term1')
         for p in relations1:
             p.term1 = term_survival
             p.save()
-        relations2 = Relation.objects.filter(term2=term_to_be_removed)
+        relations2 = Relation.objects.filter(term2=term_to_be_removed).select_related('term2')
         for p in relations2:
             p.term2 = term_survival
             p.save()
