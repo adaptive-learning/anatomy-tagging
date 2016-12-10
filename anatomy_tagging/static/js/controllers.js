@@ -623,7 +623,12 @@ angular.module('anatomy.tagging.controllers', [])
   };
 
   $scope.addField = function(relation, type) {
-    if (!relation[type].terms) {
+    if (!relation[type]) {
+      relation[type] = {
+        terms: [],
+        texts: [],
+      };
+    } else if (!relation[type].terms) {
       relation[type].terms = [relation[type].term];
     }
     relation[type].terms.push({});
