@@ -24,7 +24,7 @@
 </div>
 <alert ng-repeat="alert in alerts" type="{{alert.type}}"
   close="closeAlert($index)">{{alert.msg}}</alert>
-<div ng-hide="loading"  class="table table-striped col-sm-12">
+<div ng-hide="loading"  class="table table-striped col-sm-11 relations-table">
   <div class="row header-row">
     <span class="col-sm-2" ng-bind="mainTerm"> </span>
     <span class="col-sm-9" >

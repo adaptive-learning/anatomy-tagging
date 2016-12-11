@@ -40,6 +40,10 @@
   margin-left: 10px;
 }
 
+.relations-table .input-group {
+  width: 100%;
+}
+
 .table-row > a,
 .table-row > span {
   padding-top: 5px;
