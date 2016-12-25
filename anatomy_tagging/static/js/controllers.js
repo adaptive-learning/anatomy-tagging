@@ -646,6 +646,7 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
 
   $scope.publish = function(type) {
+    type = type.replace(' ', '-');
     $scope.saving = type;
     $http.get("relationsexport/" + type + '?empty=true').success(function(data) {
       exportService.export(type).success(function(data) {
