@@ -6,6 +6,7 @@ from collections import defaultdict
 from django.core.management.base import BaseCommand
 from optparse import make_option
 import json
+from django.template.defaultfilters import slugify
 
 
 class Command(BaseCommand):
@@ -42,7 +43,7 @@ class Command(BaseCommand):
                 terms[r.term2.id] = ExportUtils.term_to_json(r.term2)
                 flashcards[r.id] = self.relation_to_json(r, terms)
                 contexts[r.type.identifier] = self.relation_to_context(r)
-                categories[r.type.identifier.lower()] = self.relation_to_category(r)
+                categories[my_slugify(r.type.identifier)] = self.relation_to_category(r)
                 categories[self.get_category_id(r)] = self.get_category_by_id(self.get_category_id(r))
                 if r.type.identifier == 'Action':
                     # HACK: Use Czech Actions in Czech-Latin terms
@@ -65,7 +66,7 @@ class Command(BaseCommand):
             print 'Flashcards exported to file: \'%s\'' % options['output']
 
     def relation_to_category(self, relation):
-        id = relation.type.identifier.lower()
+        id = my_slugify(relation.type.identifier)
         return self.get_category_by_id(id)
 
     def get_category_by_id(self, id):
@@ -85,7 +86,7 @@ class Command(BaseCommand):
         return c_json
 
     def relation_to_context(self, relation):
-        id = relation.type.identifier.lower()
+        id = my_slugify(relation.type.identifier)
         default = {'cs': id, 'en': id}
         c_json = {
             'id': id,
@@ -101,7 +102,7 @@ class Command(BaseCommand):
         return c_json
 
     def get_category_id(self, relation):
-        category = relation.type.identifier.lower()
+        category = my_slugify(relation.type.identifier)
         if 'parent' in self.CATEGORIES.get(category, {}):
             category = self.CATEGORIES.get(category)['parent']
         return category
@@ -111,12 +112,12 @@ class Command(BaseCommand):
         term2_id = ExportUtils.get_term_id(relation.term2)
         contexts = self.get_contexts_of_relation(relation)
         category = self.get_category_id(relation)
-        subategory = relation.type.identifier.lower()
+        subategory = my_slugify(relation.type.identifier)
 
         r_json = {
             "term": term1_id,
             "term-secondary": term2_id,
-            "context": relation.type.identifier.lower(),
+            "context": my_slugify(relation.type.identifier),
             'id': ('%s-%s-%s' % (relation.type.identifier, term1_id[:20], term2_id))[:50],
             "categories": sorted(list(set(
                 [category, subategory, 'relations'] +
@@ -243,7 +244,7 @@ class Command(BaseCommand):
                 'ts2t': u'Which foramen is located in {}',
             },
         },
-        'cranial fossa': {
+        'cranialfossa': {
             'cs': {
                 't2ts': u'V jaké lebeční jámě se nachází {}',
                 'ts2t': u'Který kanálek se nachází v {}',
@@ -320,7 +321,7 @@ class Command(BaseCommand):
             'parent': 'foramina',
             'type': 'subrelation',
         },
-        'cranial fossa': {
+        'cranialfossa': {
             'cs': u'Jámy lebeční',
             'en': u'Cranial fossa',
             'parent': 'foramina',
@@ -372,3 +373,7 @@ class Command(BaseCommand):
         'active': True,
         'type': 'super',
     }
+
+
+def my_slugify(string):
+    return slugify(string).replace('-', '')
