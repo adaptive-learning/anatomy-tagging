@@ -243,6 +243,36 @@ class Command(BaseCommand):
                 'ts2t': u'Which foramen is located in {}',
             },
         },
+        'cranial fossa': {
+            'cs': {
+                't2ts': u'V jaké lebeční jámě se nachází {}',
+                'ts2t': u'Který kanálek se nachází v {}',
+            },
+            'en': {
+                't2ts': u'In which cranial fossa lies {}',
+                'ts2t': u'Which foramen lies in {}',
+            },
+        },
+        'vessels': {
+            'cs': {
+                't2ts': u'Která céva prochází skrz {}',
+                'ts2t': u'Kterým kanálkem prochází {}',
+            },
+            'en': {
+                't2ts': u'Which vessel passes through {}',
+                'ts2t': u'Through which foramen passes {}',
+            },
+        },
+        'nerves': {
+            'cs': {
+                't2ts': u'Který nerv prochází skrz {}',
+                'ts2t': u'Kterým kanálkem prochází {}',
+            },
+            'en': {
+                't2ts': u'Which nerve passes through {}',
+                'ts2t': u'Through which foramen passes {}',
+            },
+        },
         'foramina': {
             'dummy hack': {
             },
