@@ -236,12 +236,12 @@ class Command(BaseCommand):
         },
         'bone': {
             'cs': {
-                't2ts': u'Jaká kost ohraničuje foramen {}',
-                'ts2t': u'Který kanálek nebo žlábek leži v {}',
+                't2ts': u'Kteru kostí je ohraničen {}',
+                'ts2t': u'Který kanálek je ohraničen {}',
             },
             'en': {
-                't2ts': u'Which bone borders foramen {}',
-                'ts2t': u'Which foramen is located in {}',
+                't2ts': u'Which bone forms the margin of {}',
+                'ts2t': u'Which foramen is bounded by {}',
             },
         },
         'cranialfossa': {
