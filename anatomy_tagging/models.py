@@ -336,11 +336,22 @@ class RelationManager(models.Manager):
 
 class Relation(models.Model):
 
+    STATE_UNKNOWN = 'unknown'
+    STATE_VALID = 'valid'
+    STATE_INVALID = 'invalid'
+
+    STATES = {
+        'u': STATE_UNKNOWN,
+        'v': STATE_VALID,
+        'i': STATE_INVALID,
+    }
+
     term1 = models.ForeignKey(Term, null=True, blank=True, related_name='term1')
     text1 = models.TextField()
     term2 = models.ForeignKey(Term, null=True, blank=True, related_name='term2')
     text2 = models.TextField(blank=True)
     type = models.ForeignKey(RelationType, null=True, blank=True, related_name='relations')
+    state = models.CharField(max_length=1, choices=STATES.items(), default='u')
 
     objects = RelationManager()
 
@@ -353,6 +364,7 @@ class Relation(models.Model):
             'text1': self.text1,
             'text2': self.text2,
             'type': self.type.to_serializable(nested=True),
+            'state': Relation.STATES[self.state],
         }
 
     def __unicode__(self):
