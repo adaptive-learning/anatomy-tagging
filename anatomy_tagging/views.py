@@ -278,6 +278,16 @@ def relations_json(request, source=None):
 
 
 @staff_member_required
+def relation_tree(request, relation_type_identifier):
+    relation_type = get_object_or_404(RelationType, identifier=relation_type_identifier)
+    tree, next_to_process = Relation.objects.get_tree(relation_type)
+    return render_json(request, {
+        'relations': tree,
+        'next_to_process': next_to_process,
+    })
+
+
+@staff_member_required
 def relations_export(request, relation_type=None):
     export_dir = os.path.join(settings.MEDIA_DIR, 'export')
     if relation_type is not None and relation_type != '':

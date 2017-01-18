@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict, deque
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.db.models import Count
@@ -329,6 +330,50 @@ class RelationType(models.Model):
 
 
 class RelationManager(models.Manager):
+
+    def get_tree(self, relation_type):
+        rtype_ids = {relation_type.pk} | {t.pk for t in relation_type.synonyms.all()}
+        by_id = {}
+        by_term1 = defaultdict(list)
+        for relation in self.filter(type_id__in=rtype_ids):
+            by_id[relation.pk] = relation.to_serializable()
+            if relation.term1_id is not None:
+                by_term1[relation.term1_id].append(relation.pk)
+            else:
+                by_term1[relation.text1].append(relation.pk)
+        for rel_id, rel_data in by_id.items():
+            if rel_data['term2'] is None:
+                children = by_term1[rel_data['text2']]
+            else:
+                children = by_term1[rel_data['term2']['id']]
+            rel_data['children'] = children
+            for child_id in children:
+                child = by_id[child_id]
+                if 'parent_id' in child:
+                    raise Exception('The node cannot have more than one parent.')
+                child['parent_id'] = rel_id
+        previous = None
+        previous_to_process = None
+        next_to_process = None
+        for rel_id, rel_data in by_id.items():
+            if 'parent_id' in rel_data:
+                continue
+            to_visit = deque([rel_id])
+            while len(to_visit) > 0:
+                current = by_id[to_visit.popleft()]
+                if 'next' in current:
+                    raise Exception('There is a cycle in the graph.')
+                if current['state'] == Relation.STATE_UNKNOWN:
+                    if previous_to_process is not None:
+                        previous_to_process['next_to_process'] = current['id']
+                    else:
+                        next_to_process = current['id']
+                    previous_to_process = current
+                if previous is not None:
+                    current['previous'] = previous['id']
+                    previous['next'] = current['id']
+                previous = current
+        return by_id, next_to_process
 
     def prepare_related(self):
         return self.select_related('term1', 'term2', 'term1__parent', 'term2__parent', 'type')
