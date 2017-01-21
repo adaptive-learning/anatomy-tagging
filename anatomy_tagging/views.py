@@ -279,6 +279,40 @@ def relation_tree(request, relation_type_identifier):
 
 
 @staff_member_required
+def relation_tree_update(request):
+    data = simplejson.loads(request.body)
+
+    def _get_term(data):
+        if 'id' in data:
+            term = Term.objects.get(pk=data['id'])
+        else:
+            term = Term()
+        term.name_en = data.get('name_en', '')
+        term.name_la = data.get('name_la', '')
+        term.name_cs = data.get('name_cs', '')
+        term.system = data.get('system', '')
+        term.bodypart = data.get('body_part', '')
+        term.fma_id = data.get('fma_id', -1)
+        term.save()
+        return term
+
+    result = []
+    for rel in data:
+        if 'id' in rel:
+            relation = Relation.objects.get(pk=rel['id'])
+        else:
+            relation = Relation()
+        relation.type = get_object_or_404(RelationType, identifier=rel['name'])
+        relation.term1 = _get_term(rel['term1'])
+        relation.term2 = _get_term(rel['term2'])
+        relation.labels = '|'.join(set(rel.get('labels', [])))
+        relation.state = rel.get('state', 'unknown')[0]
+        relation.save()
+        result.append(relation.to_serializable())
+    return render_json(request, result)
+
+
+@staff_member_required
 def relations_export(request, relation_type=None):
     export_dir = os.path.join(settings.MEDIA_DIR, 'export')
     if relation_type is not None and relation_type != '':
