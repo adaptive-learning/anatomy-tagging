@@ -26,52 +26,14 @@ body {
 
   <div class="row" ng-show="relation">
     <span class="col-sm-6" >
-      <div class="input-group">
-        <span class="input-group-addon" >LA</span>
-        <input class="form-control input-sm" ng-model="relation.term1.name_la" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-addon" >EN</span>
-        <input class="form-control input-sm" ng-model="relation.term1.name_en" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-addon" >CS</span>
-        <input class="form-control input-sm" ng-model="relation.term1.name_cs" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-addon" >Umístění</span>
-        <input class="form-control input-sm" ng-model="relation.term1.body_part" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-addon" >Systém</span>
-        <input class="form-control input-sm" ng-model="relation.term1.system" />
-      </div>
+      <div term-edit term="relation.term1"></div>
       <br>
       <div ng-bind="relation.text1"></div>
       <br>
     </span>
 
     <span class="col-sm-6" >
-      <div class="input-group">
-        <span class="input-group-addon" >LA</span>
-        <input class="form-control input-sm" ng-model="relation.term2.name_la" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-addon" >EN</span>
-        <input class="form-control input-sm" ng-model="relation.term2.name_en" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-addon" >CS</span>
-        <input class="form-control input-sm" ng-model="relation.term2.name_cs" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-addon" >Umístění</span>
-        <input class="form-control input-sm" ng-model="relation.term2.body_part" />
-      </div>
-      <div class="input-group">
-        <span class="input-group-addon" >Systém</span>
-        <input class="form-control input-sm" ng-model="relation.term2.system" />
-      </div>
+      <div term-edit term="relation.term2"></div>
       <br>
       <div ng-bind="relation.text2"></div>
       <br>

@@ -451,6 +451,16 @@ angular.module('anatomy.tagging.directives', [])
   };
 })
 
+.directive('termEdit', function() {
+  return {
+    restrict: 'A', 
+      scope: {
+        term: '=term',
+      },   
+    templateUrl : 'static/tpl/term_edit.html',
+  };
+})
+
 .directive('tablePager', function() {
   return {
     restrict: 'A', 
