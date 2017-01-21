@@ -335,6 +335,16 @@ def relations_export(request, relation_type=None):
 
 
 @staff_member_required
+def relation_types(request):
+    source = request.GET.get('source')
+    if source is None:
+        rel_types = RelationType.objects.prepare_related().all()
+    else:
+        rel_types = RelationType.objects.prepare_related().filter(source=source)
+    return render_json(request, {rel_type.id: rel_type.to_serializable() for rel_type in rel_types})
+
+
+@staff_member_required
 def update_relations(request):
     if request.body:
         data = simplejson.loads(request.body)

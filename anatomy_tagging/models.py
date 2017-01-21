@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict, deque
 from django.db import models
-from django.template.defaultfilters import slugify
 from django.db.models import Count
 from django.db.models import Q
+from django.template.defaultfilters import slugify
+import json as simplejson
 import re
 
 
@@ -289,6 +290,9 @@ class Path(models.Model):
 
 class RelationTypeManager(models.Manager):
 
+    def prepare_related(self):
+        return self.prefetch_related('synonyms')
+
     def make_synonyms(self, first, second):
         first_synonyms = list(first.synonyms.all()) + [first]
         second_synonyms = list(second.synonyms.all()) + [second]
@@ -310,19 +314,44 @@ class RelationTypeManager(models.Manager):
 
 class RelationType(models.Model):
 
+    DEFAULT_QUESTION_CS = simplejson.dumps({
+        't2ts': u'Chybí text otázky {}',
+        'ts2t': u'Chybí text otázky {}',
+    }, sort_keys=True)
+
+    DEFAULT_QUESTION_EN = simplejson.dumps({
+        't2ts': u'Question text missing {}',
+        'ts2t': u'Question text missing {}',
+    }, sort_keys=True)
+
     identifier = models.CharField(max_length=255)
     source = models.CharField(max_length=255)
     synonyms = models.ManyToManyField('self')
+    ready = models.BooleanField(default=False)
+    name_en = models.CharField(max_length=255, null=True)
+    name_cs = models.CharField(max_length=255, null=True)
+    display_priority = models.IntegerField(default=0)
+    question_cs = models.TextField(default=DEFAULT_QUESTION_CS)
+    question_en = models.TextField(default=DEFAULT_QUESTION_EN)
 
     objects = RelationTypeManager()
 
     def to_serializable(self, nested=False):
         result = {
+            'id': self.id,
             'identifier': self.identifier,
-            'source': self.source
+            'source': self.source,
+            'ready': self.ready,
+            'name_en': self.name_en,
+            'name_cs': self.name_cs,
+            'display_priority': self.display_priority,
+            'question_en': simplejson.loads(self.question_en),
+            'question_cs': simplejson.loads(self.question_cs),
         }
         if not nested:
-            result['synonyms'] = [rt.to_serializable(nested=True) for rt in self.synonyms.all()]
+            result['synonyms'] = [rt.id for rt in self.synonyms.all()]
+            if len(result['synonyms']) == 0:
+                del result['synonyms']
         return result
 
     def __unicode__(self):
