@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from anatomy_tagging.models import Term
-from django.conf import settings
+from anatomy_tagging.models import Term, Relation, RelationType
 from django.core.management.base import BaseCommand, CommandError
+from django.template.defaultfilters import slugify
 from optparse import make_option
-import copy
-import yaml
-import os
 import json
+import yaml
 
 
 class Command(BaseCommand):
@@ -17,33 +15,20 @@ class Command(BaseCommand):
             '--source',
             dest='source'
         ),
-        make_option(
-            '--dest',
-            dest='destination'
-        )
     )
 
     def handle(self, *args, **options):
         if options['source'] is None:
             raise CommandError('The source has to be given.')
-        self.get_relations(options['source'], destination=options['destination'], force=True)
+        self.load_relations(options['source'])
 
-    def get_relations(self, source, destination=None, force=False):
-        if destination is None:
-            destination = os.path.join(settings.MEDIA_DIR, '.'.join(os.path.basename(source).split('.')[:-1]) + '.processed.json')
-        if os.path.isfile(destination) and not force:
-            with open(destination, 'r') as f:
-                raw_relations = json.load(f)
-                return raw_relations
+    def load_relations(self, source):
         with open(source, 'r') as f:
             data = yaml.load(f) if source.endswith('.yaml') else json.load(f)
         result = []
         self.init_terms()
+        self.rel_types = {}
         self.traverse_structure_and_collect(data, result)
-        with open(destination, 'w') as f:
-            print(len(result))
-            json.dump(result, f)
-        return copy.deepcopy(result)
 
     def traverse_structure_and_collect(self, data, to_save, visited=None):
         if visited is None:
@@ -54,30 +39,63 @@ class Command(BaseCommand):
         if data['fmaid'] in visited:
             return
         visited.add(data['fmaid'])
-        for follow in set(data.keys()) - {'fmaid', 'taid', 'anatomid', 'name'}:
+        for follow in set(data.keys()) - {'fmaid', 'taid', 'anatomid', 'name_la', 'name_en', 'name_cs'}:
             inserted = set()
             for child in data.get(follow, []):
                 child_id = '{}:{}'.format(child.get('taid'), child.get('fmaid'))
                 if child_id in inserted:
                     continue
                 inserted.add(child_id)
-                to_save.append({
-                    'type': follow,
-                    'term1': self.get_term(data['name'], data.get('taid'), data['fmaid']),
-                    'term2': self.get_term(child['name'], child.get('taid'), child['fmaid']),
-                    'text1': 'FMA{} : {} : {}'.format(data['fmaid'], data.get('taid', 'unknown'), data['name']),
-                    'text2': 'FMA{} : {} : {}'.format(child['fmaid'], child.get('taid', 'unknown'), child['name']),
-                    'relation_type': 'fma',
-                })
+                self.create_relation(
+                    key=follow,
+                    term1=self.get_term_from_json(data, create=True),
+                    term2=self.get_term_from_json(child, create=True)
+                )
             for child in data.get(follow, []):
                 self.traverse_structure_and_collect(child, to_save, visited=visited)
 
-    def get_term(self, term_name, term_taid, term_fmaid):
-        term = self.terms_by_taid.get(term_taid)
+    def create_relation(self, key, term1, term2):
+        rel_type = self.rel_types.get(key)
+        if rel_type is None:
+            rel_type, _ = RelationType.objects.get_or_create(
+                source='fma',
+                identifier=key
+            )
+            self.rel_types[key] = rel_type
+        rel, _ = Relation.objects.get_or_create(
+            term1_id=term1['id'],
+            term2_id=term2['id'],
+            type=rel_type
+        )
+        return rel
+
+    def get_term_from_json(self, data, create=False):
+        return self.get_term(
+            name_la=data.get('name_la'),
+            name_en=data['name_en'],
+            name_cs=None,
+            taid=data.get('taid'),
+            fmaid=data['fmaid'],
+            create=create
+        )
+
+    def get_term(self, name_la, name_en, name_cs, taid, fmaid, create=False):
+        term = self.terms_by_taid.get(taid)
         if term is None:
-            term = self.terms_by_fmaid.get(term_fmaid)
-        if term is None:
-            term = self.terms_by_name.get(term_name)
+            term = self.terms_by_fmaid.get(fmaid)
+        else:
+            if term.fma_id is None or term.fma_id < 0:
+                term.fma_id = fmaid
+                term.save()
+        if term is None and create:
+            term = Term.objects.create(
+                slug=slugify(name_en),
+                code=taid if taid else '',
+                name_la=name_la if name_la else '',
+                name_en=name_en if name_en else '',
+                name_cs=name_cs if name_cs else '',
+                fma_id=fmaid
+            )
         return term.to_serializable() if term is not None else None
 
     def init_terms(self):
