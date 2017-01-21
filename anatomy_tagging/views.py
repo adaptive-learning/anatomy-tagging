@@ -344,7 +344,8 @@ def update_relations(request):
 def get_source(request):
     return {
         'FMA': 'fma',
-        'List': 'wikipedia'
+        'List': 'wikipedia',
+        'wikipedia': 'wikipedia',
     }.get(request.GET.get('source', '').split('_')[0], 'unknown')
 
 

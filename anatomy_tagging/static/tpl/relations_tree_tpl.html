@@ -1,0 +1,106 @@
+<style>
+body {
+  background-color: #eee;
+}
+</style>
+<div class="header">
+  <div class="col-sm-12">
+    <h1>
+      <a href="/">
+        <i class="glyphicon glyphicon-home"></i>
+      </a>
+      Anatom.cz -
+      {{image.filename || ('kontrola souvislostí - ' + type)}}
+    </h1>
+  </div>
+  <div class="clearfix"></div>
+  <br>
+</div>
+      <br>
+<div class="container">
+ <div class="panel panel-default">
+ <div class="panel-heading">
+      <h3 ng-bind="type"> </h3>
+ </div>
+ <div class="panel-body">
+
+  <div class="row" ng-show="relation">
+    <span class="col-sm-6" >
+      <div class="input-group">
+        <span class="input-group-addon" >LA</span>
+        <input class="form-control input-sm" ng-model="relation.term1.name_la" />
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" >EN</span>
+        <input class="form-control input-sm" ng-model="relation.term1.name_en" />
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" >CS</span>
+        <input class="form-control input-sm" ng-model="relation.term1.name_cs" />
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" >Umístění</span>
+        <input class="form-control input-sm" ng-model="relation.term1.body_part" />
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" >Systém</span>
+        <input class="form-control input-sm" ng-model="relation.term1.system" />
+      </div>
+      <br>
+      <div ng-bind="relation.text1"></div>
+      <br>
+    </span>
+
+    <span class="col-sm-6" >
+      <div class="input-group">
+        <span class="input-group-addon" >LA</span>
+        <input class="form-control input-sm" ng-model="relation.term2.name_la" />
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" >EN</span>
+        <input class="form-control input-sm" ng-model="relation.term2.name_en" />
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" >CS</span>
+        <input class="form-control input-sm" ng-model="relation.term2.name_cs" />
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" >Umístění</span>
+        <input class="form-control input-sm" ng-model="relation.term2.body_part" />
+      </div>
+      <div class="input-group">
+        <span class="input-group-addon" >Systém</span>
+        <input class="form-control input-sm" ng-model="relation.term2.system" />
+      </div>
+      <br>
+      <div ng-bind="relation.text2"></div>
+      <br>
+    </span>
+
+  </div>
+  <div class="row">
+    <span class="col-sm-12">
+      <alert ng-repeat="alert in relation.alerts" type="{{alert.type}}"
+        close="closeAlert($index)">{{alert.msg}}</alert>
+    </span>
+  </div>
+  <div class="row">
+    <span class="col-sm-3">
+      <a class="btn btn-default" ng-click="previous()"
+        ng-disabled="!relation.previous">Předchozí</a>
+    </span>
+    <span class="col-sm-9">
+      <span class="pull-right">
+        {{relation.index}} / {{relationsCount}}
+        <a class="btn btn-success" ng-click="save(relation)"
+          ng-disabled="relation.saving || true">Uložit</a>
+        <a class="btn btn-default" ng-click="next()"
+          ng-disabled="!relation.next" >Další</a>
+        <a class="btn btn-primary" ng-click="nextToProcess()"
+          ng-disabled="!relation.next_to_process">Další nezkontrolované</a>
+      </span>
+    </span>
+  </div>
+ </div>
+ </div>
+</div>

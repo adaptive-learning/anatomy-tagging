@@ -506,6 +506,62 @@ angular.module('anatomy.tagging.controllers', [])
     }
 })
 
+.controller('RelationsTreeController', function($scope, $http, $routeParams, $cookies) {
+  $scope.type = $routeParams.type;
+  $http.get('/relationtree/' + $routeParams.type).success(function(data) {
+    $scope.relations = data.relations;
+    $scope.relation = data.relations[data.next_to_process];
+    var relation = $scope.relation;
+    for (var i = 1; relation.next; i++) {
+      relation.index = i;
+      relation = data.relations[relation.next];
+    }
+    $scope.relationsCount = i;
+  });
+
+  $scope.next = function() {
+    $scope.setActiveById($scope.relation.next);
+  };
+
+  $scope.nextToProcess = function() {
+    $scope.setActiveById($scope.relation.next_to_process);
+  };
+
+  $scope.previous = function() {
+    $scope.setActiveById($scope.relation.previous);
+  };
+
+  $scope.setActiveById = function(id) {
+    $scope.relation = $scope.relations[id];
+  };
+
+  $scope.save = function(relation) {
+    relation.saving = true;
+    var data = [];
+    data.push({
+      name : relation.type.identifier,
+      text1 : relation.text1,
+      text2 : relation.text2,
+      term1 : relation.term1,
+      term2 : relation.term2,
+      id : relation.id,
+    });
+    relation.alerts = [];
+    $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+    $http.post("relationsjson/update?source=" + relation.type.source, data).success(function(data) {
+      relation.alerts.push(data);
+      relation.saving = false;
+    }).error(function(data) {
+      relation.alerts = relation.alerts || [];
+      relation.alerts.push({
+        type : 'danger',
+        msg : 'Na serveru nastala chyba.',
+      });
+      relation.saving = false;
+    });
+  };
+})
+
 .controller('RelationsController',
     function($scope, $http, termsService, $cookies, $routeParams, exportService) {
   $scope.loading = true;
