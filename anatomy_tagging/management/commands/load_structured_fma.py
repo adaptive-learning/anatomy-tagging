@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from anatomy_tagging.models import Term, Relation, RelationType
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from django.template.defaultfilters import slugify
 from optparse import make_option
 import json
@@ -20,7 +21,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['source'] is None:
             raise CommandError('The source has to be given.')
-        self.load_relations(options['source'])
+        with transaction.atomic():
+            self.load_relations(options['source'])
 
     def load_relations(self, source):
         with open(source, 'r') as f:
@@ -58,9 +60,13 @@ class Command(BaseCommand):
         rel_type = self.rel_types.get(key)
         if rel_type is None:
             rel_type, _ = RelationType.objects.get_or_create(
-                source='fma',
                 identifier=key
             )
+            if rel_type.source is not None and rel_type.source != 'fma':
+                raise CommandError('There is already a relation type {} which is not from FMA.'.format(key))
+            if rel_type.source is None:
+                rel_type.source = 'fma'
+                rel_type.save()
             self.rel_types[key] = rel_type
         rel, _ = Relation.objects.get_or_create(
             term1_id=term1['id'],
