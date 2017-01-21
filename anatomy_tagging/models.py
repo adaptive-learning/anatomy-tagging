@@ -349,9 +349,10 @@ class RelationManager(models.Manager):
             rel_data['children'] = children
             for child_id in children:
                 child = by_id[child_id]
-                if 'parent_id' in child:
-                    raise Exception('The node cannot have more than one parent.')
-                child['parent_id'] = rel_id
+                if 'parent_ids' in child:
+                    child['parent_ids'].append(rel_id)
+                else:
+                    child['parent_ids'] = [rel_id]
         previous = None
         previous_to_process = None
         next_to_process = None
