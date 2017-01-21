@@ -20,8 +20,7 @@
     <span class="col-sm-2" >&nbsp;&nbsp;  Název latinsky </span>
     <span class="col-sm-2" >&nbsp;&nbsp;  Název anglicky </span>
     <span class="col-sm-2" >&nbsp;&nbsp;  Název česky </span>
-    <span class="col-sm-2" >&nbsp;&nbsp;  Nadpojem latinsky</span>
-    <span class="col-sm-1" > Umístění na těle
+    <span class="col-sm-2" > Umístění na těle
       <i class="glyphicon glyphicon-question-sign"
       data-toggle="tooltip" data-placement="bottom"
       title='"Hf" - Head-Face: Hlava, obličejová část (splanchnokranium);
@@ -34,7 +33,7 @@
 "UE" - Upper Ext.: horní končetina
 "LE" - Lower Ext.: dolní končetina ' ></i>
     </span>
-    <span class="col-sm-1" >&nbsp;&nbsp;  Kapitoly
+    <span class="col-sm-2" >&nbsp;&nbsp;  Kapitoly
       <i class="glyphicon glyphicon-question-sign"
       data-toggle="tooltip" data-placement="bottom"
       title='"01" - Obecná anatomie
@@ -43,7 +42,7 @@
 "04" - Svaly 
 ...' ></i>
     </span>
-    <span class="col-sm-2" ></span>
+    <span class="col-sm-1" ></span>
     <div class="clearfix"></div>
   </div>
   <div table-pager="filteredTerms"
@@ -82,20 +81,12 @@
       <input class="form-control input-sm" ng-model="term.name_cs" />
     </span>
     <span class="col-sm-2" >
-      <input class="form-control input-sm"
-        ng-model="term.parent" 
-        typeahead-template-url="termTemplate.html"
-        typeahead="term as term.name_la for term in allTerms |
-          filter:{name_la: $viewValue} | 
-          limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
-    </span>
-    <span class="col-sm-1" >
       <input ng-model="term.body_part" class="form-control imput-sm"/>
     </span>
-    <span class="col-sm-1" >
+    <span class="col-sm-2" >
       <input ng-model="term.system" class="form-control imput-sm"/>
     </span>
-    <span class="col-sm-2" >
+    <span class="col-sm-1" >
       <span ng-if="showCode"
           class="label label-default">
         {{term.code}}</span>
