@@ -247,7 +247,7 @@ class Term(models.Model):
     def __unicode__(self):
         return u'{0} ({1})'.format(self.name_la, self.slug)
 
-    def to_serializable(self, subterm=False):
+    def to_serializable(self, subterm=False, without_parent=False):
         obj = {
             'id': self.id,
             'code': self.code if self.code != "" else self.slug,
@@ -259,7 +259,7 @@ class Term(models.Model):
             'system': self.system,
             'fma_id': self.fma_id,
         }
-        if not subterm and self.parent is not None:
+        if not subterm and not without_parent and self.parent is not None:
             obj['parent'] = self.parent.to_serializable(True)
         return obj
 
@@ -404,8 +404,8 @@ class Relation(models.Model):
         return {
             'id': self.id,
             'name': self.type.identifier,
-            'term1': to_serializable_or_none(self.term1),
-            'term2': to_serializable_or_none(self.term2),
+            'term1': to_serializable_or_none(self.term1, without_parent=True),
+            'term2': to_serializable_or_none(self.term2, without_parent=True),
             'text1': self.text1,
             'text2': self.text2,
             'type': self.type.to_serializable(nested=True),
@@ -416,8 +416,8 @@ class Relation(models.Model):
         return u'{0}( {1}, {2})'.format(self.type.identifier, self.term1, self.term2)
 
 
-def to_serializable_or_none(obj):
-    return obj.to_serializable() if obj is not None else None
+def to_serializable_or_none(obj, **kwargs):
+    return obj.to_serializable(**kwargs) if obj is not None else None
 
 
 def canonical_term_name(name):
