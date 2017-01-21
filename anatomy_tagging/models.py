@@ -397,21 +397,25 @@ class Relation(models.Model):
     term2 = models.ForeignKey(Term, null=True, blank=True, related_name='term2')
     text2 = models.TextField(blank=True)
     type = models.ForeignKey(RelationType, null=True, blank=True, related_name='relations')
-    state = models.CharField(max_length=1, choices=STATES.items(), default='u')
+    state = models.CharField(max_length=1, choices=sorted(STATES.items()), default='u')
+    labels = models.TextField(null=True, blank=True, default=None)
 
     objects = RelationManager()
 
     def to_serializable(self):
-        return {
+        obj = {
             'id': self.id,
             'name': self.type.identifier,
             'term1': to_serializable_or_none(self.term1, without_parent=True),
-            'term2': to_serializable_or_none(self.term2, without_parent=True),
+            'term2': to_serializable_or_none(self.term2, subterm=False),
             'text1': self.text1,
             'text2': self.text2,
             'type': self.type.to_serializable(nested=True),
             'state': Relation.STATES[self.state],
         }
+        if self.labels:
+            obj['labels'] = sorted(self.labels.split('|'))
+        return obj
 
     def __unicode__(self):
         return u'{0}( {1}, {2})'.format(self.type.identifier, self.term1, self.term2)
