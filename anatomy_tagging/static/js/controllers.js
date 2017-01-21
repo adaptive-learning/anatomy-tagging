@@ -548,7 +548,7 @@ angular.module('anatomy.tagging.controllers', [])
     });
     relation.alerts = [];
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
-    $http.post("relationsjson/update?source=" + relation.type.source, data).success(function(data) {
+    $http.post("relationtree/update", data).success(function(data) {
       relation.alerts.push(data);
       relation.saving = false;
     }).error(function(data) {
