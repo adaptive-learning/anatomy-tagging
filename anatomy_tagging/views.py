@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from anatomy_tagging.management.commands.scrape_wiki import Command as WikiCommand, WIKI_PAGE_MUSCLES
-from anatomy_tagging.management.commands.load_structured_fma import Command as FMACommand
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core import management
@@ -260,15 +259,7 @@ def terms(request, filename_slug=None):
 
 @staff_member_required
 def relations_json(request, source=None):
-    if source.startswith('FMA_'):
-        basename = os.path.join(settings.MEDIA_DIR, source.replace('FMA_', ''))
-        if os.path.exists(basename + '.yaml'):
-            filename = basename + '.yaml'
-        else:
-            filename = basename + '.json'
-        raw_relations = FMACommand().get_relations(filename)
-    else:
-        raw_relations = WikiCommand().get_relations(source or WIKI_PAGE_MUSCLES)
+    raw_relations = WikiCommand().get_relations(source or WIKI_PAGE_MUSCLES)
     relations = [r.to_serializable() for r in Relation.objects.prepare_related().all()]
     json = {
         'raw': raw_relations,
