@@ -385,12 +385,15 @@ class RelationManager(models.Manager):
         previous = None
         previous_to_process = None
         next_to_process = None
+        next_ = None
         for rel_id, rel_data in by_id.items():
             if 'parent_id' in rel_data:
                 continue
             to_visit = deque([rel_id])
             while len(to_visit) > 0:
                 current = by_id[to_visit.popleft()]
+                if next_ is None:
+                    next_ = current['id']
                 if 'next' in current:
                     raise Exception('There is a cycle in the graph.')
                 if current['state'] == Relation.STATE_UNKNOWN:
@@ -403,7 +406,7 @@ class RelationManager(models.Manager):
                     current['previous'] = previous['id']
                     previous['next'] = current['id']
                 previous = current
-        return by_id, next_to_process
+        return by_id, next_, next_to_process
 
     def prepare_related(self):
         return self.select_related('term1', 'term2', 'term1__parent', 'term2__parent', 'type')
