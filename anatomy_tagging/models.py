@@ -364,7 +364,7 @@ class RelationManager(models.Manager):
         rtype_ids = {relation_type.pk} | {t.pk for t in relation_type.synonyms.all()}
         by_id = {}
         by_term1 = defaultdict(list)
-        for relation in self.filter(type_id__in=rtype_ids):
+        for relation in self.filter(type_id__in=rtype_ids).exclude(state='i'):
             by_id[relation.pk] = relation.to_serializable()
             if relation.term1_id is not None:
                 by_term1[relation.term1_id].append(relation.pk)
