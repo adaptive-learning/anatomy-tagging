@@ -62,9 +62,9 @@ class Command(BaseCommand):
             rel_type, _ = RelationType.objects.get_or_create(
                 identifier=key
             )
-            if rel_type.source is not None and rel_type.source != 'fma':
+            if rel_type.source and rel_type.source != 'fma':
                 raise CommandError('There is already a relation type {} which is not from FMA.'.format(key))
-            if rel_type.source is None:
+            if rel_type.source is None or rel_type.source == '':
                 rel_type.source = 'fma'
                 rel_type.save()
             self.rel_types[key] = rel_type
