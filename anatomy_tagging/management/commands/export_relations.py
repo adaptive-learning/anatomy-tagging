@@ -25,7 +25,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.options = options
-        relations = Relation.objects.prepare_related().filter(type__source='wikipedia')
+        relations = Relation.objects.prepare_related().filter(type__ready=True, state=Relation.STATE_VALID[0])
+        print(relations.query)
         relation_type = options.get('relationtype')
         if relation_type is not None and relation_type != '':
             relations = relations.filter(type__identifier=relation_type)
@@ -39,12 +40,7 @@ class Command(BaseCommand):
         flashcards = {}
         for r in progress.bar(relations, every=max(1, len(relations) / 100)):
             if r.term1 is not None and r.term2 is not None:
-                terms[r.term1.id] = ExportUtils.term_to_json(r.term1)
-                terms[r.term2.id] = ExportUtils.term_to_json(r.term2)
-                flashcards[r.id] = self.relation_to_json(r, terms)
-                contexts[r.type.identifier] = self.relation_to_context(r)
-                categories[my_slugify(r.type.identifier)] = self.relation_to_category(r)
-                categories[self.get_category_id(r)] = self.get_category_by_id(self.get_category_id(r))
+                flashcards[r.id] = self.relation_to_flashcard(r, contexts, categories, terms)
                 if r.type.identifier == 'Action':
                     # HACK: Use Czech Actions in Czech-Latin terms
                     terms[r.term2.id]['name-cs'] = terms[r.term2.id]['name-cc']
@@ -65,66 +61,80 @@ class Command(BaseCommand):
             json.dump(output_dict, f, indent=2)
             print 'Flashcards exported to file: \'%s\'' % options['output']
 
-    def relation_to_category(self, relation):
+    def relation_to_context(self, relation, all_contexts):
         id = my_slugify(relation.type.identifier)
-        return self.get_category_by_id(id)
-
-    def get_category_by_id(self, id):
-        default = {'cs': id, 'en': id}
-        category = self.CATEGORIES.get(id, default)
-
-        c_json = {
-            'id': id,
-            'name-cs': category['cs'],
-            'name-cc': category['cs'],
-            'name-en': category['en'],
-            'name-la': category['en'],
-            'display-priority': category.get('display-priority', 0),
-            'type': category.get('type', 'relation'),
-            'active': id in self.QUESTIONS,
-        }
-        return c_json
-
-    def relation_to_context(self, relation):
-        id = my_slugify(relation.type.identifier)
-        default = {'cs': id, 'en': id}
+        if id in all_contexts:
+            return id
         c_json = {
             'id': id,
             'content': json.dumps({
-                'question': self.QUESTIONS.get(id, self.MISSING_QUESTION),
+                'question': {
+                    'cs': json.loads(relation.type.question_cs),
+                    'en': json.loads(relation.type.question_en),
+                },
             }),
-            'name-cs': self.CATEGORIES.get(id, default)['cs'],
-            'name-cc': self.CATEGORIES.get(id, default)['cs'],
-            'name-en': self.CATEGORIES.get(id, default)['en'],
-            'name-la': self.CATEGORIES.get(id, default)['en'],
-            'active': id in self.QUESTIONS,
+            'name-cs': relation.type.name_cs,
+            'name-cc': relation.type.name_cs,
+            'name-en': relation.type.name_en,
+            'name-la': relation.type.name_en,
+            'active': relation.type.ready,
         }
-        return c_json
+        all_contexts[id] = c_json
+        return id
 
-    def get_category_id(self, relation):
-        category = my_slugify(relation.type.identifier)
-        if 'parent' in self.CATEGORIES.get(category, {}):
-            category = self.CATEGORIES.get(category)['parent']
-        return category
+    def relation_to_categories(self, relation, all_categories, terms):
+        id = my_slugify(relation.type.identifier)
+        result = [id]
+        category = self.CATEGORIES.get(id, {})
+        # relation type category
+        if id not in all_categories:
+            c_json = {
+                'id': id,
+                'name-cs': relation.type.name_cs,
+                'name-cc': relation.type.name_cs,
+                'name-en': relation.type.name_en,
+                'name-la': relation.type.name_en,
+                'display-priority': relation.type.display_priority,
+                'type': category.get('type', 'relation'),
+                'active': relation.type.ready,
+            }
+            all_categories[id] = c_json
+        # term categories
+        result.extend(terms[relation.term1.id]['categories'])
+        if 'parent' in category:
+            parent_id = category['parent']
+            if parent_id not in all_categories:
+                parent = self.CATEGORIES[parent_id]
+                all_categories[parent_id] = {
+                    'id': parent_id,
+                    'name-cs': parent['cs'],
+                    'name-cc': parent['cs'],
+                    'name-en': parent['en'],
+                    'name-la': parent['en'],
+                    'display-priority': parent.get('display-priority', 0),
+                    'active': parent.get('active', True),
+                }
+            result.append(parent_id)
+        return result
 
-    def relation_to_json(self, relation, terms):
+    def relation_to_flashcard(self, relation, all_contexts, all_categories, all_terms):
+        if relation.term1.id not in all_terms:
+            all_terms[relation.term1.id] = ExportUtils.term_to_json(relation.term1)
+        if relation.term2.id not in all_terms:
+            all_terms[relation.term2.id] = ExportUtils.term_to_json(relation.term2)
         term1_id = ExportUtils.get_term_id(relation.term1)
         term2_id = ExportUtils.get_term_id(relation.term2)
         contexts = self.get_contexts_of_relation(relation)
-        category = self.get_category_id(relation)
-        subategory = my_slugify(relation.type.identifier)
 
         r_json = {
             "term": term1_id,
             "term-secondary": term2_id,
-            "context": my_slugify(relation.type.identifier),
+            "context": self.relation_to_context(relation, all_contexts),
             'id': ('%s-%s-%s' % (relation.type.identifier, term1_id[:20], term2_id))[:50],
-            "categories": sorted(list(set(
-                [category, subategory, 'relations'] +
-                terms[relation.term1.id]['categories']))),
+            "categories": self.relation_to_categories(relation, all_categories, all_terms),
             "additional-info": json.dumps(contexts),
         }
-        r_json['active'] = r_json['context'] in self.QUESTIONS
+        r_json['active'] = all_contexts[r_json['context']]['active']
         hardcoded_category = self.HARDCODED_CATEGORIES.get('{}:{}'.format(r_json['term'], r_json['context']))
         if hardcoded_category is not None:
             r_json['categories'].append(hardcoded_category)
@@ -163,179 +173,25 @@ class Command(BaseCommand):
                 self._image_sizes[im.pk] = {s: len(ts) for s, ts in image_size.items()}
         return self._image_sizes[image.pk].get(system, 0)
 
-    MISSING_QUESTION = {
-        'cs': {
-            't2ts': u'Chybí text otázky {}',
-            'ts2t': u'Chybí text otázky {}',
-        },
-        'en': {
-            't2ts': u'Question text missing {}',
-            'ts2t': u'Question text missing {}',
-        },
-    }
-    QUESTIONS = {
-        'nerve': {
-            'cs': {
-                't2ts': u'Který nerv inervuje sval {}',
-                'ts2t': u'Který sval je inervován nervem {}',
-            },
-            'en': {
-                't2ts': u'Which nerve inerves muscle {}',
-                'ts2t': u'Which muscle is inerved by {}',
-            },
-        },
-        'artery': {
-            'cs': {
-                't2ts': u'Která arterie zásobuje sval {}',
-                'ts2t': u'Který sval je zásoben arterií {}',
-            },
-            'en': {
-                't2ts': u'Which artery supplies muscle {}',
-                'ts2t': u'Which muscle is supplied by {}',
-            },
-        },
-        'action': {
-            'cs': {
-                't2ts': u'Jaká je funkce svalu {}',
-                'ts2t': u'Který sval má funkci {}',
-            },
-            'en': {
-                't2ts': u'What is function of {}',
-                'ts2t': u'Which muscle has function {}',
-            },
-        },
-        'antagonist': {
-            'cs': {
-                't2ts': u'Co je antagonistou svalu {}',
-                'ts2t': u'Co je antagonistou svalu {}',
-            },
-            'en': {
-                't2ts': u'What is antagonist of {}',
-                'ts2t': u'What is antagonist of {}',
-            },
-        },
-        'insertion': {
-            'cs': {
-                't2ts': u'Kde má úpon sval {}',
-                'ts2t': u'Který sval má úpon na {}',
-            },
-            'en': {
-                't2ts': u'Where is insertion of {}',
-                'ts2t': u'Which muscle has insertion on {}',
-            },
-        },
-        'origin': {
-            'cs': {
-                't2ts': u'Kde má počátek sval {}',
-                'ts2t': u'Který sval má počátek na {}',
-            },
-            'en': {
-                't2ts': u'Where is origin of {}',
-                'ts2t': u'Which muscle has origin on {}',
-            },
-        },
-        'bone': {
-            'cs': {
-                't2ts': u'Kteru kostí je ohraničen {}',
-                'ts2t': u'Který kanálek je ohraničen {}',
-            },
-            'en': {
-                't2ts': u'Which bone forms the margin of {}',
-                'ts2t': u'Which foramen is bounded by {}',
-            },
-        },
-        'cranialfossa': {
-            'cs': {
-                't2ts': u'V jaké lebeční jámě se nachází {}',
-                'ts2t': u'Který kanálek se nachází v {}',
-            },
-            'en': {
-                't2ts': u'In which cranial fossa lies {}',
-                'ts2t': u'Which foramen lies in {}',
-            },
-        },
-        'vessels': {
-            'cs': {
-                't2ts': u'Která céva prochází skrz {}',
-                'ts2t': u'Kterým kanálkem prochází {}',
-            },
-            'en': {
-                't2ts': u'Which vessel passes through {}',
-                'ts2t': u'Through which foramen passes {}',
-            },
-        },
-        'nerves': {
-            'cs': {
-                't2ts': u'Který nerv prochází skrz {}',
-                'ts2t': u'Kterým kanálkem prochází {}',
-            },
-            'en': {
-                't2ts': u'Which nerve passes through {}',
-                'ts2t': u'Through which foramen passes {}',
-            },
-        },
-        'foramina': {
-            'dummy hack': {
-            },
-        },
-    }
     CATEGORIES = {
-        'nerve': {
-            'cs': u'Inervace',
-            'en': u'Nerve supply',
-            'display-priority': 40,
-        },
-        'artery': {
-            'cs': u'Cévní zásobení',
-            'en': u'Arterial supply',
-            'display-priority': 30,
-        },
-        'action': {
-            'cs': u'Funkce svalu',
-            'en': u'Actions',
-            'display-priority': 50,
-        },
-        'antagonist': {
-            'cs': u'Antagonisté',
-            'en': u'Antagonists',
-            'display-priority': 60,
-        },
-        'insertion': {
-            'cs': u'Úpon svalu',
-            'en': u'Insertions',
-            'display-priority': 20,
-        },
-        'origin': {
-            'cs': u'Začátek svalu',
-            'en': u'Origins',
-            'display-priority': 10,
-        },
         'foramina': {
             'cs': u'Foramina',
             'en': u'Foramina',
             'display-priority': 70,
         },
         'bone': {
-            'cs': u'Kosti',
-            'en': u'Bones',
             'parent': 'foramina',
             'type': 'subrelation',
         },
         'cranialfossa': {
-            'cs': u'Jámy lebeční',
-            'en': u'Cranial fossa',
             'parent': 'foramina',
             'type': 'subrelation',
         },
         'vessels': {
-            'cs': u'Cévy',
-            'en': u'Vessels',
             'parent': 'foramina',
             'type': 'subrelation',
         },
         'nerves': {
-            'cs': u'Nervy',
-            'en': u'Nerves',
             'parent': 'foramina',
             'type': 'subrelation',
         },
