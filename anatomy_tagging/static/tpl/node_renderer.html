@@ -1,0 +1,9 @@
+<div ui-tree-handle>
+  <a ng-click="setActiveById(node.id)">
+    {{node.index}}: {{node.term1.name_la}} -> {{node.term2.name_la}}
+  </a>
+</div>
+<ul ui-tree-nodes="" ng-model="node.children">
+  <li ng-repeat="node in node.children" ui-tree-node ng-include="'static/tpl/node_renderer.html'">
+  </li>
+</ul>

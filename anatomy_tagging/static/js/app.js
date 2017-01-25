@@ -8,6 +8,7 @@ angular.module('anatomy.tagging', [
   'slugifier',
   'ui.bootstrap', 
   'angular-svg-round-progress',
+  'ui.tree',
 ])
 
 .config(['$routeProvider', '$locationProvider',

@@ -20,6 +20,7 @@ def home(request):
         "/static/lib/angular-1.2.9/angular.js",
         "/static/lib/angular-1.2.9/angular-cookies.js",
         "/static/lib/angular-1.2.9/angular-route.js",
+        "/static/lib/angular-ui-tree.js",
         "/static/lib/ui-bootstrap.min.js",
         "/static/lib/ui-bootstrap-tpls.min.js",
         "/static/lib/raphael.js",

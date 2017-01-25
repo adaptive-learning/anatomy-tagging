@@ -511,10 +511,20 @@ angular.module('anatomy.tagging.controllers', [])
   $http.get('/relationtree/' + $routeParams.type).success(function(data) {
     $scope.relations = data.relations;
     $scope.relation = data.relations[data.next_to_process];
+
+    $scope.relationsList = [];
     var relation = data.relations[data.next];
     for (var i = 1; relation.next; i++) {
       relation.index = i;
       relation = data.relations[relation.next];
+      if (!relation.parent_ids || !relation.parent_ids.length) {
+        $scope.relationsList.push(relation);
+      }
+      if (relation.children.length) {
+        for (var j = 0; j < relation.children.length; j++) {
+          relation.children[j] = $scope.relations[relation.children[j]];
+        }
+      }
     }
     $scope.relationsCount = i;
   });
