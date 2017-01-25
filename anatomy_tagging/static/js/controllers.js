@@ -511,7 +511,7 @@ angular.module('anatomy.tagging.controllers', [])
   $http.get('/relationtree/' + $routeParams.type).success(function(data) {
     $scope.relations = data.relations;
     $scope.relation = data.relations[data.next_to_process];
-    var relation = $scope.relation;
+    var relation = data.relations[data.next];
     for (var i = 1; relation.next; i++) {
       relation.index = i;
       relation = data.relations[relation.next];
@@ -545,11 +545,16 @@ angular.module('anatomy.tagging.controllers', [])
       term1 : relation.term1,
       term2 : relation.term2,
       id : relation.id,
+      state : 'valid',
     });
     relation.alerts = [];
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
     $http.post("relationtree/update", data).success(function(data) {
-      relation.alerts.push(data);
+      $scope.relations[data[0].id] = data[0];
+      relation.alerts.push({
+        type : 'success',
+        msg : 'Souvislost byla úspěšně uložena.',
+      });
       relation.saving = false;
     }).error(function(data) {
       relation.alerts = relation.alerts || [];

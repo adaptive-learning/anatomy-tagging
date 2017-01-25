@@ -26,9 +26,16 @@ body {
       </div>
     </div>
   </div>
- <div class="panel panel-default relations-checkup" ng-show="relation">
+ <div class="panel relations-checkup
+     {{relation && relation.state == 'valid' && 'panel-success'}}
+     {{relation && relation.state == 'invalid' && 'panel-error'}}
+     {{relation && relation.state == 'unknown' && 'panel-default'}}
+     "
+   ng-if="relation">
  <div class="panel-heading">
-      <h3 ng-bind="type"> </h3>
+      <h3>{{type}}:
+      {{relation.term1.name_la || relation.text1}} ->
+      {{relation.term2.name_la || relation.text2}} </h3>
  </div>
  <div class="panel-body">
 
@@ -63,7 +70,7 @@ body {
       <span class="pull-right">
         {{relation.index}} / {{relationsCount}}
         <a class="btn btn-success" ng-click="save(relation)"
-          ng-disabled="relation.saving || true">Uložit</a>
+          ng-disabled="relation.saving">Uložit</a>
         <a class="btn btn-default" ng-click="next()"
           ng-disabled="!relation.next" >Další</a>
         <a class="btn btn-primary" ng-click="nextToProcess()"
