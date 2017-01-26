@@ -548,6 +548,7 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.setActiveById = function(id) {
     $scope.relation = $scope.relations[id];
     $scope.breadCrumps = $scope.getBreadCrump(id);
+    $scope.isRelationTerminal = ($scope.relation.labels != undefined && $scope.relation.labels.indexOf('terminal') != -1);
   };
 
   $scope.getBreadCrump = function(id) {
@@ -600,6 +601,7 @@ angular.module('anatomy.tagging.controllers', [])
       term2 : relation.term2,
       id : relation.id,
       state : state,
+      labels: $scope.isRelationTerminal ? ['terminal'] : [],
     });
     relation.alerts = [];
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
