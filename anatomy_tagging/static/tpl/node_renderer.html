@@ -1,9 +1,14 @@
 <div ui-tree-handle  class="tree-node tree-node-content">
-  <a href="" ng-click="setActiveById(node.id)" data-nodrag>
+  <a href="" ng-click="setActiveById(node.id)" data-nodrag ng-if="!node.active">
     {{node.term1.name_la ? node.term1.name_la : node.term1.name_en}}
     &rarr;
     {{node.term2.name_la ? node.term2.name_la : node.term2.name_en}}
   </a>
+  <strong ng-if="node.active">
+    {{node.term1.name_la ? node.term1.name_la : node.term1.name_en}}
+    &rarr;
+    {{node.term2.name_la ? node.term2.name_la : node.term2.name_en}}
+  </strong>
 </div>
 <ul ui-tree-nodes="" ng-model="node.children">
   <li ng-repeat="node in node.children" ui-tree-node ng-include="'static/tpl/node_renderer.html'">

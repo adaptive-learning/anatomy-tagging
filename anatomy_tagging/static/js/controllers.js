@@ -549,7 +549,11 @@ angular.module('anatomy.tagging.controllers', [])
   };
 
   $scope.setActiveById = function(id) {
+    if ($scope.relation) {
+      $scope.relation.active = false;
+    }
     $scope.relation = $scope.relations[id];
+    $scope.relation.active = true;
     $scope.breadCrumps = $scope.getBreadCrump(id);
     $scope.relation.terminal = ($scope.relation.labels != undefined && $scope.relation.labels.indexOf('terminal') != -1);
     $scope.siblings = $scope.getSiblings(id);
