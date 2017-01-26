@@ -511,10 +511,9 @@ angular.module('anatomy.tagging.controllers', [])
   $http.get('/relationtree/' + $routeParams.type).success(function(data) {
     $scope.relations = data.relations;
 
-    $scope.relationsList = [];
     var relation = data.relations[data.next];
-    for (var i = 1; relation.next; i++) {
-      relation.index = i;
+    $scope.relationsList = [relation];
+    for (; relation.next;) {
       relation = data.relations[relation.next];
       if (!relation.parent_ids || !relation.parent_ids.length) {
         $scope.relationsList.push(relation);
@@ -525,7 +524,7 @@ angular.module('anatomy.tagging.controllers', [])
         }
       }
     }
-    $scope.relationsCount = i;
+    $scope.relationsCount = Object.keys($scope.relations).length;
 
     if (data.next_to_process) {
       $scope.setActiveById(data.next_to_process)
