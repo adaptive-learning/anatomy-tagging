@@ -16,7 +16,7 @@ body {
   <div class="clearfix"></div>
   <br>
 </div>
-      <br>
+<br>
 <div class="container">
   <div class="col-sm-12" ng-hide="relation">
     <div class="progress">
@@ -26,68 +26,85 @@ body {
       </div>
     </div>
   </div>
- <div class="panel relations-checkup
-     {{relation && relation.state == 'valid' && 'panel-success'}}
-     {{relation && relation.state == 'invalid' && 'panel-error'}}
-     {{relation && relation.state == 'unknown' && 'panel-default'}}
-     "
-   ng-if="relation">
- <div class="panel-heading">
-    <h3 ng-bind="type"></h3>
-    <ol class="breadcrumb breadcrumb-arrow">
-      <li ng-repeat="term in breadCrumps">
-        <a href="" ng-click="setActiveById(term.relation_id)" ng-if="term.relation_id">{{term.name}}</a>
-      </li>
-    </ol>
- </div>
- <div class="panel-body">
+  <div class="panel relations-checkup
+    {{relation && relation.state == 'valid' && 'panel-success'}}
+    {{relation && relation.state == 'invalid' && 'panel-error'}}
+    {{relation && relation.state == 'unknown' && 'panel-default'}}
+    "
+    ng-if="relation">
+    <div class="panel-heading">
+      <h3 ng-bind="type"></h3>
+      <div class="row">
+        <ol class="breadcrumb breadcrumb-arrow col-sm-9">
+          <li ng-repeat="term in breadCrumps">
+          <a href="" ng-click="setActiveById(term.relation_id)" ng-if="term.relation_id">{{term.name}}</a>
+          </li>
+        </ol>
+        <div class="dropdown" ng-show="siblings.length > 0" class="pull-right">
+          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Sourozenecké vztahy ({{siblings.length}})
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu col-sm-9 pull-right">
+            <li ng-repeat="record in siblings">
+            <a href="" ng-click="setActiveById(record[1].id)" >
+              {{record[0].term1.name_la ? record[0].term1.name_la : record[0].term1.name_en}}
+              &rarr;
+              {{record[0].term2.name_la ? record[0].term2.name_la : record[0].term2.name_en}}
+              &rarr;
+              AA {{record[1].term2.name_la ? record[1].term2.name_la : record[1].term2.name_en}}
+            </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <span class="col-sm-6" >
+          <div term-edit term="relation.term1"></div>
+          <br>
+          <div ng-bind="relation.text1"></div>
+          <br>
+        </span>
 
-  <div class="row">
-    <span class="col-sm-6" >
-      <div term-edit term="relation.term1"></div>
-      <br>
-      <div ng-bind="relation.text1"></div>
-      <br>
-    </span>
+        <span class="col-sm-6" >
+          <div term-edit term="relation.term2"></div>
+          <br>
+          <div ng-bind="relation.text2"></div>
+          <br>
+        </span>
 
-    <span class="col-sm-6" >
-      <div term-edit term="relation.term2"></div>
-      <br>
-      <div ng-bind="relation.text2"></div>
-      <br>
-    </span>
-
+      </div>
+      <div class="row">
+        <span class="col-sm-12">
+          <alert ng-repeat="alert in relation.alerts" type="{{alert.type}}"
+          close="closeAlert($index)">{{alert.msg}}</alert>
+        </span>
+      </div>
+      <div class="row">
+        <span class="col-sm-3">
+          <a class="btn btn-default" ng-click="previous()"
+            ng-disabled="!relation.previous">Předchozí</a>
+        </span>
+        <span class="col-sm-9">
+          <span class="pull-right">
+            {{relation.index}} / {{relationsCount}}
+            <a class="btn btn-danger" ng-click="save(relation, 'invalid')"
+              ng-disabled="relation.saving">Uložit (zamítnout)</a>
+            <a class="btn btn-success" ng-click="save(relation, 'valid')"
+              ng-disabled="relation.saving">Uložit (zkontrolovat)</a>
+            <a class="btn btn-default" ng-click="next()"
+              ng-disabled="!relation.next" >Další</a>
+            <a class="btn btn-primary" ng-click="nextToProcess()"
+              ng-disabled="!relation.next_to_process">Další nezkontrolované</a>
+          </span>
+        </span>
+      </div>
+    </div>
+    <div ui-tree>
+      <ul ui-tree-nodes="" ng-model="relationsList" id="tree-root">
+        <li ng-repeat="node in relationsList" ui-tree-node ng-include="'static/tpl/node_renderer.html'"></li>
+      </ul>
+    </div>
   </div>
-  <div class="row">
-    <span class="col-sm-12">
-      <alert ng-repeat="alert in relation.alerts" type="{{alert.type}}"
-        close="closeAlert($index)">{{alert.msg}}</alert>
-    </span>
-  </div>
-  <div class="row">
-    <span class="col-sm-3">
-      <a class="btn btn-default" ng-click="previous()"
-        ng-disabled="!relation.previous">Předchozí</a>
-    </span>
-    <span class="col-sm-9">
-      <span class="pull-right">
-        {{relation.index}} / {{relationsCount}}
-        <a class="btn btn-danger" ng-click="save(relation, 'invalid')"
-          ng-disabled="relation.saving">Uložit (zamítnout)</a>
-        <a class="btn btn-success" ng-click="save(relation, 'valid')"
-          ng-disabled="relation.saving">Uložit (zkontrolovat)</a>
-        <a class="btn btn-default" ng-click="next()"
-          ng-disabled="!relation.next" >Další</a>
-        <a class="btn btn-primary" ng-click="nextToProcess()"
-          ng-disabled="!relation.next_to_process">Další nezkontrolované</a>
-      </span>
-    </span>
-  </div>
- </div>
-  <div ui-tree>
-    <ul ui-tree-nodes="" ng-model="relationsList" id="tree-root">
-      <li ng-repeat="node in relationsList" ui-tree-node ng-include="'static/tpl/node_renderer.html'"></li>
-    </ul>
-  </div>
- </div>
 </div>

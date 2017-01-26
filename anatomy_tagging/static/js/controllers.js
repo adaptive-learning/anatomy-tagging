@@ -510,11 +510,6 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.type = $routeParams.type;
   $http.get('/relationtree/' + $routeParams.type).success(function(data) {
     $scope.relations = data.relations;
-    if (data.next_to_process) {
-      $scope.setActiveById(data.next_to_process)
-    } else {
-      $scope.setActiveById(data.next)
-    }
 
     $scope.relationsList = [];
     var relation = data.relations[data.next];
@@ -531,6 +526,12 @@ angular.module('anatomy.tagging.controllers', [])
       }
     }
     $scope.relationsCount = i;
+
+    if (data.next_to_process) {
+      $scope.setActiveById(data.next_to_process)
+    } else {
+      $scope.setActiveById(data.next)
+    }
   });
 
   $scope.next = function() {
@@ -549,7 +550,30 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.relation = $scope.relations[id];
     $scope.breadCrumps = $scope.getBreadCrump(id);
     $scope.isRelationTerminal = ($scope.relation.labels != undefined && $scope.relation.labels.indexOf('terminal') != -1);
+    $scope.siblings = $scope.getSiblings(id);
+    console.log($scope.siblings);
   };
+
+  $scope.getSiblings = function(id) {
+    var relation = $scope.relations[id];
+    if (!relation.parent_ids) {
+      return [];
+    }
+    var result = [];
+    relation.parent_ids.forEach(function(parent_id) {
+      var par = $scope.relations[parent_id];
+      var siblings = par.children.filter(function(child) {
+        return child.id != id;
+      });
+      if (siblings.length > 0) {
+        console.log(siblings);
+        siblings.forEach(function(sib) {
+          result.push([par, sib]);
+        });
+      }
+    });
+    return result;
+  }
 
   $scope.getBreadCrump = function(id) {
     var parentPath = $scope.getParentPath(id);
