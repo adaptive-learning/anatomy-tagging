@@ -589,7 +589,7 @@ angular.module('anatomy.tagging.controllers', [])
     return path
   };
 
-  $scope.save = function(relation) {
+  $scope.save = function(relation, state) {
     relation.saving = true;
     var data = [];
     data.push({
@@ -599,7 +599,7 @@ angular.module('anatomy.tagging.controllers', [])
       term1 : relation.term1,
       term2 : relation.term2,
       id : relation.id,
-      state : 'valid',
+      state : state,
     });
     relation.alerts = [];
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;

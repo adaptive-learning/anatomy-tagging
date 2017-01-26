@@ -72,8 +72,10 @@ body {
     <span class="col-sm-9">
       <span class="pull-right">
         {{relation.index}} / {{relationsCount}}
-        <a class="btn btn-success" ng-click="save(relation)"
-          ng-disabled="relation.saving">Uložit</a>
+        <a class="btn btn-danger" ng-click="save(relation, 'invalid')"
+          ng-disabled="relation.saving">Uložit (zamítnout)</a>
+        <a class="btn btn-success" ng-click="save(relation, 'valid')"
+          ng-disabled="relation.saving">Uložit (zkontrolovat)</a>
         <a class="btn btn-default" ng-click="next()"
           ng-disabled="!relation.next" >Další</a>
         <a class="btn btn-primary" ng-click="nextToProcess()"
