@@ -551,7 +551,6 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.breadCrumps = $scope.getBreadCrump(id);
     $scope.isRelationTerminal = ($scope.relation.labels != undefined && $scope.relation.labels.indexOf('terminal') != -1);
     $scope.siblings = $scope.getSiblings(id);
-    console.log($scope.siblings);
   };
 
   $scope.getSiblings = function(id) {
@@ -566,7 +565,6 @@ angular.module('anatomy.tagging.controllers', [])
         return child.id != id;
       });
       if (siblings.length > 0) {
-        console.log(siblings);
         siblings.forEach(function(sib) {
           result.push([par, sib]);
         });
