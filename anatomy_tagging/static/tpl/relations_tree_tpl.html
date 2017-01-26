@@ -33,9 +33,12 @@ body {
      "
    ng-if="relation">
  <div class="panel-heading">
-      <h3>{{type}}:
-      {{relation.term1.name_la || relation.text1}} ->
-      {{relation.term2.name_la || relation.text2}} </h3>
+    <h3 ng-bind="type"></h3>
+    <ol class="breadcrumb breadcrumb-arrow">
+      <li ng-repeat="term in breadCrumps">
+        <a href="" ng-click="setActiveById(term.relation_id)" ng-if="term.relation_id">{{term.name}}</a>
+      </li>
+    </ol>
  </div>
  <div class="panel-body">
 
