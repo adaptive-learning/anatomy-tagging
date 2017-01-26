@@ -101,7 +101,7 @@ body {
         </span>
       </div>
     </div>
-    <div ui-tree>
+    <div ui-tree data-nodrop-enabled="true">
       <ul ui-tree-nodes="" ng-model="relationsList" id="tree-root">
         <li ng-repeat="node in relationsList" ui-tree-node ng-include="'static/tpl/node_renderer.html'"></li>
       </ul>
