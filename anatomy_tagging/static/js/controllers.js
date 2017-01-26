@@ -512,9 +512,11 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.relations = data.relations;
 
     var relation = data.relations[data.next];
+    relation.index = 1;
     $scope.relationsList = [relation];
-    for (; relation.next;) {
+    for (var i=2; relation.next; i++) {
       relation = data.relations[relation.next];
+      relation.index = i;
       if (!relation.parent_ids || !relation.parent_ids.length) {
         $scope.relationsList.push(relation);
       }
