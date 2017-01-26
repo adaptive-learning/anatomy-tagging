@@ -508,7 +508,8 @@ angular.module('anatomy.tagging.controllers', [])
 
 .controller('RelationsTreeController', function($scope, $http, $routeParams, $cookies) {
   $scope.type = $routeParams.type;
-  $http.get('/relationtree/' + $routeParams.type).success(function(data) {
+  $scope.filter = $routeParams.filter;
+  $http.get('/relationtree/' + $routeParams.type + ($scope.filter == 'all' ? '?all=1' : '')).success(function(data) {
     $scope.relations = data.relations;
 
     var relation = data.relations[data.next];

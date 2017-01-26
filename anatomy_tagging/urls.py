@@ -13,6 +13,7 @@ urlpatterns = patterns(
     url(r'^image/[\w\.-]*$', 'home', name='image'),
     url(r'^terms/[\w\.-]*$', 'home', name='image'),
     url(r'^relations/tree/[\w\.-]*$', 'home', name='image'),
+    url(r'^relations/tree/\w+/[\w\.-]*$', 'home', name='image'),
     url(r'^relations/[\w\.-]*$', 'home', name='image'),
     url(r'^practice/[\w\.-]*$', 'home', name='image'),
 

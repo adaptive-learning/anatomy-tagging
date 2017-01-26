@@ -34,7 +34,10 @@ angular.module('anatomy.tagging', [
   }).when('/relations/export', {
     controller : 'RelationsExportController',
     templateUrl : 'static/tpl/relations_export_tpl.html'
-  }).when('/relations/tree/:type?', {
+  }).when('/relations/tree/:type', {
+    controller : 'RelationsTreeController',
+    templateUrl : 'static/tpl/relations_tree_tpl.html'
+  }).when('/relations/tree/:filter/:type', {
     controller : 'RelationsTreeController',
     templateUrl : 'static/tpl/relations_tree_tpl.html'
   }).when('/relations/:source?', {

@@ -360,11 +360,11 @@ class RelationType(models.Model):
 
 class RelationManager(models.Manager):
 
-    def get_tree(self, relation_type):
+    def get_tree(self, relation_type, states=None):
         rtype_ids = {relation_type.pk} | {t.pk for t in relation_type.synonyms.all()}
         by_id = {}
         by_term1 = defaultdict(list)
-        for relation in self.filter(type_id__in=rtype_ids).exclude(state='i'):
+        for relation in self.filter(type_id__in=rtype_ids):
             by_id[relation.pk] = relation.to_serializable()
             if relation.term1_id is not None:
                 by_term1[relation.term1_id].append(relation.pk)
@@ -386,16 +386,20 @@ class RelationManager(models.Manager):
         previous_to_process = None
         next_to_process = None
         next_ = None
-        for rel_id, rel_data in by_id.items():
-            if 'parent_id' in rel_data:
+        result_by_id = {}
+        for rel_id, rel_data in sorted(by_id.items(), key=lambda x: (x[1]['term1']['name_la'], x[1]['term1']['name_en'])):
+            if 'parent_ids' in rel_data:
                 continue
             to_visit = deque([rel_id])
             while len(to_visit) > 0:
                 current = by_id[to_visit.popleft()]
+                if states is not None and current['state'] not in states:
+                    continue
+                if 'next' in current:
+                    continue
+                result_by_id[current['id']] = current
                 if next_ is None:
                     next_ = current['id']
-                if 'next' in current:
-                    raise Exception('There is a cycle in the graph.')
                 if current['state'] == Relation.STATE_UNKNOWN:
                     if previous_to_process is not None:
                         previous_to_process['next_to_process'] = current['id']
@@ -405,8 +409,10 @@ class RelationManager(models.Manager):
                 if previous is not None:
                     current['previous'] = previous['id']
                     previous['next'] = current['id']
+                for child_id in current.get('children', []):
+                    to_visit.append(child_id)
                 previous = current
-        return by_id, next_, next_to_process
+        return result_by_id, next_, next_to_process
 
     def prepare_related(self):
         return self.select_related('term1', 'term2', 'term1__parent', 'term2__parent', 'type')
