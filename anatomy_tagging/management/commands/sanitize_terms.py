@@ -42,7 +42,13 @@ class Command(BaseCommand):
             dest='remove_unused',
             action='store_true',
             default=False
-        )
+        ),
+        make_option(
+            '--find-duplicates',
+            dest='find_duplicates',
+            action='store_true',
+            default=False
+        ),
     )
 
     def handle(self, *args, **options):
@@ -50,7 +56,8 @@ class Command(BaseCommand):
         terms = list(Term.objects.all().exclude(code__in=['no-practice', 'too-small']))
         with transaction.atomic():
             self.make_canonical_names(terms, langs, dry=not options['canonical_names'])
-            self.find_duplicate_terms(terms)
+            if options['find_duplicates']:
+                self.find_duplicate_terms(terms)
             self.remove_unused_terms(terms, dry=not options['remove_unused'])
 
     def find_duplicate_terms(self, terms, lang='la'):
