@@ -589,12 +589,12 @@ angular.module('anatomy.tagging.controllers', [])
     var crumps = parentPath.map(function(relations) {
       var relation = relations[0];
       return {
-        name: relation.term2.name_la ? relation.term2.name_la : relation.term2_name_la,
+        name: relation.term2.name_la ? relation.term2.name_la : relation.term2.name_en,
         relation_id: relation.id
       }
     });
     crumps.unshift({
-      name: parentPath[0][0].term1.name_la ? parentPath[0][0].term1.name_la : parentPath[0][0].term1.name_la,
+      name: parentPath[0][0].term1.name_la ? parentPath[0][0].term1.name_la : parentPath[0][0].term1.name_en,
       relation_id: parentPath[0][0].id
     });
     return crumps;
