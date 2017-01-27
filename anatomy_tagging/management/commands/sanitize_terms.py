@@ -134,7 +134,6 @@ class Command(BaseCommand):
 
     def fill_fma(self):
         print 'Filling FMA IDs'
-        print('{}/fma_ta_mapping.json'.format(settings.MEDIA_DIR))
         with open('{}/fma_ta_mapping.json'.format(settings.MEDIA_DIR), 'r') as f:
             mapping = json.load(f)
         ta2fma = defaultdict(list)
