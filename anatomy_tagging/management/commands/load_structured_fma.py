@@ -88,6 +88,8 @@ class Command(BaseCommand):
     def get_term(self, name_la, name_en, name_cs, taid, fmaid, create=False):
         term = self.terms_by_taid.get(taid)
         if term is None:
+            term = self.terms_by_name.get(name_en.lower())
+        if term is None:
             term = self.terms_by_fmaid.get(fmaid)
         else:
             if term.fma_id is None or term.fma_id < 0:
@@ -102,6 +104,7 @@ class Command(BaseCommand):
                 name_cs=name_cs if name_cs else '',
                 fma_id=fmaid
             )
+            self.terms_by_fmaid[fmaid] = term
         return term.to_serializable() if term is not None else None
 
     def init_terms(self):
