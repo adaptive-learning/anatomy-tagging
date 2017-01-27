@@ -18,9 +18,9 @@ echo " * collect static | tail"
 python $DIR/manage.py collectstatic --noinput | tail
 
 echo " * anatomy data"
-python $DIR/manage.py load_images 
+python $DIR/manage.py load_images
 python $DIR/manage.py load_terms
 python $DIR/manage.py relate_terms
-python $DIR/manage.py sanitize_terms --canonical-names
+python $DIR/manage.py sanitize_terms --canonical-names --fill-fma
 
 echo "HASH = '$(date +%s)'" > $DIR/githash.py

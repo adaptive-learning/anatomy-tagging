@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from anatomy_tagging import settings
 from anatomy_tagging.models import Term, Path, Relation, canonical_term_name
 from clint.textui import progress
 from collections import defaultdict
 from django.core.management.base import BaseCommand
-from optparse import make_option
 from django.db import transaction
+from optparse import make_option
+import json
 import re
 
 
@@ -49,6 +51,12 @@ class Command(BaseCommand):
             action='store_true',
             default=False
         ),
+        make_option(
+            '--fill-fma',
+            dest='fill_fma',
+            action='store_true',
+            default=False
+        ),
     )
 
     def handle(self, *args, **options):
@@ -59,6 +67,8 @@ class Command(BaseCommand):
             if options['find_duplicates']:
                 self.find_duplicate_terms(terms)
             self.remove_unused_terms(terms, dry=not options['remove_unused'])
+            if options['fill_fma']:
+                self.fill_fma()
 
     def find_duplicate_terms(self, terms, lang='la'):
         print 'Looking for duplicates'
@@ -121,6 +131,20 @@ class Command(BaseCommand):
             if self.is_duplicate(term, t):
                 ret.append(term)
         return ret
+
+    def fill_fma(self):
+        print 'Filling FMA IDs'
+        print('{}/fma_ta_mapping.json'.format(settings.MEDIA_DIR))
+        with open('{}/fma_ta_mapping.json'.format(settings.MEDIA_DIR), 'r') as f:
+            mapping = json.load(f)
+        ta2fma = defaultdict(list)
+        for fma, ta in mapping.items():
+            ta2fma[ta].append(int(fma.replace('FMA', '')))
+        for term in progress.bar(Term.objects.filter(fma_id=-1)):
+            found_fmas = ta2fma[term.code]
+            if len(found_fmas) == 1:
+                term.fma_id = found_fmas[0]
+                term.save()
 
     def is_duplicate(self, t1, t2):
         paths1 = Path.objects.filter(term=t1).select_related('image')
