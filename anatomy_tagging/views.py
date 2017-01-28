@@ -360,7 +360,7 @@ def update_relations(request):
             ).delete()
         for r_data in data:
             if 'id' in r_data:
-                relation = Relation.objects.get(id=r_data['id'])
+                relation = Relation.objects.get(id=r_data['id'], state='v')
             else:
                 relation = Relation()
             relation.text1 = r_data['text1']
