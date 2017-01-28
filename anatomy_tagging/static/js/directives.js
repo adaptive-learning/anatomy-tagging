@@ -474,4 +474,15 @@ angular.module('anatomy.tagging.directives', [])
       scope.Math = Math;
     }
   };
+})
+
+.directive('scrollTopOnClick', function() {
+  return {
+    restrict: 'A',
+    link: function(scope, $elm) {
+      $elm.on('click', function() {
+        $("body").animate({scrollTop: 0}, 200);
+      });
+    }
+  };
 });

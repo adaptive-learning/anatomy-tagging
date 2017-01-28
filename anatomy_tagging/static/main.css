@@ -249,3 +249,7 @@ select.per-page-select {
   min-width: 90px;
   text-align: right;
 }
+
+.relations-checkup .breadcrumb {
+  margin-bottom: 0;
+}

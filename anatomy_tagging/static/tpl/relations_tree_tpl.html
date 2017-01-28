@@ -33,28 +33,29 @@ body {
     "
     ng-if="relation">
     <div class="panel-heading">
-      <h3 ng-bind="type"></h3>
       <div class="row">
-        <ol class="breadcrumb breadcrumb-arrow col-sm-9">
-          <li ng-repeat="term in breadCrumps">
-          <a href="" ng-click="setActiveById(term.relation_id)" ng-if="term.relation_id">{{term.name}}</a>
-          </li>
-        </ol>
-        <div class="dropdown" ng-show="siblings.length > 0" class="pull-right">
-          <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Sourozenecké vztahy ({{siblings.length}})
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu col-sm-9 pull-right">
-            <li ng-repeat="record in siblings">
-            <a href="" ng-click="setActiveById(record[1].id)" >
-              {{record[0].term1.name_la ? record[0].term1.name_la : record[0].term1.name_en}}
-              &rarr;
-              {{record[0].term2.name_la ? record[0].term2.name_la : record[0].term2.name_en}}
-              &rarr;
-              {{record[1].term2.name_la ? record[1].term2.name_la : record[1].term2.name_en}}
-            </a>
+        <div class="col-sm-12">
+          <ol class="breadcrumb breadcrumb-arrow pull-left">
+            <li ng-repeat="term in breadCrumps">
+            <a href="" ng-click="setActiveById(term.relation_id)" ng-if="term.relation_id">{{term.name}}</a>
             </li>
-          </ul>
+          </ol>
+          <span class="dropdown pull-right" ng-show="siblings.length > 0" class="pull-right">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Sourozenecké vztahy ({{siblings.length}})
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li ng-repeat="record in siblings">
+              <a href="" ng-click="setActiveById(record[1].id)" >
+                {{record[0].term1.name_la ? record[0].term1.name_la : record[0].term1.name_en}}
+                &rarr;
+                {{record[0].term2.name_la ? record[0].term2.name_la : record[0].term2.name_en}}
+                &rarr;
+                {{record[1].term2.name_la ? record[1].term2.name_la : record[1].term2.name_en}}
+              </a>
+              </li>
+            </ul>
+          </span>
         </div>
       </div>
     </div>
@@ -87,17 +88,15 @@ body {
         </span>
       </div>
       <div class="row">
-        <span class="col-sm-3">
+        <span class="col-sm-12">
           <a class="btn btn-default" ng-click="previous()"
             ng-disabled="!relation.previous">Předchozí</a>
-        </span>
-        <span class="col-sm-9">
           <span class="pull-right">
             {{relation.index}} / {{relationsCount}}
             <a class="btn btn-danger" ng-click="save(relation, 'invalid')"
-              ng-disabled="relation.saving">Uložit (zamítnout)</a>
+              ng-disabled="relation.saving">Zamítnout</a>
             <a class="btn btn-success" ng-click="save(relation, 'valid')"
-              ng-disabled="relation.saving">Uložit (zkontrolovat)</a>
+              ng-disabled="relation.saving">Schválit</a>
             <a class="btn btn-default" ng-click="next()"
               ng-disabled="!relation.next" >Další</a>
             <a class="btn btn-primary" ng-click="nextToProcess()"
@@ -106,6 +105,9 @@ body {
         </span>
       </div>
     </div>
+  </div>
+  <div class="panel panel-default" ng-if="relationsList">
+    <div class="panel-body">
     <div ui-tree data-nodrop-enabled="true">
       <ul ui-tree-nodes="" ng-model="relationsList" id="tree-root">
         <li ng-repeat="node in relationsList" ui-tree-node ng-include="'static/tpl/node_renderer.html'"></li>

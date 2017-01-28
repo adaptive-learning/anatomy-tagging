@@ -1,5 +1,7 @@
 <div ui-tree-handle  class="tree-node tree-node-content">
-  <a href="" ng-click="setActiveById(node.id)" data-nodrag ng-if="!node.active">
+  <a href="" ng-click="setActiveById(node.id)"
+     scroll-top-on-click
+     data-nodrag ng-if="!node.active">
     {{node.term1.name_la ? node.term1.name_la : node.term1.name_en}}
     &rarr;
     {{node.term2.name_la ? node.term2.name_la : node.term2.name_en}}
