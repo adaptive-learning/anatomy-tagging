@@ -326,7 +326,7 @@ class RelationType(models.Model):
 
     identifier = models.CharField(max_length=255)
     source = models.CharField(max_length=255)
-    synonyms = models.ManyToManyField('self')
+    synonyms = models.ManyToManyField('self', blank=True)
     ready = models.BooleanField(default=False)
     name_en = models.CharField(max_length=255, null=True)
     name_cs = models.CharField(max_length=255, null=True)
