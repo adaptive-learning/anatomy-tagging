@@ -506,9 +506,11 @@ angular.module('anatomy.tagging.controllers', [])
     }
 })
 
-.controller('RelationsTreeController', function($scope, $http, $routeParams, $cookies) {
+.controller('RelationsTreeController', function($scope, $http, $routeParams, $cookies, exportService) {
   $scope.type = $routeParams.type;
   $scope.filter = $routeParams.filter;
+  $scope.alerts = [];
+  $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
   $http.get('/relationtree/' + $routeParams.type + ($scope.filter == 'all' ? '?all=1' : '')).success(function(data) {
     $scope.relations = data.relations;
 
@@ -535,9 +537,9 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.relationsCount = Object.keys($scope.relations).length;
 
     if (data.next_to_process) {
-      $scope.setActiveById(data.next_to_process)
+      $scope.setActiveById(data.next_to_process);
     } else {
-      $scope.setActiveById(data.next)
+      $scope.setActiveById(data.next);
     }
   });
 
@@ -664,6 +666,30 @@ angular.module('anatomy.tagging.controllers', [])
         msg : 'Na serveru nastala chyba.',
       });
       relation.saving = false;
+    });
+  };
+
+  $scope.publish = function(type) {
+    $scope.saving = type;
+    type = type.replace(' ', '-');
+    $http.get("relationsexport/" + type + '?empty=true').success(function(data) {
+      exportService.export(type).success(function(data) {
+        $scope.alerts.push(data);
+        $scope.saving = false;
+      }).error(function(data) {
+        $scope.alerts.push({
+          type : 'danger',
+          msg : 'Na serveru nastala chyba',
+        });
+        $scope.saving = false;
+      });
+    })
+    .error(function(data) {
+      $scope.alerts.push({
+        type : 'danger',
+        msg : 'Na serveru nastala chyba',
+      });
+      $scope.saving = false;
     });
   };
 })
