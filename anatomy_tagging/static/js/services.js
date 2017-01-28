@@ -6,7 +6,7 @@ angular.module('anatomy.tagging.services', [])
       var url = '/termsjson/' + (image || '') + '?' +
         (showImages ? 'images=True&relations=True' : '') +
         (usedOnly ? 'images=True&relations=True&usedonly=True' : '');
-      var promise = $http.get(url);
+      var promise = $http.get(url, {cache: true});
       return promise;
     },
     save : function(term) {

@@ -458,6 +458,21 @@ angular.module('anatomy.tagging.directives', [])
         term: '=term',
       },   
     templateUrl : 'static/tpl/term_edit.html',
+    controller : function($scope, termsService) {
+      $scope.termNames = { 
+        la : [],
+        en : [],
+        cs : [],
+      };
+
+      termsService.get().success(function(data) {
+        $scope.termNames = {
+          la : data.map(function(t) { return t.name_la;}),
+          en : data.map(function(t) { return t.name_en;}),
+          cs : data.map(function(t) { return t.name_cs;}),
+        };
+      });
+    },
   };
 })
 

@@ -5,15 +5,24 @@
   </div>
   <div class="input-group">
     <span class="input-group-addon" >LA</span>
-    <input class="form-control input-sm" ng-model="term.name_la" />
+    <input class="form-control input-sm" ng-model="term.name_la"
+        typeahead="term as term for term in termNames.la |
+          filter: $viewValue | 
+          limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
   </div>
   <div class="input-group">
     <span class="input-group-addon" >EN</span>
-    <input class="form-control input-sm" ng-model="term.name_en" />
+    <input class="form-control input-sm" ng-model="term.name_en" 
+        typeahead="term as term for term in termNames.en |
+          filter: $viewValue | 
+          limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
   </div>
   <div class="input-group">
     <span class="input-group-addon" >CS</span>
-    <input class="form-control input-sm" ng-model="term.name_cs" />
+    <input class="form-control input-sm" ng-model="term.name_cs" 
+        typeahead="term as term for term in termNames.cs |
+          filter: $viewValue | 
+          limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
   </div>
   <div class="input-group">
     <span class="input-group-addon" >Umístění</span>
