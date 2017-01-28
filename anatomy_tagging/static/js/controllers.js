@@ -553,19 +553,32 @@ angular.module('anatomy.tagging.controllers', [])
     $scope.setActiveById($scope.relation.previous);
   };
 
-  $scope.setActiveById = function(id) {
+  $scope.addChild = function(relation) {
+    $scope.setActive({
+      term1: relation.term2,
+      term2: {},
+      type: relation.type,
+      parent_ids: [relation.id],
+    });
+  };
+
+  $scope.setActive = function(relation) {
     if ($scope.relation) {
       $scope.relation.active = false;
     }
-    $scope.relation = $scope.relations[id];
+    $scope.relation = relation;
     $scope.relation.active = true;
-    $scope.breadCrumps = $scope.getBreadCrump(id);
-    $scope.relation.terminal = ($scope.relation.labels != undefined && $scope.relation.labels.indexOf('terminal') != -1);
-    $scope.siblings = $scope.getSiblings(id);
+    $scope.relation.terminal = $scope.relation.labels &&
+      $scope.relation.labels.indexOf('terminal') != -1;
+    $scope.relation.siblings = $scope.getSiblings(relation);
+    $scope.relation.breadCrumbs = $scope.getBreadCrumb(relation);
   };
 
-  $scope.getSiblings = function(id) {
-    var relation = $scope.relations[id];
+  $scope.setActiveById = function(id) {
+    $scope.setActive($scope.relations[id]);
+  };
+
+  $scope.getSiblings = function(relation) {
     if (!relation.parent_ids) {
       return [];
     }
@@ -573,7 +586,7 @@ angular.module('anatomy.tagging.controllers', [])
     relation.parent_ids.forEach(function(parent_id) {
       var par = $scope.relations[parent_id];
       var siblings = par.children.filter(function(child) {
-        return child.id != id;
+        return child.id != relation.id;
       });
       if (siblings.length > 0) {
         siblings.forEach(function(sib) {
@@ -582,10 +595,10 @@ angular.module('anatomy.tagging.controllers', [])
       }
     });
     return result;
-  }
+  };
 
-  $scope.getBreadCrump = function(id) {
-    var parentPath = $scope.getParentPath(id);
+  $scope.getBreadCrumb = function(relation) {
+    var parentPath = $scope.getParentPath(relation);
     var crumps = parentPath.map(function(relations) {
       var relation = relations[0];
       return {
@@ -600,8 +613,7 @@ angular.module('anatomy.tagging.controllers', [])
     return crumps;
   };
 
-  $scope.getParentPath = function(id) {
-    var relation = $scope.relations[id];
+  $scope.getParentPath = function(relation) {
     var path = [[relation]];
     var i = 0;
     var parents = function(parent_id) {
@@ -620,7 +632,7 @@ angular.module('anatomy.tagging.controllers', [])
       }
     }
     path.reverse();
-    return path
+    return path;
   };
 
   $scope.save = function(relation, state) {

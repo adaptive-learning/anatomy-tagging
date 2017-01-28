@@ -36,16 +36,16 @@ body {
       <div class="row">
         <div class="col-sm-12">
           <ol class="breadcrumb breadcrumb-arrow pull-left">
-            <li ng-repeat="term in breadCrumps">
+            <li ng-repeat="term in relation.breadCrumbs">
             <a href="" ng-click="setActiveById(term.relation_id)" ng-if="term.relation_id">{{term.name}}</a>
             </li>
           </ol>
-          <span class="dropdown pull-right" ng-show="siblings.length > 0" class="pull-right">
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Sourozenecké vztahy ({{siblings.length}})
+          <span class="dropdown pull-right" ng-show="relation.siblings.length > 0" class="pull-right">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Sourozenecké vztahy ({{relation.siblings.length}})
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-              <li ng-repeat="record in siblings">
+              <li ng-repeat="record in relation.siblings">
               <a href="" ng-click="setActiveById(record[1].id)" >
                 {{record[0].term1.name_la ? record[0].term1.name_la : record[0].term1.name_en}}
                 &rarr;

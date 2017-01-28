@@ -11,6 +11,12 @@
     &rarr;
     {{node.term2.name_la ? node.term2.name_la : node.term2.name_en}}
   </strong>
+  <a class="btn btn-sm btn-default" href=""
+    data-nodrag
+    scroll-top-on-click
+    ng-click="addChild(node)" title="Přidat podčást">
+    <i class="glyphicon glyphicon-plus"></i>
+  </a>
 </div>
 <ul ui-tree-nodes="" ng-model="node.children">
   <li ng-repeat="node in node.children" ui-tree-node ng-include="'static/tpl/node_renderer.html'">
