@@ -253,3 +253,11 @@ select.per-page-select {
 .relations-checkup .breadcrumb {
   margin-bottom: 0;
 }
+
+.btn-bold {
+  font-weight: bold;
+}
+
+.tree-node {
+  margin-bottom: 5px;
+}

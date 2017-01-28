@@ -1,22 +1,24 @@
 <div ui-tree-handle  class="tree-node tree-node-content">
-  <a href="" ng-click="setActiveById(node.id)"
-     scroll-top-on-click
-     data-nodrag ng-if="!node.active">
-    {{node.term1.name_la ? node.term1.name_la : node.term1.name_en}}
-    &rarr;
-    {{node.term2.name_la ? node.term2.name_la : node.term2.name_en}}
-  </a>
-  <strong ng-if="node.active">
-    {{node.term1.name_la ? node.term1.name_la : node.term1.name_en}}
-    &rarr;
-    {{node.term2.name_la ? node.term2.name_la : node.term2.name_en}}
-  </strong>
-  <a class="btn btn-sm btn-default" href=""
-    data-nodrag
-    scroll-top-on-click
-    ng-click="addChild(node)" title="Přidat podčást">
-    <i class="glyphicon glyphicon-plus"></i>
-  </a>
+  <span class="btn-group" data-nodrag>
+    <a href="" ng-click="setActiveById(node.id)"
+      ng-disabled="node.active"
+      class="btn btn-sm
+      {{node.active && 'btn-bold'}}
+      {{node.state == 'valid' && 'btn-success'}}
+      {{node.state == 'invalid' && 'btn-danger'}}
+      {{node.state == 'unknown' && 'btn-default'}}
+      "
+       scroll-top-on-click >
+      {{node.term1.name_la ? node.term1.name_la : node.term1.name_en}}
+      &rarr;
+      {{node.term2.name_la ? node.term2.name_la : node.term2.name_en}}
+    </a>
+    <a class="btn btn-sm btn-default" href=""
+      scroll-top-on-click
+      ng-click="addChild(node)" title="Přidat podčást">
+      &nbsp; <i class="glyphicon glyphicon-plus"></i> &nbsp;
+    </a>
+  </span>
 </div>
 <ul ui-tree-nodes="" ng-model="node.children">
   <li ng-repeat="node in node.children" ui-tree-node ng-include="'static/tpl/node_renderer.html'">
