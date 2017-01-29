@@ -261,3 +261,7 @@ select.per-page-select {
 .tree-node {
   margin-bottom: 5px;
 }
+
+.tooltip-inner {
+   white-space: normal;
+}

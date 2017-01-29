@@ -1,7 +1,16 @@
 <div class="relation-term-edit">
   <div class="input-group">
-    <span class="input-group-addon" >ID</span>
-    <input class="form-control input-sm" disabled ng-model="term.code" />
+    <span class="input-group-addon" >
+      <i class="glyphicon glyphicon-question-sign"
+        tooltip="Toto pole mění celý pojem, narozdíl od ostatních,
+        které mění jen sebe. Našptávač hledá v všech jazycích"></i>
+      ID 
+    </span>
+    <input class="form-control input-sm" ng-model="term"
+        typeahead-template-url="termIdTemplate.html"
+        typeahead="term as term.code for term in allTerms |
+          filter: $viewValue | 
+          limitTo:($viewValue.length ? $viewValue.length * 2 : 2)" />
   </div>
   <div class="input-group">
     <span class="input-group-addon" >LA</span>

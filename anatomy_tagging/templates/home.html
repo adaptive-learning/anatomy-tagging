@@ -21,6 +21,15 @@
   </span>
   </a>
 </script>
+
+<script type="text/ng-template" id="termIdTemplate.html">
+  <a>
+  <span bind-html-unsafe="match.model.parent.code | typeaheadHighlight:query"></span>
+  <span style="color:#ccc;">
+    <span bind-html-unsafe="match.model.name_la | typeaheadHighlight:query"></span>
+  </span>
+  </a>
+</script>
 </head>
 <body ng-view>
 </body>

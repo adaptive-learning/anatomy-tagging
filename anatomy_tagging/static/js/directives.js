@@ -464,8 +464,10 @@ angular.module('anatomy.tagging.directives', [])
         en : [],
         cs : [],
       };
+      $scope.allTerms = [];
 
       termsService.get().success(function(data) {
+        $scope.allTerms = data;
         $scope.termNames = {
           la : data.map(function(t) { return t.name_la;}),
           en : data.map(function(t) { return t.name_en;}),
