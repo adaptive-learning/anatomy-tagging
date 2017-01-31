@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Count
 from django.db.models import Q
 from django.template.defaultfilters import slugify
+from .ontology import parse_matcher
 import json as simplejson
 import re
 
@@ -360,7 +361,27 @@ class RelationType(models.Model):
 
 class RelationManager(models.Manager):
 
-    def get_tree(self, relation_types, states=None):
+    def composite_relation(self, relation_definition):
+        matcher = parse_matcher(relation_definition)
+        terms = {t.id: t for t in Term.objects.all()}
+        result = []
+        ontology = self.get_ontology()
+        for term_id in ontology.keys():
+            matched = matcher.match({term_id}, ontology)
+            for m in matched:
+                result.append((terms[term_id], terms[m]))
+        return result
+
+    def get_ontology(self):
+        ontology = defaultdict(lambda: defaultdict(set))
+        for relation in self.select_related('type').filter(state='v'):
+            if relation.term1 is None or relation.term2 is None:
+                continue
+            ontology[relation.term1_id][relation.type.identifier].add(relation.term2_id)
+            ontology[relation.term2_id]['{}_opposite'.format(relation.type.identifier)].add(relation.term1_id)
+        return {t1: {r: [t2 for t2 in t2s] for r, t2s in data.items()} for t1, data in ontology.items()}
+
+    def get_graph(self, relation_types, states=None):
         rtype_ids = {relation_type.pk for relation_type in relation_types} | {t.pk for relation_type in relation_types for t in relation_type.synonyms.all()}
         by_id = {}
         by_term1 = defaultdict(list)

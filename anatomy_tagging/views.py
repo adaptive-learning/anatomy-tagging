@@ -277,7 +277,7 @@ def relation_tree(request):
     for identifier in identifiers:
         relation_types.append(get_object_or_404(RelationType, identifier=identifier))
     states = None if rel_all else ['valid', 'unknown']
-    tree, next_, next_to_process = Relation.objects.get_tree(relation_types, states=states)
+    tree, next_, next_to_process = Relation.objects.get_graph(relation_types, states=states)
     return render_json(request, {
         'relations': tree,
         'next': next_,
