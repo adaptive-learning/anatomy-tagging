@@ -345,13 +345,13 @@ class RelationType(models.Model):
             'name_en': self.name_en,
             'name_cs': self.name_cs,
             'display_priority': self.display_priority,
-            'question_en': simplejson.loads(self.question_en),
-            'question_cs': simplejson.loads(self.question_cs),
         }
         if not nested:
             result['synonyms'] = [rt.id for rt in self.synonyms.all()]
             if len(result['synonyms']) == 0:
                 del result['synonyms']
+            result['question_en'] = simplejson.loads(self.question_en)
+            result['question_cs'] = simplejson.loads(self.question_cs)
         return result
 
     def __unicode__(self):
