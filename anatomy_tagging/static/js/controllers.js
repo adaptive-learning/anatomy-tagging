@@ -511,7 +511,7 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.filter = $routeParams.filter;
   $scope.alerts = [];
   $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
-  $http.get('/relationtree/' + $routeParams.type + ($scope.filter == 'all' ? '?all=1' : '')).success(function(data) {
+  $http.get('/relationtree?relations=["' + $routeParams.type + '"]' + ($scope.filter == 'all' ? '&all=1' : '')).success(function(data) {
     $scope.relations = data.relations;
 
     var relation = data.relations[data.next];

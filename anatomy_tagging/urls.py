@@ -26,7 +26,7 @@ urlpatterns = patterns(
 
     url(r'^relationtypes$', 'relation_types', name='relation_types'),
     url(r'^relationtree/update$', 'relation_tree_update', name='relation_tree_update'),
-    url(r'^relationtree/(?P<relation_type_identifier>\w+)$', 'relation_tree', name='relation_tree'),
+    url(r'^relationtree$', 'relation_tree', name='relation_tree'),
     url(r'^relationsjson/update$', 'update_relations', name='update_relations'),
     url(r'^relationsjson/(?P<source>[\w\.-]*)$', 'relations_json', name='relations_json'),
     url(r'^relationsexport/(?P<relation_type>[\w\.-]*)$', 'relations_export', name='relations_export'),

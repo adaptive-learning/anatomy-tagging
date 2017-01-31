@@ -360,8 +360,8 @@ class RelationType(models.Model):
 
 class RelationManager(models.Manager):
 
-    def get_tree(self, relation_type, states=None):
-        rtype_ids = {relation_type.pk} | {t.pk for t in relation_type.synonyms.all()}
+    def get_tree(self, relation_types, states=None):
+        rtype_ids = {relation_type.pk for relation_type in relation_types} | {t.pk for relation_type in relation_types for t in relation_type.synonyms.all()}
         by_id = {}
         by_term1 = defaultdict(list)
         for relation in self.filter(type_id__in=rtype_ids):

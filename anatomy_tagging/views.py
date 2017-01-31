@@ -270,11 +270,14 @@ def relations_json(request, source=None):
 
 
 @staff_member_required
-def relation_tree(request, relation_type_identifier):
+def relation_tree(request):
     rel_all = request.GET.get('all', False)
+    identifiers = simplejson.loads(request.GET.get('relations', '[]'))
+    relation_types = []
+    for identifier in identifiers:
+        relation_types.append(get_object_or_404(RelationType, identifier=identifier))
     states = None if rel_all else ['valid', 'unknown']
-    relation_type = get_object_or_404(RelationType, identifier=relation_type_identifier)
-    tree, next_, next_to_process = Relation.objects.get_tree(relation_type, states=states)
+    tree, next_, next_to_process = Relation.objects.get_tree(relation_types, states=states)
     return render_json(request, {
         'relations': tree,
         'next': next_,
