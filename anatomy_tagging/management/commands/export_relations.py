@@ -123,7 +123,7 @@ class Command(BaseCommand):
                     'active': parent.get('active', True),
                 }
             result.append(parent_id)
-        return result
+        return result + [self.RELATIONS_CATEGORY['id']]
 
     def relation_to_flashcard(self, relation, all_contexts, all_categories, all_terms):
         if relation.term1.id not in all_terms:
