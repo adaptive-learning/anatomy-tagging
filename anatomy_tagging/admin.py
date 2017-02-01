@@ -1,4 +1,4 @@
-from models import Image, Path, Term, Category, Bbox, Relation, RelationType
+from models import Image, Path, Term, Category, Bbox, Relation, RelationType, CompositeRelationType
 from django.contrib import admin
 
 
@@ -26,6 +26,10 @@ class RelationTypeAdmin(admin.ModelAdmin):
     pass
 
 
+class CompositeRelationTypeAdmin(admin.ModelAdmin):
+    pass
+
+
 class CategoryAdmin(admin.ModelAdmin):
     pass
 
@@ -48,3 +52,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Bbox, BboxAdmin)
 admin.site.register(Relation, RelationAdmin)
 admin.site.register(RelationType, RelationTypeAdmin)
+admin.site.register(CompositeRelationType, CompositeRelationTypeAdmin)

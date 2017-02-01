@@ -8,7 +8,7 @@ from django.db import connection
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
-from models import Term, Path, Image, Bbox, Relation, RelationType
+from models import Term, Path, Image, Bbox, Relation, RelationType, CompositeRelationType
 import json as simplejson
 import os
 
@@ -282,6 +282,14 @@ def relation_tree(request):
         'relations': tree,
         'next': next_,
         'next_to_process': next_to_process,
+    })
+
+
+def composite_relation(request, identifier):
+    rel = get_object_or_404(CompositeRelationType, identifier=identifier)
+    data = CompositeRelationType.objects.composite_relation(rel)
+    return render_json(request, {
+        'data': [CompositeRelationType.objects.composite_relation_to_serializable(r) for r in data],
     })
 
 

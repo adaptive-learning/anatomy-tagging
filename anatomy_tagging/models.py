@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from collections import defaultdict, deque
+from collections import defaultdict, deque, namedtuple
 from django.db import models
 from django.db.models import Count
 from django.db.models import Q
@@ -362,18 +362,65 @@ class RelationType(models.Model):
         return '{}: {}'.format(self.source, self.identifier)
 
 
-class RelationManager(models.Manager):
+class CompositeRelationTypeManager(models.Manager):
 
-    def composite_relation(self, relation_definition):
-        matcher = parse_matcher(relation_definition)
+    def composite_relation(self, relation_type):
+        CompositeRelation = namedtuple('CompositeRelation', 'id term1 term2 type')
+        matcher = parse_matcher(relation_type.definition)
         terms = {t.id: t for t in Term.objects.all()}
         result = []
-        ontology = self.get_ontology()
+        ontology = Relation.objects.get_ontology()
         for term_id in ontology.keys():
             matched = matcher.match({term_id}, ontology)
             for m in matched:
-                result.append((terms[term_id], terms[m]))
+                result.append(CompositeRelation(
+                    id='{}-{}-{}'.format(relation_type.id, term_id, m),
+                    term1=terms[term_id],
+                    term2=terms[m],
+                    type=relation_type
+                ))
         return result
+
+    def composite_relation_to_serializable(self, relation):
+        return {
+            'name': relation.type.identifier,
+            'term1': to_serializable_or_none(relation.term1, without_parent=True),
+            'term2': to_serializable_or_none(relation.term2, subterm=False),
+            'type': relation.type.to_serializable(nested=True),
+            'state': Relation.STATE_VALID,
+        }
+
+
+class CompositeRelationType(models.Model):
+
+    identifier = models.CharField(max_length=255)
+    ready = models.BooleanField(default=False)
+    name_en = models.CharField(max_length=255, null=True)
+    name_cs = models.CharField(max_length=255, null=True)
+    display_priority = models.IntegerField(default=0)
+    question_cs = models.TextField(default=RelationType.DEFAULT_QUESTION_CS)
+    question_en = models.TextField(default=RelationType.DEFAULT_QUESTION_EN)
+    definition = models.TextField()
+
+    objects = CompositeRelationTypeManager()
+
+    def to_serializable(self, nested=False):
+        result = {
+            'id': self.id,
+            'identifier': self.identifier,
+            'ready': self.ready,
+            'name_en': self.name_en,
+            'name_cs': self.name_cs,
+            'display_priority': self.display_priority,
+            'definition': self.definition,
+        }
+        if not nested:
+            result['question_en'] = simplejson.loads(self.question_en)
+            result['question_cs'] = simplejson.loads(self.question_cs)
+        return result
+
+
+class RelationManager(models.Manager):
 
     def get_ontology(self):
         ontology = defaultdict(lambda: defaultdict(set))

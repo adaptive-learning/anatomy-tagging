@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from anatomy_tagging.management.commands.export_flashcards import ExportUtils
-from anatomy_tagging.models import Relation, Path, Image, Term
+from anatomy_tagging.models import Relation, Path, Image, Term, CompositeRelationType
 from clint.textui import progress
 from collections import defaultdict
 from django.core.management.base import BaseCommand
+from django.template.defaultfilters import slugify
 from optparse import make_option
 import json
-from django.template.defaultfilters import slugify
 
 
 class Command(BaseCommand):
@@ -18,18 +18,26 @@ class Command(BaseCommand):
             default='relations-flashcards.json'),
         make_option(
             '--relationtype',
-            dest='relationtype',
+            dest='relation_type',
+            type=str,
+            default=None),
+        make_option(
+            '--compositerelationtype',
+            dest='composite_relation_type',
             type=str,
             default=None),
     )
 
     def handle(self, *args, **options):
         self.options = options
-        relations = Relation.objects.prepare_related().filter(type__ready=True, state=Relation.STATE_VALID[0])
-        print(relations.query)
-        relation_type = options.get('relationtype')
-        if relation_type is not None and relation_type != '':
-            relations = relations.filter(type__identifier=relation_type)
+        composite_relation_type = options.get('composite_relation_type')
+        relation_type = options.get('relation_type')
+        if composite_relation_type:
+            relations = CompositeRelationType.objects.composite_relation(CompositeRelationType.objects.get(identifier=composite_relation_type))
+        else:
+            relations = Relation.objects.prepare_related().filter(type__ready=True, state=Relation.STATE_VALID[0])
+            if relation_type is not None and relation_type != '':
+                relations = relations.filter(type__identifier=relation_type)
         terms = {}
         categories = ExportUtils.load_categories()
         categories.update({
@@ -134,8 +142,11 @@ class Command(BaseCommand):
             "categories": self.relation_to_categories(relation, all_categories, all_terms),
             "additional-info": json.dumps(contexts),
         }
-        r_json['restrict-open-questions'] = not Term.objects.is_code_terminologia_anatomica(r_json['term-secondary'])
-        r_json['disable-open-questions'] = not Term.objects.is_code_terminologia_anatomica(r_json['term'])
+        if isinstance(relation, Relation):
+            r_json['restrict-open-questions'] = not Term.objects.is_code_terminologia_anatomica(r_json['term-secondary'])
+            r_json['disable-open-questions'] = not Term.objects.is_code_terminologia_anatomica(r_json['term'])
+        else:
+            r_json['disable-open-questions'] = True
         r_json['active'] = all_contexts[r_json['context']]['active']
         hardcoded_category = self.HARDCODED_CATEGORIES.get('{}:{}'.format(r_json['term'], r_json['context']))
         if hardcoded_category is not None:
