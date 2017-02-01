@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from anatomy_tagging.management.commands.export_flashcards import ExportUtils
-from anatomy_tagging.models import Relation, Path, Image
+from anatomy_tagging.models import Relation, Path, Image, Term
 from clint.textui import progress
 from collections import defaultdict
 from django.core.management.base import BaseCommand
@@ -134,6 +134,8 @@ class Command(BaseCommand):
             "categories": self.relation_to_categories(relation, all_categories, all_terms),
             "additional-info": json.dumps(contexts),
         }
+        r_json['restrict-open-questions'] = not Term.objects.is_code_terminologia_anatomica(r_json['term-secondary'])
+        r_json['disable-open-questions'] = not Term.objects.is_code_terminologia_anatomica(r_json['term'])
         r_json['active'] = all_contexts[r_json['context']]['active']
         hardcoded_category = self.HARDCODED_CATEGORIES.get('{}:{}'.format(r_json['term'], r_json['context']))
         if hardcoded_category is not None:

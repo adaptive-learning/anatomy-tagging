@@ -83,6 +83,7 @@ class Command(BaseCommand):
                     'active': c['active'],
                     'categories': list(terms[p['term']]['categories'])
                 }
+                f_json['restrict-open-questions'] = not Term.objects.is_code_terminologia_anatomica(f_json['term'])
                 if c['category'] == '15':
                     f_json['categories'].append(c['category'])
                 if len(terms[p['term']]['systems']) == 0 and c['category'] is not None:

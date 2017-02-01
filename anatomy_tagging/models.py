@@ -195,6 +195,9 @@ class TermManager(models.Manager):
                     term.save()
             return term
 
+    def is_code_terminologia_anatomica(self, code):
+        return code.startswith('A') and len(code) == 12
+
 
 class Term(models.Model):
     HEAD = "H"
