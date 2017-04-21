@@ -335,6 +335,8 @@ class ExportUtils(object):
 
     @staticmethod
     def term_to_json(t):
+        if not t.name_cs and not t.name_la:
+            raise CommandError('Both Latin and Czech names are empty for term "{}" ({}).'.format(t.slug, t.id))
         t_json = {
             'id': t.code if t.code else hashlib.sha1(t.slug).hexdigest(),
             'name-cs': ExportUtils._empty(t.name_la, t.name_cs),
