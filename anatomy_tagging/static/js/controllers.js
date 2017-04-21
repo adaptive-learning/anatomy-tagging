@@ -740,6 +740,7 @@ angular.module('anatomy.tagging.controllers', [])
     for (var i = 0; i < data.raw.length; i++) {
       var r = data.raw[i];
       var key = r.text1.trim();
+      var rType = r.type.toLowerCase();
       var rObject = $scope.relationsDict[key];
       if (!rObject) {
         rObject = {};
@@ -750,18 +751,18 @@ angular.module('anatomy.tagging.controllers', [])
         term : r.term1,
         text : r.text1,
       };
-      rObject[r.type] = rObject[r.type] || {
+      rObject[rType] = rObject[rType] || {
         terms : [],
         texts : [],
       };
       if (r.term2) {
-          rObject[r.type].terms.push({term: r.term2});
+          rObject[rType].terms.push({term: r.term2});
       }
       if (r.text2) {
-        rObject[r.type].texts.push(r.text2);
+        rObject[rType].texts.push(r.text2);
       }
-      if ($scope.relationTypes.indexOf(r.type) == -1) {
-        $scope.relationTypes.push(r.type);
+      if ($scope.relationTypes.indexOf(rType) == -1) {
+        $scope.relationTypes.push(rType);
       }
     }
     $scope.loading = false;
