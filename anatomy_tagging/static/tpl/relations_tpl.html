@@ -82,7 +82,7 @@
         <div ng-if="!relation.editting"
             ng-repeat="relationField in relation[type].terms">
           <div class="label label-{{relationField.id ? 'success' : 'default'}} relation-term-label"
-            ng-bind="relationField.term.name_la">
+            ng-bind="relationField.term.name_la ? relationField.term.name_la : relationField.term.name_cs">
           </div>
         </div>
         <div class="input-group"
