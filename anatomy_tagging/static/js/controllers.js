@@ -33,7 +33,10 @@ angular.module('anatomy.tagging.controllers', [])
 
   var urlParts = $location.absUrl().split('/');
   $scope.search = $routeParams.search;
-  $scope.emptyField = $routeParams.empty;
+  $scope.emptyFields = $routeParams.empty;
+  if (typeof $scope.emptyFields != 'undefined') {
+    $scope.emptyFields = $scope.emptyFields.split(",").map(function(x) { return x.trim() });
+  }
   $scope.page = 1;
   $scope.pageSize = 20;
   $scope.showCode = $routeParams.showcode || $routeParams.usedonly;
@@ -42,9 +45,9 @@ angular.module('anatomy.tagging.controllers', [])
 
   termsService.get(image, $scope.showCode, $scope.usedOnly).success(function(data) {
     $scope.terms = data;
-    if ($scope.emptyField) {
+    if ($scope.emptyFields) {
       $scope.terms = $scope.terms.filter(function(row) {
-        return !row[$scope.emptyField];
+        return $scope.emptyFields.every(function(field) { return !row[field] });
       });
     }
     $scope.loading = false;

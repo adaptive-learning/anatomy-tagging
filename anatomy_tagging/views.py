@@ -241,7 +241,7 @@ def terms(request, filename_slug=None):
                 t['images'] = list(set(images))
 
     if 'relations' in request.GET:
-        relations = Relation.objects.all().select_related('term1', 'term1')
+        relations = Relation.objects.filter(state='v').select_related('term1', 'term1')
         relation_by_term = {}
         for r in relations:
             if r.term1 is not None and r.term2 is not None:
@@ -250,11 +250,11 @@ def terms(request, filename_slug=None):
                 relation_by_term[r.term2.slug] = relation_by_term.get(r.term2.slug, [])
                 relation_by_term[r.term2.slug].append(r.term1.name_la)
         for t in json:
-            relations = relation_by_term.get(t['slug'], None)
-            if relations is not None:
+            relations = [r for r in relation_by_term.get(t['slug'], []) if r]
+            if relations:
                 t['relations'] = list(set(relations))
     if 'usedonly' in request.GET:
-            json = [t for t in json if 'relations' in t or 'images' in t]
+        json = [t for t in json if 'relations' in t or 'images' in t]
     return render_json(request, json)
 
 
