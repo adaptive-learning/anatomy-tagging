@@ -532,6 +532,7 @@ angular.module('anatomy.tagging.controllers', [])
         for (var j = 0; j < relation.children.length; j++) {
           relation.children[j] = $scope.relations[relation.children[j]];
         }
+        relation.children = relation.children.filter(function(child) { return typeof child != 'undefined' });
       }
     }
     $scope.relationsCount = Object.keys($scope.relations).length;
