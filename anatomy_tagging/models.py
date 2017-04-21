@@ -217,25 +217,27 @@ class Term(models.Model):
         (UPPER_EXT, 'Upper Ext. - Horní končetina'),
         (LOWER_EXT, 'Lower Ext. - Dolní končetina'),
     )
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', null=True, blank=True)
     slug = models.SlugField(
         max_length=200,
         db_index=True,
         unique=True)
     code = models.TextField(max_length=200)
     fma_id = models.IntegerField(default=-1)
-    name_cs = models.TextField(max_length=200)
-    name_en = models.TextField(max_length=200)
-    name_la = models.TextField(max_length=200)
+    name_cs = models.TextField(max_length=200, null=True, blank=True)
+    name_en = models.TextField(max_length=200, null=True, blank=True)
+    name_la = models.TextField(max_length=200, null=True, blank=True)
     body_part = models.CharField(
         max_length=10,
         default='',
-        null=True
+        null=True,
+        blank=True
     )
     system = models.CharField(
         max_length=30,
         default='',
-        null=True
+        null=True,
+        blank=True
     )
 
     objects = TermManager()
