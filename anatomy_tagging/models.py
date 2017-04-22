@@ -421,6 +421,8 @@ class CompositeRelationType(models.Model):
             result['question_cs'] = simplejson.loads(self.question_cs)
         return result
 
+    def __unicode__(self):
+        return self.identifier
 
 class RelationManager(models.Manager):
 

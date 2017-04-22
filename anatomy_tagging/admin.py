@@ -27,7 +27,8 @@ class RelationTypeAdmin(admin.ModelAdmin):
 
 
 class CompositeRelationTypeAdmin(admin.ModelAdmin):
-    pass
+
+    list_display = ('name_en', 'name_cs', 'ready', 'definition')
 
 
 class CategoryAdmin(admin.ModelAdmin):
