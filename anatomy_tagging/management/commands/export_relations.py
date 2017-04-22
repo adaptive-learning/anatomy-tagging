@@ -173,7 +173,7 @@ class Command(BaseCommand):
         if len(images) > 0:
             image = max(images, key=lambda im: self.get_image_size(im, term.system))
             return image.filename_slug[:50]
-        elif int(self.options.get('verbosity')) > 0:
+        elif int(self.options.get('verbosity')) == 3:
             print "WARNING:", 'Term with no image', term
 
     def get_image_size(self, image, system):
