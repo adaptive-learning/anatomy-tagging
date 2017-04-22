@@ -93,9 +93,9 @@ class Multiplier(RelationMatcher):
         for _ in range(self._lower_bound):
             counter += 1
             terms = self._matcher.match(terms, ontology)
-        while counter < self._upper_bound:
+        while self._upper_bound is None or counter < self._upper_bound:
             new_terms = self._matcher.match(terms, ontology)
-            if len(new_terms) == len(terms):
+            if len(new_terms - terms) == 0:
                 return terms
             terms |= new_terms
             counter += 1
@@ -127,8 +127,6 @@ class Multiplier(RelationMatcher):
                 upper_bound = int(splitted_bounds[-1])
             else:
                 raise ValidationError('There are more than two bounds.')
-            lower_bound = int(splitted_bounds[0])
-            upper_bound = int(splitted_bounds[-1])
         return Multiplier(parse_fun(splitted[0]), lower_bound=lower_bound, upper_bound=upper_bound)
 
 
