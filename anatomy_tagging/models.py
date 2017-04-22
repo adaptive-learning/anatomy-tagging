@@ -368,20 +368,25 @@ class CompositeRelationTypeManager(models.Manager):
 
     def composite_relation(self, relation_type):
         CompositeRelation = namedtuple('CompositeRelation', 'id term1 term2 type')
-        matcher = parse_matcher(relation_type.definition)
-        terms = {t.id: t for t in Term.objects.all()}
         result = []
+        for term1, term2 in self.composite_relation_from_definition(relation_type.definition):
+            result.append(CompositeRelation(
+                id='{}-{}-{}'.format(relation_type.id, term1.id, term2.id),
+                term1=term1,
+                term2=term2,
+                type=relation_type
+            ))
+        return result
+
+    def composite_relation_from_definition(self, definition):
+        matcher = parse_matcher(definition)
+        terms = {t.id: t for t in Term.objects.all()}
         ontology = Relation.objects.get_ontology()
         for term_id in ontology.keys():
             matched = matcher.match({term_id}, ontology)
             for m in matched:
-                result.append(CompositeRelation(
-                    id='{}-{}-{}'.format(relation_type.id, term_id, m),
-                    term1=terms[term_id],
-                    term2=terms[m],
-                    type=relation_type
-                ))
-        return result
+                yield terms[term_id], terms[m]
+
 
     def composite_relation_to_serializable(self, relation):
         return {
