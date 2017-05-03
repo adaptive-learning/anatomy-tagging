@@ -31,10 +31,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         categories = ExportUtils.load_categories()
-        terms = self.load_terms()
-        contexts, used_terms = self.load_contexts(
-            terms, options['context'])
-        terms = dict(filter(lambda (i, t): i in used_terms, terms.items()))
+        contexts, used_terms = self.load_contexts(options['context'])
+        terms = self.load_terms(used_terms)
+        terms = {i: t for i, t in terms.items() if i in used_terms}
         flashcards = self.load_flashcards(contexts, terms)
         if options['context'] is not None:
             options['output'] = options['output'].replace(
@@ -99,7 +98,7 @@ class Command(BaseCommand):
             del c['category']
         return result
 
-    def load_contexts(self, terms, context):
+    def load_contexts(self, context):
         result = {}
         used_terms = set()
         print "\nLoading contexts"
@@ -118,16 +117,9 @@ class Command(BaseCommand):
                 if p.bbox is not None:
                     p_json['bbox'] = self._bbox_to_json(p.bbox)
                 if p.term is not None and p.term.code not in ['no-practice', 'too-small']:
-                    if p.term.code:
-                        p_json['term'] = p.term.code
-                    else:
-                        p_json['term'] = hashlib.sha1(p.term.slug).hexdigest()
+                    p_json['term'] = ExportUtils.get_term_id(p.term)
                     used_terms.add(p_json['term'])
                     terms_in_image.add(p_json['term'])
-                    if i.category is not None:
-                        term_json = terms[p_json['term']]
-                        term_categories = term_json.get('categories', [])
-                        term_json['categories'] = list(set(term_categories))
                 if p.stroke is not None:
                     p_json['stroke'] = p.stroke
                     p_json['stroke_width'] = p.stroke_width
@@ -155,9 +147,11 @@ class Command(BaseCommand):
             result[c_json['id']] = c_json
         return result, used_terms
 
-    def load_terms(self):
+    def load_terms(self, used_terms):
         result = {}
         for t in Term.objects.all().exclude(code__in=['no-practice', 'too-small']):
+            if ExportUtils.get_term_id(t) not in used_terms:
+                continue
             t_json = ExportUtils.term_to_json(t)
             result[t_json['id']] = t_json
         return result
@@ -338,7 +332,7 @@ class ExportUtils(object):
         if not t.name_cs and not t.name_la:
             raise CommandError('Both Latin and Czech names are empty for term "{}" ({}).'.format(t.slug, t.id))
         t_json = {
-            'id': t.code if t.code else hashlib.sha1(t.slug).hexdigest(),
+            'id': ExportUtils.get_term_id(t),
             'name-cs': ExportUtils._empty(t.name_la, t.name_cs),
             'name-cc': ExportUtils._empty(t.name_cs, t.name_la),
             'name-en': ExportUtils._empty(t.name_en, t.name_la),
