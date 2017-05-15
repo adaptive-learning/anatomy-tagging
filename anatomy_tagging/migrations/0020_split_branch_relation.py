@@ -122,6 +122,15 @@ def to_serializable_or_none(obj, **kwargs):
 END OF HACK
 """
 
+def is_term_artery(term):
+    if 'artery' in term.name_en:
+        return True
+    if 'arteria' in term.name_la:
+        return True
+    if term.code and term.code.startswith('A12'):
+        return True
+    return False
+
 
 def split_branch_relation(apps, schema_editor):
     Relation = apps.get_model("anatomy_tagging", "Relation")
@@ -137,7 +146,7 @@ def split_branch_relation(apps, schema_editor):
     while rnext is not None:
         r = relations[rnext]
         parent_is_artery = any([is_artery.get(p, False) for p in graph[rnext].get('parent_ids', [])])
-        if parent_is_artery or 'artery' in r.term1.name_en or 'arteria' in r.term1.name_la or 'artery' in r.term2.name_en or 'arteria' in r.term2.name_la:
+        if parent_is_artery or is_term_artery(r.term1) or is_term_artery(r.term2):
             is_artery[rnext] = True
         rnext = graph[rnext].get('next')
     for r in relations.values():
