@@ -94,7 +94,7 @@ class Command(BaseCommand):
             terms_updated = False
             for t in ts:
                 print '  ',
-                print t.id, '\t', t.fma_id, t.name_la, '|', t.name_en, '|', t.name_cs
+                print t.id, '\t', t.fma_id, t.name_la.encode('utf8'), '|', t.name_en.encode('utf8'), '|', t.name_cs.encode('utf8')
                 term_updated = False
                 if u'♀' in getattr(t, 'name_{}'.format(lang)) and 'F' not in t.code:
                     print('      CONVERTING CODE TO FEMALE VERSION')
@@ -109,7 +109,7 @@ class Command(BaseCommand):
                         t.code = '{}M'.format(t.code)
                         t.save()
                 for p in t.path_set.filter(image__active=True).select_related('image'):
-                    print '      image', p.image.filename
+                    print '      image', p.image.filename.encode('utf8')
                     if term_updated:
                         images_to_export.add(p.image.filename)
                 if term_updated:
@@ -126,7 +126,7 @@ class Command(BaseCommand):
                 print '  ', 'NOT RESOLVED'
         print 'IMAGES TO EXPORT:'
         for i in sorted(images_to_export):
-            print '  ', i
+            print '  ', i.encode('utf8')
 
     def find_duplicate_terms(self, terms, lang='la'):
         print 'Looking for duplicates'
