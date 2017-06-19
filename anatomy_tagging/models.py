@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from .ontology import parse_matcher
 from collections import defaultdict, deque, namedtuple
 from django.db import models
+from django.db import transaction
 from django.db.models import Count
 from django.db.models import Q
 from django.template.defaultfilters import slugify
-from .ontology import parse_matcher
 import json as simplejson
 import re
 
@@ -197,6 +198,40 @@ class TermManager(models.Manager):
 
     def is_code_terminologia_anatomica(self, code):
         return code.startswith('A') and len(code) == 12
+
+    def all_used(self):
+        paths = Path.objects.exclude(
+            term=None).exclude(
+            term__slug__in=['too-small', 'no-practice']).select_related(
+            'image', 'term')
+        relations = Relation.objects.select_related('term1', 'term1')
+        all_terms = {}
+        for path in paths:
+            all_terms[path.term.id] = path.term
+        for rel in relations:
+            if rel.term1 is not None:
+                all_terms[rel.term1.id] = rel.term1
+            if rel.term2 is not None:
+                all_terms[rel.term2.id] = rel.term2
+        return list(all_terms.values())
+
+    @transaction.atomic()
+    def merge_terms(self, to_survive, to_remove):
+        paths = Path.objects.filter(
+            term=to_remove).select_related('image')
+        for p in paths:
+            p.term = to_survive
+            p.save()
+        relations1 = Relation.objects.filter(term1=to_remove).select_related('term1', 'type')
+        for p in relations1:
+            p.term1 = to_survive
+            p.save()
+        relations2 = Relation.objects.filter(term2=to_remove).select_related('term2', 'type')
+        for p in relations2:
+            p.term2 = to_survive
+            p.save()
+        to_remove.delete()
+        return list({p.image for p in paths}), list({rel.type for rel in relations1} | {rel.type for rel in relations2})
 
 
 class Term(models.Model):

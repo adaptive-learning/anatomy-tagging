@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from anatomy_tagging import settings
-from anatomy_tagging.models import Term, Path, Relation, canonical_term_name
+from anatomy_tagging.models import Term, Path, canonical_term_name
 from clint.textui import progress
 from collections import defaultdict
 from django.core.management.base import BaseCommand
@@ -52,6 +52,12 @@ class Command(BaseCommand):
             default=False
         ),
         make_option(
+            '--fix-duplicate-codes',
+            dest='fix_duplicate_codes',
+            action='store_true',
+            default=False
+        ),
+        make_option(
             '--fill-fma',
             dest='fill_fma',
             action='store_true',
@@ -63,12 +69,64 @@ class Command(BaseCommand):
         langs = [options['lang']] if options['lang'] is not None else ['en', 'cs', 'la']
         terms = list(Term.objects.all().exclude(code__in=['no-practice', 'too-small']))
         with transaction.atomic():
+            self.fix_duplicate_codes(terms, dry=not options['fix_duplicate_codes'])
             self.make_canonical_names(terms, langs, dry=not options['canonical_names'])
             if options['find_duplicates']:
                 self.find_duplicate_terms(terms)
             self.remove_unused_terms(terms, dry=not options['remove_unused'])
             if options['fill_fma']:
                 self.fill_fma()
+
+    def fix_duplicate_codes(self, terms, lang='la', used_only=False, dry=True):
+        print 'Fixing duplicate term codes'
+        used_ids = {t.id for t in Term.objects.all_used()}
+        if used_only:
+            terms = [t for t in terms if t.id in used_ids]
+        groupped = defaultdict(list)
+        for t in terms:
+            if t.code == '':
+                continue
+            groupped[t.code].append(t)
+        filtered = {code: ts for code, ts in groupped.items() if len(ts) > 1}
+        images_to_export = set()
+        for code, ts in filtered.items():
+            print code
+            terms_updated = False
+            for t in ts:
+                print '  ',
+                print t.id, '\t', t.fma_id, t.name_la, '|', t.name_en, '|', t.name_cs
+                term_updated = False
+                if u'♀' in getattr(t, 'name_{}'.format(lang)) and 'F' not in t.code:
+                    print('      CONVERTING CODE TO FEMALE VERSION')
+                    term_updated = True
+                    if not dry:
+                        t.code = '{}F'.format(t.code)
+                        t.save()
+                if u'♂' in getattr(t, 'name_{}'.format(lang)) and 'M' not in t.code:
+                    print('      CONVERTING CODE TO MALE VERSION')
+                    term_updated = True
+                    if not dry:
+                        t.code = '{}M'.format(t.code)
+                        t.save()
+                for p in t.path_set.filter(image__active=True).select_related('image'):
+                    print '      image', p.image.filename
+                    if term_updated:
+                        images_to_export.add(p.image.filename)
+                if term_updated:
+                    terms_updated = True
+            if not terms_updated and len({t.fma_id for t in ts if t.fma_id != -1}) <= 1:
+                to_survive = min(ts, key=lambda t: t.id)
+                print '  ', 'MERGING ALL AS', to_survive.id
+                for to_merge in [t for t in ts if t.id != to_survive.id]:
+                    if not dry:
+                        Term.objects.merge_terms(to_survive, to_merge)
+                    for p in t.path_set.filter(image__active=True).select_related('image'):
+                        images_to_export.add(p.image.filename)
+            elif not terms_updated:
+                print '  ', 'NOT RESOLVED'
+        print 'IMAGES TO EXPORT:'
+        for i in sorted(images_to_export):
+            print '  ', i
 
     def find_duplicate_terms(self, terms, lang='la'):
         print 'Looking for duplicates'
@@ -107,22 +165,15 @@ class Command(BaseCommand):
 
     def remove_unused_terms(self, terms, dry):
         print 'Looking for unused terms'
-        paths = Path.objects.all().select_related('term')
-        relations = Relation.objects.all().select_related('term1,term2')
-        used_terms_ids = list(set(
-            [p.term_id for p in paths if p.term_id is not None] +
-            [r.term1_id for r in relations if r.term1_id is not None] +
-            [r.term2_id for r in relations if r.term2_id is not None] +
-            [r.term2.parent_id for r in relations if r.term2_id is not None]
-        ))
-        unused_terms = [t for t in terms if t.id not in used_terms_ids and t.code == '']
-        for t in unused_terms:
+        used_ids = {t.id for t in Term.objects.all_used()}
+        to_remove = [t for t in terms if t.id not in used_ids and t.code == '']
+        for t in to_remove:
             if not dry:
                 print 'Removing', t.name_la.encode('utf-8')
                 t.delete()
             else:
                 print '    ', t.name_la.encode('utf-8')
-        print len(unused_terms), "unused terms found", ("and deleted" if not dry else "")
+        print len(to_remove), "unused terms found", ("and deleted" if not dry else "")
 
     def find_duplicates(self, t):
         terms = Term.objects.filter(name_la=t.name_la).exclude(id=t.id)
