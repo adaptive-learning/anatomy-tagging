@@ -516,11 +516,13 @@ angular.module('anatomy.tagging.controllers', [])
   $scope.exportDomain = $routeParams.exportdomain || 'anatom.cz';
   $http.get('/relationtree?relations=["' + $routeParams.type + '"]' + ($scope.filter == 'all' ? '&all=1' : '')).success(function(data) {
     $scope.relations = data.relations;
+    $scope.processedRelations = {};
 
     var relation = data.relations[data.next];
     if (relation.children.length) {
       for (var j = 0; j < relation.children.length; j++) {
         relation.children[j] = $scope.relations[relation.children[j]];
+        $scope.processedRelations[relation.children[j]] = true;
       }
     }
     relation.index = 1;
@@ -533,7 +535,20 @@ angular.module('anatomy.tagging.controllers', [])
       }
       if (relation.children.length) {
         for (var j = 0; j < relation.children.length; j++) {
-          relation.children[j] = $scope.relations[relation.children[j]];
+          if (typeof $scope.processedRelations[relation.children[j]] == 'undefined') {
+            $scope.processedRelations[relation.children[j]] = true;
+            relation.children[j] = $scope.relations[relation.children[j]];
+          } else {
+            child = $scope.relations[relation.children[j]];
+            if (typeof child == 'undefined') {
+              relation.children[j] = undefined;
+              continue;
+            }
+            child = JSON.parse(JSON.stringify($scope.relations[relation.children[j]]))
+            child.children = [];
+            child.repeated = true;
+            relation.children[j] = child;
+          }
         }
         relation.children = relation.children.filter(function(child) { return typeof child != 'undefined' });
       }

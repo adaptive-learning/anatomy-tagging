@@ -9,15 +9,19 @@
       {{node.state == 'unknown' && 'btn-default'}}
       "
        scroll-top-on-click >
-      {{node.term1.name_la ? node.term1.name_la : node.term1.name_en}}
+      {{ (node.term1.name_la ? node.term1.name_la : node.term1.name_en).split(';')[0] }}
       &rarr;
-      {{node.term2.name_la ? node.term2.name_la : node.term2.name_en}}
+      {{ (node.term2.name_la ? node.term2.name_la : node.term2.name_en).split(';')[0] }}
     </a>
+
     <a class="btn btn-sm btn-default" href=""
-      scroll-top-on-click
+      scroll-top-on-click ng-hide="node.repeated"
       ng-click="addChild(node)" title="Přidat podčást">
       &nbsp; <i class="glyphicon glyphicon-plus"></i> &nbsp;
     </a>
+    <span class="btn btn-sm btn-default disabled" ng-show="node.repeated">
+      &nbsp; <i class="glyphicon glyphicon-remove"></i> &nbsp;
+    </span>
   </span>
 </div>
 <ul ui-tree-nodes="" ng-model="node.children">
