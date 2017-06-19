@@ -66,9 +66,9 @@ class Command(BaseCommand):
         terms = Term.objects.prepare_related().all()
         self.terms = {}
         for t in terms:
-            for name in t.name_la.split(';'):
+            for name in t.name_la.split(';') if t.name_la is not None else []:
                 self.terms[name.lower()] = t
-            for name in t.name_en.split(';'):
+            for name in t.name_en.split(';') if t.name_en is not None else []:
                 self.terms[name.lower()] = t
 
     def get_term_name(self, cell):
